@@ -4,13 +4,17 @@ import { Bell, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const Header = () => {
+interface HeaderProps {
+  pageTitle?: string;
+}
+
+const Header = ({ pageTitle = "Dashboard" }: HeaderProps) => {
   const [notifications, setNotifications] = useState(3);
 
   return (
     <header className="flex items-center justify-between px-6 py-3 bg-white border-b">
       <div className="flex items-center gap-4">
-        <h1 className="text-xl font-semibold text-xiracom-blue">Dashboard</h1>
+        <h1 className="text-xl font-semibold text-xiracom-blue">{pageTitle}</h1>
         <div className="hidden md:flex relative w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
