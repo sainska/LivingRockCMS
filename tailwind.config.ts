@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Xiracom colors
+				xiracom: {
+					blue: '#0071BC',
+					orange: '#F7941D',
+					darkblue: '#005999',
+					lightorange: '#FFAD4D',
+					gray: '#F0F0F0'
 				}
 			},
 			borderRadius: {
