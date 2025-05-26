@@ -1,44 +1,37 @@
 
-import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LucideIcon } from "lucide-react";
 
-interface StatsCardProps {
+export interface StatsCardProps {
   title: string;
-  value: string;
-  icon: ReactNode;
-  change?: string;
-  isPositive?: boolean;
-  className?: string;
+  value: string | number;
+  icon: LucideIcon;
+  description?: string;
+  trend?: {
+    value: number;
+    isPositive: boolean;
+  };
 }
 
-const StatsCard = ({
-  title,
-  value,
-  icon,
-  change,
-  isPositive = true,
-  className,
-}: StatsCardProps) => {
+const StatsCard = ({ title, value, icon: Icon, description, trend }: StatsCardProps) => {
   return (
-    <div className={cn("stats-card", className)}>
-      <div className="flex justify-between">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <h3 className="text-2xl font-bold mt-1">{value}</h3>
-          {change && (
-            <p
-              className={cn(
-                "text-xs font-medium mt-1",
-                isPositive ? "text-green-600" : "text-red-600"
-              )}
-            >
-              {isPositive ? "+" : "-"}{change} since last month
-            </p>
-          )}
-        </div>
-        <div className="p-2 rounded-lg bg-muted/50">{icon}</div>
-      </div>
-    </div>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-xiracom-blue">{title}</CardTitle>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        {description && (
+          <p className="text-xs text-muted-foreground">{description}</p>
+        )}
+        {trend && (
+          <p className={`text-xs ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
+            {trend.isPositive ? '+' : ''}{trend.value}% from last month
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

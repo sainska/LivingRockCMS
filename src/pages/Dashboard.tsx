@@ -1,5 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, Calendar, DollarSign, TrendingUp } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import DonationChart from "@/components/dashboard/DonationChart";
 import RecentDonations from "@/components/dashboard/RecentDonations";
@@ -22,10 +23,40 @@ const Dashboard = () => {
       {/* Quick Actions */}
       <QuickActions />
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatsCard
+          title="Total Members"
+          value={1247}
+          icon={Users}
+          description="Active congregation members"
+          trend={{ value: 5.2, isPositive: true }}
+        />
+        <StatsCard
+          title="This Month's Giving"
+          value="KSh 850,000"
+          icon={DollarSign}
+          description="Tithes and offerings"
+          trend={{ value: 12.3, isPositive: true }}
+        />
+        <StatsCard
+          title="Upcoming Events"
+          value={8}
+          icon={Calendar}
+          description="Events this month"
+        />
+        <StatsCard
+          title="Attendance Growth"
+          value="15.2%"
+          icon={TrendingUp}
+          description="Compared to last month"
+          trend={{ value: 15.2, isPositive: true }}
+        />
+      </div>
+
       {/* Dashboard Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <StatsCard />
           <DonationChart />
         </div>
         
