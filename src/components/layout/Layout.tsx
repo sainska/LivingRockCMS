@@ -16,18 +16,18 @@ const Layout = ({ children }: LayoutProps) => {
     // Update page title based on current route
     const path = location.pathname;
     if (path === "/") setPageTitle("Dashboard");
-    else if (path === "/members") setPageTitle("Members");
+    else if (path === "/members") setPageTitle("Member Management");
     else if (path === "/finances") setPageTitle("Financial Management");
     else if (path === "/events") setPageTitle("Events & Scheduling");
     else if (path === "/ministry") setPageTitle("Ministry Support");
     else if (path === "/communication") setPageTitle("Communication Tools");
     else if (path === "/reports") setPageTitle("Reports & Analytics");
-    else if (path === "/security") setPageTitle("Security");
+    else if (path === "/security") setPageTitle("Security & Access");
     else if (path === "/settings") setPageTitle("System Settings");
     else setPageTitle("Dashboard");
 
     // Update page title in browser
-    document.title = `Church Treasurer - ${pageTitle}`;
+    document.title = `Living Rock Church - ${pageTitle}`;
   }, [location.pathname, pageTitle]);
 
   return (

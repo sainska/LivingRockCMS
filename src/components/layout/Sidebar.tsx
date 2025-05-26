@@ -54,7 +54,12 @@ const Sidebar = () => {
       )}
     >
       <div className="flex items-center justify-between p-4">
-        {!collapsed && <span className="text-xl font-bold text-sidebar-foreground">ChurchTreasurer</span>}
+        {!collapsed && (
+          <div className="text-sidebar-foreground">
+            <div className="text-xl font-bold">Living Rock</div>
+            <div className="text-sm opacity-80">Church Management</div>
+          </div>
+        )}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="p-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground"
@@ -125,7 +130,7 @@ const Sidebar = () => {
       <div className="p-4">
         {!collapsed && (
           <div className="text-xs text-sidebar-foreground opacity-70">
-            © {new Date().getFullYear()} ChurchTreasurer
+            © {new Date().getFullYear()} Living Rock Church
           </div>
         )}
       </div>

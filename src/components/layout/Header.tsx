@@ -19,7 +19,7 @@ const Header = ({ pageTitle = "Dashboard" }: HeaderProps) => {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search..."
+            placeholder="Search members, events..."
             className="pl-8 bg-muted"
           />
         </div>
@@ -38,7 +38,7 @@ const Header = ({ pageTitle = "Dashboard" }: HeaderProps) => {
         </div>
         <div className="flex items-center gap-2">
           <div className="hidden md:block text-right">
-            <p className="text-sm font-medium">John Doe</p>
+            <p className="text-sm font-medium">Pastor John Doe</p>
             <p className="text-xs text-muted-foreground">Administrator</p>
           </div>
           <Button variant="ghost" size="icon" className="rounded-full">
