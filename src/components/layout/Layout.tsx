@@ -3,6 +3,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import Footer from "./Footer";
 
 interface LayoutProps {
   children: ReactNode;
@@ -36,6 +37,7 @@ const Layout = ({ children }: LayoutProps) => {
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header pageTitle={pageTitle} />
         <main className="flex-1 overflow-auto p-6 bg-gray-50">{children}</main>
+        <Footer />
       </div>
     </div>
   );
