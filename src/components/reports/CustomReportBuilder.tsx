@@ -193,8 +193,8 @@ const CustomReportBuilder = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="equals">=</SelectItem>
-                        <SelectItem value="greater">></SelectItem>
-                        <SelectItem value="less"><</SelectItem>
+                        <SelectItem value="greater">&gt;</SelectItem>
+                        <SelectItem value="less">&lt;</SelectItem>
                         <SelectItem value="contains">Contains</SelectItem>
                       </SelectContent>
                     </Select>
