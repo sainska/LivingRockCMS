@@ -16,18 +16,15 @@ const Layout = ({ children }: LayoutProps) => {
   useEffect(() => {
     // Update page title based on current route
     const path = location.pathname;
-    if (path === "/") setPageTitle("Dashboard Overview");
-    else if (path === "/member-profile") setPageTitle("Member Profile");
-    else if (path === "/events-services") setPageTitle("Events & Services");
-    else if (path === "/spiritual-journey") setPageTitle("Spiritual Journey");
-    else if (path === "/ministries-groups") setPageTitle("Ministries & Groups");
-    else if (path === "/giving-donations") setPageTitle("Giving & Donations");
-    else if (path === "/announcements-news") setPageTitle("Announcements & News");
-    else if (path === "/volunteer-service") setPageTitle("Volunteer & Service");
-    else if (path === "/resources-media") setPageTitle("Resources & Media");
-    else if (path === "/messaging-communication") setPageTitle("Messaging & Communication");
-    else if (path === "/settings-preferences") setPageTitle("Settings & Preferences");
-    else if (path === "/feedback-testimonies") setPageTitle("Feedback & Testimonies");
+    if (path === "/") setPageTitle("Dashboard");
+    else if (path === "/members") setPageTitle("Member Management");
+    else if (path === "/finances") setPageTitle("Financial Management");
+    else if (path === "/events") setPageTitle("Events & Scheduling");
+    else if (path === "/ministry") setPageTitle("Ministry Support");
+    else if (path === "/communication") setPageTitle("Communication Tools");
+    else if (path === "/reports") setPageTitle("Reports & Analytics");
+    else if (path === "/security") setPageTitle("Security & Access");
+    else if (path === "/settings") setPageTitle("System Settings");
     else setPageTitle("Dashboard");
 
     // Update page title in browser
