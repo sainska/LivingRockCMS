@@ -34,13 +34,9 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
-          {/* Protected Routes with Layout */}
+          {/* Admin Routes with Layout */}
           <Route path="/" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/dashboard/member" element={<Layout><Dashboard /></Layout>} />
           <Route path="/dashboard/admin" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/dashboard/clergy" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/dashboard/treasurer" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/dashboard/secretary" element={<Layout><Dashboard /></Layout>} />
           
           <Route path="/members" element={<Layout><Members /></Layout>} />
           <Route path="/finances" element={<Layout><Finances /></Layout>} />

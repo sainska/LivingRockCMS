@@ -18,18 +18,18 @@ const Settings = () => {
 
   // Simulate checking user role - in real app this would come from auth context
   useEffect(() => {
-    // Simulating treasurer role for demonstration
-    const simulatedUserRole = "Treasurer"; // Change this to test different roles
+    // Simulating admin role for demonstration
+    const simulatedUserRole = "Admin"; // Change this to test different roles
     setUserRole(simulatedUserRole);
   }, []);
 
-  // Check if user has treasurer privileges
-  const isTreasurer = userRole === "Treasurer" || userRole === "Clergy" || userRole === "Admin";
+  // Check if user has admin privileges
+  const isAdmin = userRole === "Admin" || userRole === "Clergy";
 
-  if (!isTreasurer) {
+  if (!isAdmin) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">System Settings</h1>
+        <h1 className="text-3xl font-bold">System Administration</h1>
         
         <Card className="max-w-2xl mx-auto">
           <CardContent className="p-8 text-center">
@@ -37,21 +37,21 @@ const Settings = () => {
               <Lock className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-muted-foreground mb-2">Access Restricted</h2>
               <p className="text-muted-foreground mb-4">
-                This section is restricted to church treasurers and administrators only.
+                This section is restricted to system administrators only.
               </p>
             </div>
             
             <Alert>
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Access Denied:</strong> You need treasurer-level permissions to access system settings. 
-                Please contact your church administrator if you need access to this section.
+                <strong>Access Denied:</strong> You need administrator-level permissions to access system administration. 
+                Please contact your system administrator if you need access to this section.
               </AlertDescription>
             </Alert>
             
             <div className="mt-6 text-sm text-muted-foreground">
               <p>Your current role: <strong>{userRole}</strong></p>
-              <p>Required role: <strong>Treasurer, Clergy, or Admin</strong></p>
+              <p>Required role: <strong>Admin or Clergy</strong></p>
             </div>
           </CardContent>
         </Card>

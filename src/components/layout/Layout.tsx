@@ -11,21 +11,21 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
-  const [pageTitle, setPageTitle] = useState("Dashboard");
+  const [pageTitle, setPageTitle] = useState("Admin Dashboard");
 
   useEffect(() => {
     // Update page title based on current route
     const path = location.pathname;
-    if (path === "/") setPageTitle("Dashboard");
-    else if (path === "/members") setPageTitle("Member Management");
-    else if (path === "/finances") setPageTitle("Financial Management");
-    else if (path === "/events") setPageTitle("Events & Scheduling");
-    else if (path === "/ministry") setPageTitle("Ministry Support");
-    else if (path === "/communication") setPageTitle("Communication Tools");
-    else if (path === "/reports") setPageTitle("Reports & Analytics");
-    else if (path === "/security") setPageTitle("Security & Access");
-    else if (path === "/settings") setPageTitle("System Settings");
-    else setPageTitle("Dashboard");
+    if (path === "/") setPageTitle("Admin Dashboard");
+    else if (path === "/members") setPageTitle("User Management");
+    else if (path === "/finances") setPageTitle("System Data Management");
+    else if (path === "/events") setPageTitle("System Events");
+    else if (path === "/ministry") setPageTitle("Content Management");
+    else if (path === "/communication") setPageTitle("System Communications");
+    else if (path === "/reports") setPageTitle("System Reports");
+    else if (path === "/security") setPageTitle("Security & Access Control");
+    else if (path === "/settings") setPageTitle("System Administration");
+    else setPageTitle("Admin Dashboard");
 
     // Update page title in browser
     document.title = `Living Rock Church - ${pageTitle}`;

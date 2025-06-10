@@ -4,10 +4,10 @@ import { Link, useLocation } from "react-router-dom";
 import { 
   ChevronLeft, 
   ChevronRight, 
-  Home, 
+  LayoutDashboard, 
   Users, 
   Calendar, 
-  DollarSign, 
+  Database, 
   BookOpen, 
   MessageCircle, 
   Settings, 
@@ -57,7 +57,7 @@ const Sidebar = () => {
         {!collapsed && (
           <div className="text-sidebar-foreground">
             <div className="text-xl font-bold">Living Rock</div>
-            <div className="text-sm opacity-80">Church Management</div>
+            <div className="text-sm opacity-80">System Administration</div>
           </div>
         )}
         <button
@@ -72,56 +72,56 @@ const Sidebar = () => {
         <nav className="flex flex-col gap-1">
           <NavItem
             href="/"
-            icon={<Home size={20} />}
-            title="Dashboard"
+            icon={<LayoutDashboard size={20} />}
+            title="Admin Dashboard"
             isCollapsed={collapsed}
           />
           <NavItem
             href="/members"
             icon={<Users size={20} />}
-            title="Members"
+            title="User Management"
             isCollapsed={collapsed}
           />
           <NavItem
             href="/finances"
-            icon={<DollarSign size={20} />}
-            title="Finances"
+            icon={<Database size={20} />}
+            title="System Data"
             isCollapsed={collapsed}
           />
           <NavItem
             href="/events"
             icon={<Calendar size={20} />}
-            title="Events"
+            title="System Events"
             isCollapsed={collapsed}
           />
           <NavItem
             href="/ministry"
             icon={<BookOpen size={20} />}
-            title="Ministry"
+            title="Content Management"
             isCollapsed={collapsed}
           />
           <NavItem
             href="/communication"
             icon={<MessageCircle size={20} />}
-            title="Communication"
+            title="System Communications"
             isCollapsed={collapsed}
           />
           <NavItem
             href="/reports"
             icon={<BarChart size={20} />}
-            title="Reports"
+            title="System Reports"
             isCollapsed={collapsed}
           />
           <NavItem
             href="/security"
             icon={<Shield size={20} />}
-            title="Security"
+            title="Security & Access"
             isCollapsed={collapsed}
           />
           <NavItem
             href="/settings"
             icon={<Settings size={20} />}
-            title="Settings"
+            title="System Settings"
             isCollapsed={collapsed}
           />
         </nav>
@@ -131,6 +131,8 @@ const Sidebar = () => {
         {!collapsed && (
           <div className="text-xs text-sidebar-foreground opacity-70">
             © {new Date().getFullYear()} Living Rock Church
+            <br />
+            System Administration Panel
           </div>
         )}
       </div>
