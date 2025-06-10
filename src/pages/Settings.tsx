@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Shield, Settings as SettingsIcon, AlertTriangle, Lock } from "lucide-react";
+import { Shield, Settings as SettingsIcon, AlertTriangle, Lock, LayoutDashboard } from "lucide-react";
+import AdminDashboard from "@/components/admin/AdminDashboard";
 import SystemSettings from "@/components/settings/SystemSettings";
 import ChurchSettings from "@/components/settings/ChurchSettings";
 import UserManagement from "@/components/settings/UserManagement";
@@ -12,13 +13,12 @@ import BackupSettings from "@/components/settings/BackupSettings";
 import IntegrationSettings from "@/components/settings/IntegrationSettings";
 
 const Settings = () => {
-  const [userRole, setUserRole] = useState<string>("Member"); // This would come from authentication context
-  const [activeTab, setActiveTab] = useState("church");
+  const [userRole, setUserRole] = useState<string>("Member");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   // Simulate checking user role - in real app this would come from auth context
   useEffect(() => {
     // Simulating treasurer role for demonstration
-    // In a real app, this would be fetched from your authentication system
     const simulatedUserRole = "Treasurer"; // Change this to test different roles
     setUserRole(simulatedUserRole);
   }, []);
@@ -62,10 +62,10 @@ const Settings = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">System Settings</h1>
+        <h1 className="text-3xl font-bold">System Administration</h1>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Shield className="h-4 w-4" />
-          <span>Treasurer Access Level</span>
+          <span>Admin Access Level</span>
         </div>
       </div>
 
@@ -73,28 +73,36 @@ const Settings = () => {
       <Alert>
         <Shield className="h-4 w-4" />
         <AlertDescription>
-          <strong>Treasurer Access Granted:</strong> You have full access to all system settings. 
+          <strong>Admin Access Granted:</strong> You have full access to all system administration features. 
           Please use these settings responsibly as they affect the entire church management system.
         </AlertDescription>
       </Alert>
 
-      {/* Settings Tabs */}
+      {/* Admin Dashboard Tabs */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <SettingsIcon className="h-5 w-5" />
-            Church Management Settings
+            Living Rock Church - System Administration
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
+              <TabsTrigger value="dashboard">
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Dashboard
+              </TabsTrigger>
               <TabsTrigger value="church">Church Info</TabsTrigger>
               <TabsTrigger value="system">System</TabsTrigger>
-              <TabsTrigger value="users">User Management</TabsTrigger>
-              <TabsTrigger value="backup">Backup & Data</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="backup">Backup</TabsTrigger>
               <TabsTrigger value="integrations">Integrations</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="dashboard">
+              <AdminDashboard />
+            </TabsContent>
 
             <TabsContent value="church">
               <ChurchSettings />

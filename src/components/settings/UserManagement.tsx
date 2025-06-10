@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -231,7 +230,6 @@ const UserManagement = () => {
                       <Switch
                         checked={user.status === "Active"}
                         onCheckedChange={() => handleStatusToggle(user.id)}
-                        size="sm"
                       />
                     </div>
                   </TableCell>
