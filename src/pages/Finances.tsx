@@ -3,49 +3,46 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Plus, Filter } from "lucide-react";
-import DonationChart from "@/components/dashboard/DonationChart";
-import RecentDonations from "@/components/dashboard/RecentDonations";
-import { Input } from "@/components/ui/input";
+import { Download, Plus, Filter, Database, FileText, Users, Calendar } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Sample data for expenses
-const expenses = [
-  { id: "EXP-1234", category: "Utilities", description: "Electricity Bill", amount: "$450.00", date: "2025-05-15", approvedBy: "Sarah Johnson" },
-  { id: "EXP-1235", category: "Salaries", description: "Staff Salaries - May", amount: "$12,500.00", date: "2025-05-10", approvedBy: "Robert Miller" },
-  { id: "EXP-1236", category: "Supplies", description: "Office Supplies", amount: "$275.50", date: "2025-05-08", approvedBy: "Sarah Johnson" },
-  { id: "EXP-1237", category: "Maintenance", description: "AC Repair", amount: "$850.00", date: "2025-05-05", approvedBy: "John Smith" },
-  { id: "EXP-1238", category: "Events", description: "Youth Camp Deposit", amount: "$2,000.00", date: "2025-05-03", approvedBy: "Robert Miller" },
+// Sample data for system records
+const systemRecords = [
+  { id: "SYS-1234", category: "User Activity", description: "New member registration", count: "15", date: "2025-05-15", status: "Active" },
+  { id: "SYS-1235", category: "Events", description: "Weekly Service", count: "890", date: "2025-05-10", status: "Completed" },
+  { id: "SYS-1236", category: "Ministry", description: "Youth Group Meeting", count: "45", date: "2025-05-08", status: "Active" },
+  { id: "SYS-1237", category: "Communication", description: "Newsletter Sent", count: "1200", date: "2025-05-05", status: "Completed" },
+  { id: "SYS-1238", category: "Events", description: "Community Outreach", count: "150", date: "2025-05-03", status: "Planned" },
 ];
 
-// Sample data for pledges
-const pledges = [
-  { id: "PLG-1234", campaign: "Building Fund", name: "John Smith", pledged: "$5,000.00", fulfilled: "$2,500.00", status: "In Progress", endDate: "2025-12-31" },
-  { id: "PLG-1235", campaign: "Building Fund", name: "Jane Cooper", pledged: "$10,000.00", fulfilled: "$10,000.00", status: "Completed", endDate: "2025-12-31" },
-  { id: "PLG-1236", campaign: "Mission Trip", name: "Robert Johnson", pledged: "$2,500.00", fulfilled: "$500.00", status: "In Progress", endDate: "2025-08-15" },
-  { id: "PLG-1237", campaign: "Mission Trip", name: "Sarah Williams", pledged: "$1,500.00", fulfilled: "$0.00", status: "Not Started", endDate: "2025-08-15" },
-  { id: "PLG-1238", campaign: "Building Fund", name: "Michael Brown", pledged: "$7,500.00", fulfilled: "$5,000.00", status: "In Progress", endDate: "2025-12-31" },
+// Sample data for member engagement
+const memberEngagement = [
+  { id: "ENG-1234", activity: "Weekly Services", member: "John Smith", participation: "Regular", level: "High", endDate: "Ongoing" },
+  { id: "ENG-1235", activity: "Bible Study", member: "Jane Cooper", participation: "Weekly", level: "High", endDate: "Ongoing" },
+  { id: "ENG-1236", activity: "Youth Ministry", member: "Robert Johnson", participation: "Monthly", level: "Medium", endDate: "2025-08-15" },
+  { id: "ENG-1237", activity: "Volunteer Work", member: "Sarah Williams", participation: "Occasional", level: "Low", endDate: "Ongoing" },
+  { id: "ENG-1238", activity: "Choir Practice", member: "Michael Brown", participation: "Weekly", level: "High", endDate: "Ongoing" },
 ];
 
-// Sample data for budget
-const budgetCategories = [
-  { id: 1, name: "Staff Salaries", budgeted: "$150,000.00", spent: "$62,500.00", remaining: "$87,500.00", percentUsed: 42 },
-  { id: 2, name: "Utilities", budgeted: "$24,000.00", spent: "$10,250.00", remaining: "$13,750.00", percentUsed: 43 },
-  { id: 3, name: "Maintenance", budgeted: "$30,000.00", spent: "$15,750.00", remaining: "$14,250.00", percentUsed: 53 },
-  { id: 4, name: "Ministry Programs", budgeted: "$45,000.00", spent: "$18,500.00", remaining: "$26,500.00", percentUsed: 41 },
-  { id: 5, name: "Outreach & Missions", budgeted: "$60,000.00", spent: "$22,800.00", remaining: "$37,200.00", percentUsed: 38 },
+// Sample data for system metrics
+const systemMetrics = [
+  { id: 1, name: "User Management", total: "1,247", active: "890", inactive: "357", growth: 12 },
+  { id: 2, name: "Event Management", total: "45", completed: "38", upcoming: "7", growth: 15 },
+  { id: 3, name: "Ministry Programs", total: "12", active: "10", planning: "2", growth: 8 },
+  { id: 4, name: "Communication", total: "156", sent: "145", scheduled: "11", growth: 22 },
+  { id: 5, name: "Member Engagement", total: "780", high: "450", medium: "230", growth: 18 },
 ];
 
-const getPledgeStatusBadge = (status: string) => {
-  switch (status) {
-    case "Completed":
-      return <Badge className="bg-green-500">Completed</Badge>;
-    case "In Progress":
-      return <Badge className="bg-xiracom-blue">In Progress</Badge>;
-    case "Not Started":
-      return <Badge variant="outline" className="text-gray-500">Not Started</Badge>;
+const getEngagementBadge = (level: string) => {
+  switch (level) {
+    case "High":
+      return <Badge className="bg-green-500">High</Badge>;
+    case "Medium":
+      return <Badge className="bg-xiracom-blue">Medium</Badge>;
+    case "Low":
+      return <Badge variant="outline" className="text-gray-500">Low</Badge>;
     default:
       return null;
   }
@@ -57,7 +54,7 @@ const Finances = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Financial Management</h1>
+        <h1 className="text-3xl font-bold">System Data Management</h1>
         <div className="flex gap-2">
           <Select defaultValue={year} onValueChange={setYear}>
             <SelectTrigger className="w-[120px]">
@@ -73,30 +70,28 @@ const Finances = () => {
             </SelectContent>
           </Select>
           <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue">
-            <Plus className="mr-2 h-4 w-4" /> New Transaction
+            <Plus className="mr-2 h-4 w-4" /> New Record
           </Button>
         </div>
       </div>
       
-      <Tabs defaultValue="donations">
+      <Tabs defaultValue="records">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="donations">Donations</TabsTrigger>
-          <TabsTrigger value="expenses">Expenses</TabsTrigger>
-          <TabsTrigger value="pledges">Pledges</TabsTrigger>
-          <TabsTrigger value="budget">Budget</TabsTrigger>
+          <TabsTrigger value="records">System Records</TabsTrigger>
+          <TabsTrigger value="engagement">Member Engagement</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="metrics">System Metrics</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="donations" className="space-y-6 pt-4">
-          <DonationChart />
-          <RecentDonations />
-        </TabsContent>
-        
-        <TabsContent value="expenses" className="pt-4">
+        <TabsContent value="records" className="pt-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Expense Tracking</CardTitle>
-                <CardDescription>Manage and track church expenses</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="h-5 w-5" />
+                  System Activity Records
+                </CardTitle>
+                <CardDescription>Track and manage system activities and events</CardDescription>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline">
@@ -106,7 +101,7 @@ const Finances = () => {
                   <Download className="mr-2 h-4 w-4" /> Export
                 </Button>
                 <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue">
-                  <Plus className="mr-2 h-4 w-4" /> Add Expense
+                  <Plus className="mr-2 h-4 w-4" /> Add Record
                 </Button>
               </div>
             </CardHeader>
@@ -118,21 +113,25 @@ const Finances = () => {
                       <TableHead>ID</TableHead>
                       <TableHead>Category</TableHead>
                       <TableHead>Description</TableHead>
-                      <TableHead>Amount</TableHead>
+                      <TableHead>Count</TableHead>
                       <TableHead>Date</TableHead>
-                      <TableHead>Approved By</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {expenses.map((expense) => (
-                      <TableRow key={expense.id}>
-                        <TableCell className="font-medium">{expense.id}</TableCell>
-                        <TableCell>{expense.category}</TableCell>
-                        <TableCell>{expense.description}</TableCell>
-                        <TableCell>{expense.amount}</TableCell>
-                        <TableCell>{expense.date}</TableCell>
-                        <TableCell>{expense.approvedBy}</TableCell>
+                    {systemRecords.map((record) => (
+                      <TableRow key={record.id}>
+                        <TableCell className="font-medium">{record.id}</TableCell>
+                        <TableCell>{record.category}</TableCell>
+                        <TableCell>{record.description}</TableCell>
+                        <TableCell>{record.count}</TableCell>
+                        <TableCell>{record.date}</TableCell>
+                        <TableCell>
+                          <Badge variant={record.status === "Completed" ? "default" : "outline"}>
+                            {record.status}
+                          </Badge>
+                        </TableCell>
                         <TableCell>
                           <div className="flex space-x-1">
                             <Button variant="outline" size="sm">View</Button>
@@ -148,19 +147,22 @@ const Finances = () => {
           </Card>
         </TabsContent>
         
-        <TabsContent value="pledges" className="pt-4">
+        <TabsContent value="engagement" className="pt-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Campaign Pledges</CardTitle>
-                <CardDescription>Track pledge campaigns and fulfillment</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Member Engagement Tracking
+                </CardTitle>
+                <CardDescription>Monitor member participation and engagement levels</CardDescription>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline">
-                  <Filter className="mr-2 h-4 w-4" /> Filter by Campaign
+                  <Filter className="mr-2 h-4 w-4" /> Filter by Activity
                 </Button>
                 <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue">
-                  <Plus className="mr-2 h-4 w-4" /> New Campaign
+                  <Plus className="mr-2 h-4 w-4" /> New Engagement
                 </Button>
               </div>
             </CardHeader>
@@ -170,24 +172,22 @@ const Finances = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>ID</TableHead>
-                      <TableHead>Campaign</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Pledged</TableHead>
-                      <TableHead>Fulfilled</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Activity</TableHead>
+                      <TableHead>Member</TableHead>
+                      <TableHead>Participation</TableHead>
+                      <TableHead>Engagement Level</TableHead>
                       <TableHead>End Date</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {pledges.map((pledge) => (
-                      <TableRow key={pledge.id}>
-                        <TableCell className="font-medium">{pledge.id}</TableCell>
-                        <TableCell>{pledge.campaign}</TableCell>
-                        <TableCell>{pledge.name}</TableCell>
-                        <TableCell>{pledge.pledged}</TableCell>
-                        <TableCell>{pledge.fulfilled}</TableCell>
-                        <TableCell>{getPledgeStatusBadge(pledge.status)}</TableCell>
-                        <TableCell>{pledge.endDate}</TableCell>
+                    {memberEngagement.map((engagement) => (
+                      <TableRow key={engagement.id}>
+                        <TableCell className="font-medium">{engagement.id}</TableCell>
+                        <TableCell>{engagement.activity}</TableCell>
+                        <TableCell>{engagement.member}</TableCell>
+                        <TableCell>{engagement.participation}</TableCell>
+                        <TableCell>{getEngagementBadge(engagement.level)}</TableCell>
+                        <TableCell>{engagement.endDate}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -197,19 +197,80 @@ const Finances = () => {
           </Card>
         </TabsContent>
         
-        <TabsContent value="budget" className="pt-4">
+        <TabsContent value="analytics" className="pt-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Budget Planning</CardTitle>
-                <CardDescription>Yearly budget allocation and tracking</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  System Analytics
+                </CardTitle>
+                <CardDescription>Analyze system performance and user engagement</CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline">
+                  <Download className="mr-2 h-4 w-4" /> Export Analytics
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <Users className="h-8 w-8 text-blue-600" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total Users</p>
+                        <p className="text-2xl font-bold">1,247</p>
+                        <p className="text-sm text-green-600">+5.2% this month</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <Calendar className="h-8 w-8 text-green-600" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Active Events</p>
+                        <p className="text-2xl font-bold">45</p>
+                        <p className="text-sm text-green-600">+8.3% this month</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <Database className="h-8 w-8 text-purple-600" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Data Records</p>
+                        <p className="text-2xl font-bold">12,456</p>
+                        <p className="text-sm text-green-600">+15.7% this month</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="metrics" className="pt-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>System Performance Metrics</CardTitle>
+                <CardDescription>Monitor system performance across different modules</CardDescription>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline">
                   <Download className="mr-2 h-4 w-4" /> Export
                 </Button>
                 <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue">
-                  <Plus className="mr-2 h-4 w-4" /> Update Budget
+                  <Plus className="mr-2 h-4 w-4" /> Update Metrics
                 </Button>
               </div>
             </CardHeader>
@@ -218,30 +279,30 @@ const Finances = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Budgeted</TableHead>
-                      <TableHead>Spent</TableHead>
-                      <TableHead>Remaining</TableHead>
-                      <TableHead>% Used</TableHead>
+                      <TableHead>Module</TableHead>
+                      <TableHead>Total Records</TableHead>
+                      <TableHead>Active</TableHead>
+                      <TableHead>Inactive/Other</TableHead>
+                      <TableHead>Growth %</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {budgetCategories.map((category) => (
-                      <TableRow key={category.id}>
-                        <TableCell className="font-medium">{category.name}</TableCell>
-                        <TableCell>{category.budgeted}</TableCell>
-                        <TableCell>{category.spent}</TableCell>
-                        <TableCell>{category.remaining}</TableCell>
+                    {systemMetrics.map((metric) => (
+                      <TableRow key={metric.id}>
+                        <TableCell className="font-medium">{metric.name}</TableCell>
+                        <TableCell>{metric.total}</TableCell>
+                        <TableCell>{metric.active}</TableCell>
+                        <TableCell>{metric.inactive}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <div className="w-full bg-gray-200 rounded-full h-2">
                               <div
                                 className="bg-xiracom-blue h-2 rounded-full"
-                                style={{ width: `${category.percentUsed}%` }}
+                                style={{ width: `${metric.growth}%` }}
                               ></div>
                             </div>
-                            <span className="text-sm">{category.percentUsed}%</span>
+                            <span className="text-sm text-green-600">+{metric.growth}%</span>
                           </div>
                         </TableCell>
                         <TableCell>
