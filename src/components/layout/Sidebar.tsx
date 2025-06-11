@@ -4,18 +4,15 @@ import { Link, useLocation } from "react-router-dom";
 import { 
   ChevronLeft, 
   ChevronRight, 
-  Home, 
-  User,
-  Calendar,
-  Heart,
-  Users,
-  DollarSign,
-  Bell,
-  HandHeart,
-  BookOpen,
-  MessageCircle,
-  Settings,
-  FileText
+  LayoutDashboard, 
+  Users, 
+  Calendar, 
+  Database, 
+  BookOpen, 
+  MessageCircle, 
+  Settings, 
+  BarChart, 
+  Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -60,7 +57,7 @@ const Sidebar = () => {
         {!collapsed && (
           <div className="text-sidebar-foreground">
             <div className="text-xl font-bold">Living Rock</div>
-            <div className="text-sm opacity-80">Church Management</div>
+            <div className="text-sm opacity-80">System Administration</div>
           </div>
         )}
         <button
@@ -75,74 +72,56 @@ const Sidebar = () => {
         <nav className="flex flex-col gap-1">
           <NavItem
             href="/"
-            icon={<Home size={20} />}
-            title="Dashboard Overview"
+            icon={<LayoutDashboard size={20} />}
+            title="Admin Dashboard"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/member-profile"
-            icon={<User size={20} />}
-            title="Member Profile"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/events-services"
-            icon={<Calendar size={20} />}
-            title="Events & Services"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/spiritual-journey"
-            icon={<Heart size={20} />}
-            title="Spiritual Journey"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/ministries-groups"
+            href="/members"
             icon={<Users size={20} />}
-            title="Ministries & Groups"
+            title="User Management"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/giving-donations"
-            icon={<DollarSign size={20} />}
-            title="Giving & Donations"
+            href="/finances"
+            icon={<Database size={20} />}
+            title="System Data"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/announcements-news"
-            icon={<Bell size={20} />}
-            title="Announcements & News"
+            href="/events"
+            icon={<Calendar size={20} />}
+            title="System Events"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/volunteer-service"
-            icon={<HandHeart size={20} />}
-            title="Volunteer & Service"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/resources-media"
+            href="/ministry"
             icon={<BookOpen size={20} />}
-            title="Resources & Media"
+            title="Content Management"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/messaging-communication"
+            href="/communication"
             icon={<MessageCircle size={20} />}
-            title="Messaging & Communication"
+            title="System Communications"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/settings-preferences"
+            href="/reports"
+            icon={<BarChart size={20} />}
+            title="System Reports"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/security"
+            icon={<Shield size={20} />}
+            title="Security & Access"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/settings"
             icon={<Settings size={20} />}
-            title="Settings & Preferences"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/feedback-testimonies"
-            icon={<FileText size={20} />}
-            title="Feedback & Testimonies"
+            title="System Settings"
             isCollapsed={collapsed}
           />
         </nav>
@@ -152,6 +131,8 @@ const Sidebar = () => {
         {!collapsed && (
           <div className="text-xs text-sidebar-foreground opacity-70">
             © {new Date().getFullYear()} Living Rock Church
+            <br />
+            System Administration Panel
           </div>
         )}
       </div>

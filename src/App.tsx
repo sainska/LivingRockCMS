@@ -10,17 +10,14 @@ import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import MemberProfile from "./pages/MemberProfile";
-import EventsServices from "./pages/EventsServices";
-import SpiritualJourney from "./pages/SpiritualJourney";
-import MinistriesGroups from "./pages/MinistriesGroups";
-import GivingDonations from "./pages/GivingDonations";
-import AnnouncementsNews from "./pages/AnnouncementsNews";
-import VolunteerService from "./pages/VolunteerService";
-import ResourcesMedia from "./pages/ResourcesMedia";
-import MessagingCommunication from "./pages/MessagingCommunication";
-import SettingsPreferences from "./pages/SettingsPreferences";
-import FeedbackTestimonies from "./pages/FeedbackTestimonies";
+import Members from "./pages/Members";
+import Finances from "./pages/Finances";
+import Events from "./pages/Events";
+import Ministry from "./pages/Ministry";
+import Communication from "./pages/Communication";
+import Reports from "./pages/Reports";
+import Security from "./pages/Security";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,19 +34,18 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
-          {/* Protected Routes with Layout */}
+          {/* Admin Routes with Layout */}
           <Route path="/" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/member-profile" element={<Layout><MemberProfile /></Layout>} />
-          <Route path="/events-services" element={<Layout><EventsServices /></Layout>} />
-          <Route path="/spiritual-journey" element={<Layout><SpiritualJourney /></Layout>} />
-          <Route path="/ministries-groups" element={<Layout><MinistriesGroups /></Layout>} />
-          <Route path="/giving-donations" element={<Layout><GivingDonations /></Layout>} />
-          <Route path="/announcements-news" element={<Layout><AnnouncementsNews /></Layout>} />
-          <Route path="/volunteer-service" element={<Layout><VolunteerService /></Layout>} />
-          <Route path="/resources-media" element={<Layout><ResourcesMedia /></Layout>} />
-          <Route path="/messaging-communication" element={<Layout><MessagingCommunication /></Layout>} />
-          <Route path="/settings-preferences" element={<Layout><SettingsPreferences /></Layout>} />
-          <Route path="/feedback-testimonies" element={<Layout><FeedbackTestimonies /></Layout>} />
+          <Route path="/dashboard/admin" element={<Layout><Dashboard /></Layout>} />
+          
+          <Route path="/members" element={<Layout><Members /></Layout>} />
+          <Route path="/finances" element={<Layout><Finances /></Layout>} />
+          <Route path="/events" element={<Layout><Events /></Layout>} />
+          <Route path="/ministry" element={<Layout><Ministry /></Layout>} />
+          <Route path="/communication" element={<Layout><Communication /></Layout>} />
+          <Route path="/reports" element={<Layout><Reports /></Layout>} />
+          <Route path="/security" element={<Layout><Security /></Layout>} />
+          <Route path="/settings" element={<Layout><Settings /></Layout>} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>

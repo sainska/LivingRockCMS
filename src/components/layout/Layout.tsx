@@ -11,24 +11,21 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
-  const [pageTitle, setPageTitle] = useState("Dashboard");
+  const [pageTitle, setPageTitle] = useState("Admin Dashboard");
 
   useEffect(() => {
     // Update page title based on current route
     const path = location.pathname;
-    if (path === "/") setPageTitle("Dashboard Overview");
-    else if (path === "/member-profile") setPageTitle("Member Profile");
-    else if (path === "/events-services") setPageTitle("Events & Services");
-    else if (path === "/spiritual-journey") setPageTitle("Spiritual Journey");
-    else if (path === "/ministries-groups") setPageTitle("Ministries & Groups");
-    else if (path === "/giving-donations") setPageTitle("Giving & Donations");
-    else if (path === "/announcements-news") setPageTitle("Announcements & News");
-    else if (path === "/volunteer-service") setPageTitle("Volunteer & Service");
-    else if (path === "/resources-media") setPageTitle("Resources & Media");
-    else if (path === "/messaging-communication") setPageTitle("Messaging & Communication");
-    else if (path === "/settings-preferences") setPageTitle("Settings & Preferences");
-    else if (path === "/feedback-testimonies") setPageTitle("Feedback & Testimonies");
-    else setPageTitle("Dashboard");
+    if (path === "/") setPageTitle("Admin Dashboard");
+    else if (path === "/members") setPageTitle("User Management");
+    else if (path === "/finances") setPageTitle("System Data Management");
+    else if (path === "/events") setPageTitle("System Events");
+    else if (path === "/ministry") setPageTitle("Content Management");
+    else if (path === "/communication") setPageTitle("System Communications");
+    else if (path === "/reports") setPageTitle("System Reports");
+    else if (path === "/security") setPageTitle("Security & Access Control");
+    else if (path === "/settings") setPageTitle("System Administration");
+    else setPageTitle("Admin Dashboard");
 
     // Update page title in browser
     document.title = `Living Rock Church - ${pageTitle}`;
