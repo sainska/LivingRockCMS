@@ -2,19 +2,24 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Shield, Settings as SettingsIcon, AlertTriangle, Lock, LayoutDashboard } from "lucide-react";
+import { Shield, Settings as SettingsIcon, AlertTriangle, Lock, LayoutDashboard, Database, Users, Activity, Eye } from "lucide-react";
 import AdminDashboard from "@/components/admin/AdminDashboard";
+import SystemDashboard from "@/components/admin/SystemDashboard";
 import SystemSettings from "@/components/settings/SystemSettings";
 import ChurchSettings from "@/components/settings/ChurchSettings";
 import UserManagement from "@/components/settings/UserManagement";
 import BackupSettings from "@/components/settings/BackupSettings";
 import IntegrationSettings from "@/components/settings/IntegrationSettings";
+import SecurityOverview from "@/components/security/SecurityOverview";
+import UserAccessControl from "@/components/security/UserAccessControl";
+import DataProtection from "@/components/security/DataProtection";
+import SecurityLogs from "@/components/security/SecurityLogs";
+import CheckInSecurity from "@/components/security/CheckInSecurity";
 
 const Settings = () => {
   const [userRole, setUserRole] = useState<string>("Member");
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("admin-dashboard");
 
   // Simulate checking user role - in real app this would come from auth context
   useEffect(() => {
@@ -88,27 +93,52 @@ const Settings = () => {
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="dashboard">
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                Dashboard
+            <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12 gap-1">
+              <TabsTrigger value="admin-dashboard" className="text-xs">
+                <LayoutDashboard className="h-3 w-3 mr-1" />
+                Admin
               </TabsTrigger>
-              <TabsTrigger value="church">Church Info</TabsTrigger>
-              <TabsTrigger value="system">System</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="backup">Backup</TabsTrigger>
-              <TabsTrigger value="integrations">Integrations</TabsTrigger>
+              <TabsTrigger value="system-dashboard" className="text-xs">
+                <Activity className="h-3 w-3 mr-1" />
+                System
+              </TabsTrigger>
+              <TabsTrigger value="church" className="text-xs">Church</TabsTrigger>
+              <TabsTrigger value="system-overview" className="text-xs">Overview</TabsTrigger>
+              <TabsTrigger value="users" className="text-xs">
+                <Users className="h-3 w-3 mr-1" />
+                Users
+              </TabsTrigger>
+              <TabsTrigger value="backup" className="text-xs">
+                <Database className="h-3 w-3 mr-1" />
+                Backup
+              </TabsTrigger>
+              <TabsTrigger value="security-overview" className="text-xs">
+                <Shield className="h-3 w-3 mr-1" />
+                Security
+              </TabsTrigger>
+              <TabsTrigger value="access-control" className="text-xs">Access</TabsTrigger>
+              <TabsTrigger value="data-protection" className="text-xs">Data</TabsTrigger>
+              <TabsTrigger value="security-logs" className="text-xs">
+                <Eye className="h-3 w-3 mr-1" />
+                Logs
+              </TabsTrigger>
+              <TabsTrigger value="checkin-security" className="text-xs">Check-in</TabsTrigger>
+              <TabsTrigger value="integrations" className="text-xs">Integrations</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="dashboard">
+            <TabsContent value="admin-dashboard">
               <AdminDashboard />
+            </TabsContent>
+
+            <TabsContent value="system-dashboard">
+              <SystemDashboard />
             </TabsContent>
 
             <TabsContent value="church">
               <ChurchSettings />
             </TabsContent>
 
-            <TabsContent value="system">
+            <TabsContent value="system-overview">
               <SystemSettings />
             </TabsContent>
 
@@ -118,6 +148,26 @@ const Settings = () => {
 
             <TabsContent value="backup">
               <BackupSettings />
+            </TabsContent>
+
+            <TabsContent value="security-overview">
+              <SecurityOverview />
+            </TabsContent>
+
+            <TabsContent value="access-control">
+              <UserAccessControl />
+            </TabsContent>
+
+            <TabsContent value="data-protection">
+              <DataProtection />
+            </TabsContent>
+
+            <TabsContent value="security-logs">
+              <SecurityLogs />
+            </TabsContent>
+
+            <TabsContent value="checkin-security">
+              <CheckInSecurity />
             </TabsContent>
 
             <TabsContent value="integrations">
