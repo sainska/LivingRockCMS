@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon, Download, Users, Calendar, TrendingUp, FileText, BarChart3 } from "lucide-react";
+import { CalendarIcon, Download, Users, DollarSign, Calendar, TrendingUp, FileText, BarChart3 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import AttendanceReport from "@/components/reports/AttendanceReport";
+import FinancialReport from "@/components/reports/FinancialReport";
 import MembershipReport from "@/components/reports/MembershipReport";
 import EventsReport from "@/components/reports/EventsReport";
 import CustomReportBuilder from "@/components/reports/CustomReportBuilder";
@@ -24,10 +25,10 @@ const Reports = () => {
       color: "text-blue-600"
     },
     {
-      title: "System Events",
-      value: "45",
-      change: "+8.3%",
-      icon: Calendar,
+      title: "Monthly Giving",
+      value: "KSh 850,000",
+      change: "+12.3%",
+      icon: DollarSign,
       color: "text-green-600"
     },
     {
@@ -105,9 +106,10 @@ const Reports = () => {
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="attendance">Attendance</TabsTrigger>
+              <TabsTrigger value="financial">Financial</TabsTrigger>
               <TabsTrigger value="membership">Membership</TabsTrigger>
               <TabsTrigger value="events">Events</TabsTrigger>
               <TabsTrigger value="custom">Custom</TabsTrigger>
@@ -115,7 +117,7 @@ const Reports = () => {
 
             <TabsContent value="overview">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">System Overview Report</h3>
+                <h3 className="text-lg font-semibold">Church Overview Report</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
@@ -128,7 +130,7 @@ const Reports = () => {
                           <span className="text-green-600">+8.1%</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Member Activity</span>
+                          <span>Giving Growth</span>
                           <span className="text-green-600">+12.3%</span>
                         </div>
                         <div className="flex justify-between">
@@ -161,8 +163,8 @@ const Reports = () => {
                           <span className="font-medium">35%</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Active Ministries</span>
-                          <span className="font-medium">12</span>
+                          <span>Giving Families</span>
+                          <span className="font-medium">456</span>
                         </div>
                       </div>
                     </CardContent>
@@ -173,6 +175,10 @@ const Reports = () => {
 
             <TabsContent value="attendance">
               <AttendanceReport period={selectedPeriod} />
+            </TabsContent>
+
+            <TabsContent value="financial">
+              <FinancialReport period={selectedPeriod} />
             </TabsContent>
 
             <TabsContent value="membership">

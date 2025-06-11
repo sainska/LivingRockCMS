@@ -17,19 +17,17 @@ const CustomReportBuilder = () => {
 
   const reportTypes = [
     { value: "attendance", label: "Attendance Report" },
+    { value: "financial", label: "Financial Report" },
     { value: "membership", label: "Membership Report" },
     { value: "events", label: "Events Report" },
-    { value: "engagement", label: "Member Engagement Report" },
-    { value: "system", label: "System Activity Report" },
     { value: "mixed", label: "Mixed Report" }
   ];
 
   const availableFields = {
     attendance: ["Service Name", "Date", "Total Attendance", "Capacity", "Fill Rate"],
+    financial: ["Income Category", "Amount", "Expense Category", "Net Income", "Percentage"],
     membership: ["Member Name", "Age Group", "Join Date", "Ministry Involvement", "Status"],
     events: ["Event Name", "Date", "Type", "Attendance", "Location", "Status"],
-    engagement: ["Member Name", "Activity", "Participation Level", "Frequency", "Duration"],
-    system: ["Module", "Activity Type", "User Count", "Success Rate", "Performance"],
     mixed: ["All Available Fields"]
   };
 
@@ -180,10 +178,9 @@ const CustomReportBuilder = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="date">Date</SelectItem>
-                        <SelectItem value="count">Count</SelectItem>
+                        <SelectItem value="amount">Amount</SelectItem>
                         <SelectItem value="attendance">Attendance</SelectItem>
                         <SelectItem value="status">Status</SelectItem>
-                        <SelectItem value="engagement">Engagement</SelectItem>
                       </SelectContent>
                     </Select>
 
