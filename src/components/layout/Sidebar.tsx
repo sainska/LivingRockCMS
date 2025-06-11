@@ -5,14 +5,17 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Home, 
-  Users, 
-  Calendar, 
-  DollarSign, 
-  BookOpen, 
-  MessageCircle, 
-  Settings, 
-  BarChart, 
-  Shield
+  User,
+  Calendar,
+  Heart,
+  Users,
+  DollarSign,
+  Bell,
+  HandHeart,
+  BookOpen,
+  MessageCircle,
+  Settings,
+  FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -73,55 +76,73 @@ const Sidebar = () => {
           <NavItem
             href="/"
             icon={<Home size={20} />}
-            title="Dashboard"
+            title="Dashboard Overview"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/members"
-            icon={<Users size={20} />}
-            title="Members"
+            href="/member-profile"
+            icon={<User size={20} />}
+            title="Member Profile"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/finances"
-            icon={<DollarSign size={20} />}
-            title="Finances"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/events"
+            href="/events-services"
             icon={<Calendar size={20} />}
-            title="Events"
+            title="Events & Services"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/ministry"
+            href="/spiritual-journey"
+            icon={<Heart size={20} />}
+            title="Spiritual Journey"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/ministries-groups"
+            icon={<Users size={20} />}
+            title="Ministries & Groups"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/giving-donations"
+            icon={<DollarSign size={20} />}
+            title="Giving & Donations"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/announcements-news"
+            icon={<Bell size={20} />}
+            title="Announcements & News"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/volunteer-service"
+            icon={<HandHeart size={20} />}
+            title="Volunteer & Service"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/resources-media"
             icon={<BookOpen size={20} />}
-            title="Ministry"
+            title="Resources & Media"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/communication"
+            href="/messaging-communication"
             icon={<MessageCircle size={20} />}
-            title="Communication"
+            title="Messaging & Communication"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/reports"
-            icon={<BarChart size={20} />}
-            title="Reports"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/security"
-            icon={<Shield size={20} />}
-            title="Security"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/settings"
+            href="/settings-preferences"
             icon={<Settings size={20} />}
-            title="Settings"
+            title="Settings & Preferences"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/feedback-testimonies"
+            icon={<FileText size={20} />}
+            title="Feedback & Testimonies"
             isCollapsed={collapsed}
           />
         </nav>
