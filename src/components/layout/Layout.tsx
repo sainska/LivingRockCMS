@@ -17,6 +17,18 @@ const Layout = ({ children }: LayoutProps) => {
     // Update page title based on current route
     const path = location.pathname;
     if (path === "/") setPageTitle("Admin Dashboard");
+    else if (path === "/system-dashboard") setPageTitle("System Dashboard");
+    else if (path === "/church-info") setPageTitle("Church Information");
+    else if (path === "/system-overview") setPageTitle("System Overview");
+    else if (path === "/users") setPageTitle("User Management");
+    else if (path === "/backup") setPageTitle("Backup & Data Management");
+    else if (path === "/security-overview") setPageTitle("Security Overview");
+    else if (path === "/access-control") setPageTitle("Access Control");
+    else if (path === "/data-protection") setPageTitle("Data Protection");
+    else if (path === "/security-logs") setPageTitle("Security Logs");
+    else if (path === "/checkin-security") setPageTitle("Check-in Security");
+    else if (path === "/integrations") setPageTitle("Integrations");
+    // Legacy routes for backward compatibility
     else if (path === "/members") setPageTitle("User Management");
     else if (path === "/finances") setPageTitle("System Data Management");
     else if (path === "/events") setPageTitle("System Events");

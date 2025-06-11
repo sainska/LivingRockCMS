@@ -36,8 +36,22 @@ const App = () => (
           
           {/* Admin Routes with Layout */}
           <Route path="/" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/dashboard/admin" element={<Layout><Dashboard /></Layout>} />
           
+          {/* New admin dashboard routes */}
+          <Route path="/system-dashboard" element={<Layout><Settings /></Layout>} />
+          <Route path="/church-info" element={<Layout><Settings /></Layout>} />
+          <Route path="/system-overview" element={<Layout><Settings /></Layout>} />
+          <Route path="/users" element={<Layout><Members /></Layout>} />
+          <Route path="/backup" element={<Layout><Settings /></Layout>} />
+          <Route path="/security-overview" element={<Layout><Security /></Layout>} />
+          <Route path="/access-control" element={<Layout><Security /></Layout>} />
+          <Route path="/data-protection" element={<Layout><Security /></Layout>} />
+          <Route path="/security-logs" element={<Layout><Security /></Layout>} />
+          <Route path="/checkin-security" element={<Layout><Security /></Layout>} />
+          <Route path="/integrations" element={<Layout><Settings /></Layout>} />
+          
+          {/* Legacy routes for backward compatibility */}
+          <Route path="/dashboard/admin" element={<Layout><Dashboard /></Layout>} />
           <Route path="/members" element={<Layout><Members /></Layout>} />
           <Route path="/finances" element={<Layout><Finances /></Layout>} />
           <Route path="/events" element={<Layout><Events /></Layout>} />
