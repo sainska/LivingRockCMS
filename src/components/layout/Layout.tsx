@@ -14,7 +14,7 @@ const Layout = ({ children }: LayoutProps) => {
   const [pageTitle, setPageTitle] = useState("Admin Dashboard");
 
   useEffect(() => {
-    // Update page title based on current route
+    // Update page title based on current route - each route has specific functionality
     const path = location.pathname;
     if (path === "/") setPageTitle("Admin Dashboard");
     else if (path === "/system-dashboard") setPageTitle("System Dashboard");
@@ -28,15 +28,6 @@ const Layout = ({ children }: LayoutProps) => {
     else if (path === "/security-logs") setPageTitle("Security Logs");
     else if (path === "/checkin-security") setPageTitle("Check-in Security");
     else if (path === "/integrations") setPageTitle("Integrations");
-    // Legacy routes for backward compatibility
-    else if (path === "/members") setPageTitle("User Management");
-    else if (path === "/finances") setPageTitle("System Data Management");
-    else if (path === "/events") setPageTitle("System Events");
-    else if (path === "/ministry") setPageTitle("Content Management");
-    else if (path === "/communication") setPageTitle("System Communications");
-    else if (path === "/reports") setPageTitle("System Reports");
-    else if (path === "/security") setPageTitle("Security & Access Control");
-    else if (path === "/settings") setPageTitle("System Administration");
     else setPageTitle("Admin Dashboard");
 
     // Update page title in browser

@@ -1,25 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Shield, Settings as SettingsIcon, AlertTriangle, Lock, LayoutDashboard, Database, Users, Activity, Eye } from "lucide-react";
-import AdminDashboard from "@/components/admin/AdminDashboard";
-import SystemDashboard from "@/components/admin/SystemDashboard";
-import SystemSettings from "@/components/settings/SystemSettings";
-import ChurchSettings from "@/components/settings/ChurchSettings";
-import UserManagement from "@/components/settings/UserManagement";
-import BackupSettings from "@/components/settings/BackupSettings";
-import IntegrationSettings from "@/components/settings/IntegrationSettings";
-import SecurityOverview from "@/components/security/SecurityOverview";
-import UserAccessControl from "@/components/security/UserAccessControl";
-import DataProtection from "@/components/security/DataProtection";
-import SecurityLogs from "@/components/security/SecurityLogs";
-import CheckInSecurity from "@/components/security/CheckInSecurity";
+import { Shield, Lock, AlertTriangle } from "lucide-react";
+import { useLocation, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const Settings = () => {
   const [userRole, setUserRole] = useState<string>("Member");
-  const [activeTab, setActiveTab] = useState("admin-dashboard");
+  const location = useLocation();
 
   // Simulate checking user role - in real app this would come from auth context
   useEffect(() => {
@@ -79,103 +68,56 @@ const Settings = () => {
         <Shield className="h-4 w-4" />
         <AlertDescription>
           <strong>Admin Access Granted:</strong> You have full access to all system administration features. 
-          Please use these settings responsibly as they affect the entire church management system.
+          Use the sidebar navigation to access specific administrative modules.
         </AlertDescription>
       </Alert>
 
-      {/* Admin Dashboard Tabs */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <SettingsIcon className="h-5 w-5" />
-            Living Rock Church - System Administration
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12 gap-1">
-              <TabsTrigger value="admin-dashboard" className="text-xs">
-                <LayoutDashboard className="h-3 w-3 mr-1" />
-                Admin
-              </TabsTrigger>
-              <TabsTrigger value="system-dashboard" className="text-xs">
-                <Activity className="h-3 w-3 mr-1" />
-                System
-              </TabsTrigger>
-              <TabsTrigger value="church" className="text-xs">Church</TabsTrigger>
-              <TabsTrigger value="system-overview" className="text-xs">Overview</TabsTrigger>
-              <TabsTrigger value="users" className="text-xs">
-                <Users className="h-3 w-3 mr-1" />
-                Users
-              </TabsTrigger>
-              <TabsTrigger value="backup" className="text-xs">
-                <Database className="h-3 w-3 mr-1" />
-                Backup
-              </TabsTrigger>
-              <TabsTrigger value="security-overview" className="text-xs">
-                <Shield className="h-3 w-3 mr-1" />
-                Security
-              </TabsTrigger>
-              <TabsTrigger value="access-control" className="text-xs">Access</TabsTrigger>
-              <TabsTrigger value="data-protection" className="text-xs">Data</TabsTrigger>
-              <TabsTrigger value="security-logs" className="text-xs">
-                <Eye className="h-3 w-3 mr-1" />
-                Logs
-              </TabsTrigger>
-              <TabsTrigger value="checkin-security" className="text-xs">Check-in</TabsTrigger>
-              <TabsTrigger value="integrations" className="text-xs">Integrations</TabsTrigger>
-            </TabsList>
+      {/* Admin Navigation Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-2">General Administration</h3>
+            <div className="space-y-2 text-sm">
+              <Link to="/" className="block text-blue-600 hover:underline">Admin Dashboard</Link>
+              <Link to="/system-dashboard" className="block text-blue-600 hover:underline">System Dashboard</Link>
+              <Link to="/system-overview" className="block text-blue-600 hover:underline">System Overview</Link>
+            </div>
+          </CardContent>
+        </Card>
 
-            <TabsContent value="admin-dashboard">
-              <AdminDashboard />
-            </TabsContent>
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-2">Church & User Management</h3>
+            <div className="space-y-2 text-sm">
+              <Link to="/church-info" className="block text-blue-600 hover:underline">Church Information</Link>
+              <Link to="/users" className="block text-blue-600 hover:underline">User Management</Link>
+              <Link to="/backup" className="block text-blue-600 hover:underline">Backup & Data Management</Link>
+            </div>
+          </CardContent>
+        </Card>
 
-            <TabsContent value="system-dashboard">
-              <SystemDashboard />
-            </TabsContent>
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-2">Security & Access</h3>
+            <div className="space-y-2 text-sm">
+              <Link to="/security-overview" className="block text-blue-600 hover:underline">Security Overview</Link>
+              <Link to="/access-control" className="block text-blue-600 hover:underline">Access Control</Link>
+              <Link to="/data-protection" className="block text-blue-600 hover:underline">Data Protection</Link>
+              <Link to="/security-logs" className="block text-blue-600 hover:underline">Security Logs</Link>
+              <Link to="/checkin-security" className="block text-blue-600 hover:underline">Check-in Security</Link>
+            </div>
+          </CardContent>
+        </Card>
 
-            <TabsContent value="church">
-              <ChurchSettings />
-            </TabsContent>
-
-            <TabsContent value="system-overview">
-              <SystemSettings />
-            </TabsContent>
-
-            <TabsContent value="users">
-              <UserManagement />
-            </TabsContent>
-
-            <TabsContent value="backup">
-              <BackupSettings />
-            </TabsContent>
-
-            <TabsContent value="security-overview">
-              <SecurityOverview />
-            </TabsContent>
-
-            <TabsContent value="access-control">
-              <UserAccessControl />
-            </TabsContent>
-
-            <TabsContent value="data-protection">
-              <DataProtection />
-            </TabsContent>
-
-            <TabsContent value="security-logs">
-              <SecurityLogs />
-            </TabsContent>
-
-            <TabsContent value="checkin-security">
-              <CheckInSecurity />
-            </TabsContent>
-
-            <TabsContent value="integrations">
-              <IntegrationSettings />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+        <Card className="md:col-span-2 lg:col-span-1">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-2">System Integration</h3>
+            <div className="space-y-2 text-sm">
+              <Link to="/integrations" className="block text-blue-600 hover:underline">Integrations</Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

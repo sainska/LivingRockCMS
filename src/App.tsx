@@ -9,15 +9,18 @@ import Layout from "./components/layout/Layout";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import Members from "./pages/Members";
-import Finances from "./pages/Finances";
-import Events from "./pages/Events";
-import Ministry from "./pages/Ministry";
-import Communication from "./pages/Communication";
-import Reports from "./pages/Reports";
-import Security from "./pages/Security";
-import Settings from "./pages/Settings";
+import AdminDashboard from "./components/admin/AdminDashboard";
+import SystemDashboard from "./components/admin/SystemDashboard";
+import ChurchSettings from "./components/settings/ChurchSettings";
+import SystemSettings from "./components/settings/SystemSettings";
+import UserManagement from "./components/settings/UserManagement";
+import BackupSettings from "./components/settings/BackupSettings";
+import SecurityOverview from "./components/security/SecurityOverview";
+import UserAccessControl from "./components/security/UserAccessControl";
+import DataProtection from "./components/security/DataProtection";
+import SecurityLogs from "./components/security/SecurityLogs";
+import CheckInSecurity from "./components/security/CheckInSecurity";
+import IntegrationSettings from "./components/settings/IntegrationSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,32 +37,19 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
-          {/* Admin Routes with Layout */}
-          <Route path="/" element={<Layout><Dashboard /></Layout>} />
-          
-          {/* New admin dashboard routes */}
-          <Route path="/system-dashboard" element={<Layout><Settings /></Layout>} />
-          <Route path="/church-info" element={<Layout><Settings /></Layout>} />
-          <Route path="/system-overview" element={<Layout><Settings /></Layout>} />
-          <Route path="/users" element={<Layout><Members /></Layout>} />
-          <Route path="/backup" element={<Layout><Settings /></Layout>} />
-          <Route path="/security-overview" element={<Layout><Security /></Layout>} />
-          <Route path="/access-control" element={<Layout><Security /></Layout>} />
-          <Route path="/data-protection" element={<Layout><Security /></Layout>} />
-          <Route path="/security-logs" element={<Layout><Security /></Layout>} />
-          <Route path="/checkin-security" element={<Layout><Security /></Layout>} />
-          <Route path="/integrations" element={<Layout><Settings /></Layout>} />
-          
-          {/* Legacy routes for backward compatibility */}
-          <Route path="/dashboard/admin" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/members" element={<Layout><Members /></Layout>} />
-          <Route path="/finances" element={<Layout><Finances /></Layout>} />
-          <Route path="/events" element={<Layout><Events /></Layout>} />
-          <Route path="/ministry" element={<Layout><Ministry /></Layout>} />
-          <Route path="/communication" element={<Layout><Communication /></Layout>} />
-          <Route path="/reports" element={<Layout><Reports /></Layout>} />
-          <Route path="/security" element={<Layout><Security /></Layout>} />
-          <Route path="/settings" element={<Layout><Settings /></Layout>} />
+          {/* Admin Routes with Layout - Each route maps to specific functionality */}
+          <Route path="/" element={<Layout><AdminDashboard /></Layout>} />
+          <Route path="/system-dashboard" element={<Layout><SystemDashboard /></Layout>} />
+          <Route path="/church-info" element={<Layout><ChurchSettings /></Layout>} />
+          <Route path="/system-overview" element={<Layout><SystemSettings /></Layout>} />
+          <Route path="/users" element={<Layout><UserManagement /></Layout>} />
+          <Route path="/backup" element={<Layout><BackupSettings /></Layout>} />
+          <Route path="/security-overview" element={<Layout><SecurityOverview /></Layout>} />
+          <Route path="/access-control" element={<Layout><UserAccessControl /></Layout>} />
+          <Route path="/data-protection" element={<Layout><DataProtection /></Layout>} />
+          <Route path="/security-logs" element={<Layout><SecurityLogs /></Layout>} />
+          <Route path="/checkin-security" element={<Layout><CheckInSecurity /></Layout>} />
+          <Route path="/integrations" element={<Layout><IntegrationSettings /></Layout>} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
