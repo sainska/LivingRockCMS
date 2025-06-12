@@ -4,21 +4,11 @@ import { Link, useLocation } from "react-router-dom";
 import { 
   ChevronLeft, 
   ChevronRight, 
-  LayoutDashboard, 
   Users, 
-  Database, 
   BookOpen, 
-  Settings, 
-  BarChart, 
-  Shield,
-  Activity,
-  Lock,
-  Eye,
-  UserCog,
-  ShieldCheck,
   Heart,
   Calendar,
-  MessageSquare
+  LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -63,7 +53,7 @@ const Sidebar = () => {
         {!collapsed && (
           <div className="text-sidebar-foreground">
             <div className="text-xl font-bold">Living Rock</div>
-            <div className="text-sm opacity-80">Church Administration</div>
+            <div className="text-sm opacity-80">Church Ministry</div>
           </div>
         )}
         <button
@@ -76,120 +66,38 @@ const Sidebar = () => {
 
       <div className="flex-1 overflow-auto py-4 px-2">
         <nav className="flex flex-col gap-1">
-          {/* System Admin Section */}
+          {/* Clergy Dashboard Section */}
           {!collapsed && (
             <div className="px-3 py-2 text-xs font-semibold text-sidebar-foreground opacity-70 uppercase tracking-wider">
-              System Admin
+              Ministry Dashboard
             </div>
           )}
           <NavItem
             href="/"
             icon={<LayoutDashboard size={20} />}
-            title="Admin Dashboard"
+            title="Dashboard"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/system-dashboard"
-            icon={<Activity size={20} />}
-            title="System Dashboard"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/church-info"
-            icon={<BookOpen size={20} />}
-            title="Church Info"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/system-overview"
-            icon={<Settings size={20} />}
-            title="System Overview"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/users"
-            icon={<Users size={20} />}
-            title="User Management"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/backup"
-            icon={<Database size={20} />}
-            title="Backup & Data Management"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/security-overview"
-            icon={<Shield size={20} />}
-            title="Security Overview"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/access-control"
-            icon={<UserCog size={20} />}
-            title="Access Control"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/data-protection"
-            icon={<ShieldCheck size={20} />}
-            title="Data Protection"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/security-logs"
-            icon={<Eye size={20} />}
-            title="Security Logs"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/checkin-security"
-            icon={<Lock size={20} />}
-            title="Check-in Security"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/integrations"
-            icon={<BarChart size={20} />}
-            title="Integrations"
-            isCollapsed={collapsed}
-          />
-
-          {/* Separator */}
-          {!collapsed && <div className="h-px bg-sidebar-border mx-3 my-2" />}
-
-          {/* Clergy Section */}
-          {!collapsed && (
-            <div className="px-3 py-2 text-xs font-semibold text-sidebar-foreground opacity-70 uppercase tracking-wider">
-              Clergy Dashboard
-            </div>
-          )}
-          <NavItem
-            href="/clergy"
-            icon={<Heart size={20} />}
-            title="Clergy Dashboard"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/clergy/members"
+            href="/members"
             icon={<Users size={20} />}
             title="Member Directory"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/clergy/pastoral-care"
+            href="/pastoral-care"
             icon={<Heart size={20} />}
             title="Pastoral Care"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/clergy/sermons"
+            href="/sermons"
             icon={<BookOpen size={20} />}
             title="Sermon Library"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/clergy/events"
+            href="/events"
             icon={<Calendar size={20} />}
             title="Events & Ministry"
             isCollapsed={collapsed}
@@ -202,7 +110,7 @@ const Sidebar = () => {
           <div className="text-xs text-sidebar-foreground opacity-70">
             © {new Date().getFullYear()} Living Rock Church
             <br />
-            Church Management System
+            Ministry Management System
           </div>
         )}
       </div>
