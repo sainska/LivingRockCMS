@@ -14,6 +14,7 @@ import MemberDirectory from "./components/clergy/MemberDirectory";
 import PastoralCare from "./components/clergy/PastoralCare";
 import SermonLibrary from "./components/clergy/SermonLibrary";
 import EventsMinistry from "./components/clergy/EventsMinistry";
+import ClergySettings from "./components/clergy/ClergySettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/pastoral-care" element={<Layout><PastoralCare /></Layout>} />
           <Route path="/sermons" element={<Layout><SermonLibrary /></Layout>} />
           <Route path="/events" element={<Layout><EventsMinistry /></Layout>} />
+          <Route path="/settings" element={<Layout><ClergySettings /></Layout>} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>

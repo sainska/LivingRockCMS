@@ -21,6 +21,7 @@ const Layout = ({ children }: LayoutProps) => {
     else if (path === "/pastoral-care") setPageTitle("Pastoral Care");
     else if (path === "/sermons") setPageTitle("Sermon Library");
     else if (path === "/events") setPageTitle("Events & Ministry");
+    else if (path === "/settings") setPageTitle("Clergy Settings");
     else setPageTitle("Clergy Dashboard");
 
     // Update page title in browser

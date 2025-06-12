@@ -8,7 +8,8 @@ import {
   BookOpen, 
   Heart,
   Calendar,
-  LayoutDashboard
+  LayoutDashboard,
+  Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -100,6 +101,12 @@ const Sidebar = () => {
             href="/events"
             icon={<Calendar size={20} />}
             title="Events & Ministry"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/settings"
+            icon={<Settings size={20} />}
+            title="Settings"
             isCollapsed={collapsed}
           />
         </nav>
