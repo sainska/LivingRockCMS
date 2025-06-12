@@ -15,7 +15,10 @@ import {
   Lock,
   Eye,
   UserCog,
-  ShieldCheck
+  ShieldCheck,
+  Heart,
+  Calendar,
+  MessageSquare
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -60,7 +63,7 @@ const Sidebar = () => {
         {!collapsed && (
           <div className="text-sidebar-foreground">
             <div className="text-xl font-bold">Living Rock</div>
-            <div className="text-sm opacity-80">System Administration</div>
+            <div className="text-sm opacity-80">Church Administration</div>
           </div>
         )}
         <button
@@ -73,6 +76,12 @@ const Sidebar = () => {
 
       <div className="flex-1 overflow-auto py-4 px-2">
         <nav className="flex flex-col gap-1">
+          {/* System Admin Section */}
+          {!collapsed && (
+            <div className="px-3 py-2 text-xs font-semibold text-sidebar-foreground opacity-70 uppercase tracking-wider">
+              System Admin
+            </div>
+          )}
           <NavItem
             href="/"
             icon={<LayoutDashboard size={20} />}
@@ -145,6 +154,46 @@ const Sidebar = () => {
             title="Integrations"
             isCollapsed={collapsed}
           />
+
+          {/* Separator */}
+          {!collapsed && <div className="h-px bg-sidebar-border mx-3 my-2" />}
+
+          {/* Clergy Section */}
+          {!collapsed && (
+            <div className="px-3 py-2 text-xs font-semibold text-sidebar-foreground opacity-70 uppercase tracking-wider">
+              Clergy Dashboard
+            </div>
+          )}
+          <NavItem
+            href="/clergy"
+            icon={<Heart size={20} />}
+            title="Clergy Dashboard"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/clergy/members"
+            icon={<Users size={20} />}
+            title="Member Directory"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/clergy/pastoral-care"
+            icon={<Heart size={20} />}
+            title="Pastoral Care"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/clergy/sermons"
+            icon={<BookOpen size={20} />}
+            title="Sermon Library"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/clergy/events"
+            icon={<Calendar size={20} />}
+            title="Events & Ministry"
+            isCollapsed={collapsed}
+          />
         </nav>
       </div>
 
@@ -153,7 +202,7 @@ const Sidebar = () => {
           <div className="text-xs text-sidebar-foreground opacity-70">
             © {new Date().getFullYear()} Living Rock Church
             <br />
-            System Administration Panel
+            Church Management System
           </div>
         )}
       </div>

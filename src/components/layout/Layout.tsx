@@ -28,6 +28,11 @@ const Layout = ({ children }: LayoutProps) => {
     else if (path === "/security-logs") setPageTitle("Security Logs");
     else if (path === "/checkin-security") setPageTitle("Check-in Security");
     else if (path === "/integrations") setPageTitle("Integrations");
+    else if (path === "/clergy") setPageTitle("Clergy Dashboard");
+    else if (path === "/clergy/members") setPageTitle("Member Directory");
+    else if (path === "/clergy/pastoral-care") setPageTitle("Pastoral Care");
+    else if (path === "/clergy/sermons") setPageTitle("Sermon Library");
+    else if (path === "/clergy/events") setPageTitle("Events & Ministry");
     else setPageTitle("Admin Dashboard");
 
     // Update page title in browser

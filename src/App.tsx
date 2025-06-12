@@ -21,6 +21,11 @@ import DataProtection from "./components/security/DataProtection";
 import SecurityLogs from "./components/security/SecurityLogs";
 import CheckInSecurity from "./components/security/CheckInSecurity";
 import IntegrationSettings from "./components/settings/IntegrationSettings";
+import ClergyDashboard from "./components/clergy/ClergyDashboard";
+import MemberDirectory from "./components/clergy/MemberDirectory";
+import PastoralCare from "./components/clergy/PastoralCare";
+import SermonLibrary from "./components/clergy/SermonLibrary";
+import EventsMinistry from "./components/clergy/EventsMinistry";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +55,13 @@ const App = () => (
           <Route path="/security-logs" element={<Layout><SecurityLogs /></Layout>} />
           <Route path="/checkin-security" element={<Layout><CheckInSecurity /></Layout>} />
           <Route path="/integrations" element={<Layout><IntegrationSettings /></Layout>} />
+          
+          {/* Clergy Dashboard Routes */}
+          <Route path="/clergy" element={<Layout><ClergyDashboard /></Layout>} />
+          <Route path="/clergy/members" element={<Layout><MemberDirectory /></Layout>} />
+          <Route path="/clergy/pastoral-care" element={<Layout><PastoralCare /></Layout>} />
+          <Route path="/clergy/sermons" element={<Layout><SermonLibrary /></Layout>} />
+          <Route path="/clergy/events" element={<Layout><EventsMinistry /></Layout>} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
