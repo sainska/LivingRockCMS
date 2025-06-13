@@ -4,12 +4,18 @@ import { Link, useLocation } from "react-router-dom";
 import { 
   ChevronLeft, 
   ChevronRight, 
+  LayoutDashboard, 
   Users, 
+  Database, 
   BookOpen, 
-  Heart,
-  Calendar,
-  LayoutDashboard,
-  Settings
+  Settings, 
+  BarChart, 
+  Shield,
+  Activity,
+  Lock,
+  Eye,
+  UserCog,
+  ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -54,7 +60,7 @@ const Sidebar = () => {
         {!collapsed && (
           <div className="text-sidebar-foreground">
             <div className="text-xl font-bold">Living Rock</div>
-            <div className="text-sm opacity-80">Church Ministry</div>
+            <div className="text-sm opacity-80">System Administration</div>
           </div>
         )}
         <button
@@ -67,46 +73,76 @@ const Sidebar = () => {
 
       <div className="flex-1 overflow-auto py-4 px-2">
         <nav className="flex flex-col gap-1">
-          {/* Clergy Dashboard Section */}
-          {!collapsed && (
-            <div className="px-3 py-2 text-xs font-semibold text-sidebar-foreground opacity-70 uppercase tracking-wider">
-              Ministry Dashboard
-            </div>
-          )}
           <NavItem
             href="/"
             icon={<LayoutDashboard size={20} />}
-            title="Dashboard"
+            title="Admin Dashboard"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/members"
-            icon={<Users size={20} />}
-            title="Member Directory"
+            href="/system-dashboard"
+            icon={<Activity size={20} />}
+            title="System Dashboard"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/pastoral-care"
-            icon={<Heart size={20} />}
-            title="Pastoral Care"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/sermons"
+            href="/church-info"
             icon={<BookOpen size={20} />}
-            title="Sermon Library"
+            title="Church Info"
             isCollapsed={collapsed}
           />
           <NavItem
-            href="/events"
-            icon={<Calendar size={20} />}
-            title="Events & Ministry"
-            isCollapsed={collapsed}
-          />
-          <NavItem
-            href="/settings"
+            href="/system-overview"
             icon={<Settings size={20} />}
-            title="Settings"
+            title="System Overview"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/users"
+            icon={<Users size={20} />}
+            title="User Management"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/backup"
+            icon={<Database size={20} />}
+            title="Backup & Data Management"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/security-overview"
+            icon={<Shield size={20} />}
+            title="Security Overview"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/access-control"
+            icon={<UserCog size={20} />}
+            title="Access Control"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/data-protection"
+            icon={<ShieldCheck size={20} />}
+            title="Data Protection"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/security-logs"
+            icon={<Eye size={20} />}
+            title="Security Logs"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/checkin-security"
+            icon={<Lock size={20} />}
+            title="Check-in Security"
+            isCollapsed={collapsed}
+          />
+          <NavItem
+            href="/integrations"
+            icon={<BarChart size={20} />}
+            title="Integrations"
             isCollapsed={collapsed}
           />
         </nav>
@@ -117,7 +153,7 @@ const Sidebar = () => {
           <div className="text-xs text-sidebar-foreground opacity-70">
             © {new Date().getFullYear()} Living Rock Church
             <br />
-            Ministry Management System
+            System Administration Panel
           </div>
         )}
       </div>
