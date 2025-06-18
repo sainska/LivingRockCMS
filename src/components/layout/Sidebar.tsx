@@ -22,7 +22,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+<<<<<<< HEAD
 import { useUserRole } from "@/hooks/useUserRole";
+=======
+import { useUserRole, UserRole } from "@/hooks/useUserRole";
+>>>>>>> 261d74c65cbd239d5b8574bd604eb73743e83f96
 
 type NavItemProps = {
   href: string;
@@ -54,13 +58,20 @@ const NavItem = ({ href, icon, title, isCollapsed }: NavItemProps) => {
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useAuth();
+<<<<<<< HEAD
   const { userRole } = useUserRole();
+=======
+  const { role: userRole, loading } = useUserRole();
+
+  // Default to member role while loading or if no role found
+  const currentRole: UserRole = userRole || "member";
+>>>>>>> 261d74c65cbd239d5b8574bd604eb73743e83f96
 
   const getDashboardItems = () => {
     const items = [];
     
     // Role-specific dashboard items
-    switch (userRole) {
+    switch (currentRole) {
       case "system_admin":
         items.push(
           { href: "/", icon: <LayoutDashboard size={20} />, title: "Admin Dashboard" },
@@ -100,7 +111,7 @@ const Sidebar = () => {
     ];
 
     // Admin-only items
-    const adminItems = userRole === "system_admin" ? [
+    const adminItems = currentRole === "system_admin" ? [
       { href: "/system-overview", icon: <Settings size={20} />, title: "System Overview" },
       { href: "/users", icon: <Users size={20} />, title: "User Management" },
       { href: "/backup", icon: <Database size={20} />, title: "Backup & Data Management" },
@@ -115,6 +126,49 @@ const Sidebar = () => {
     return [...dashboardItems, ...commonItems, ...adminItems];
   };
 
+  const getRoleDisplayText = (role: UserRole) => {
+    switch (role) {
+      case "system_admin":
+        return "System Administration";
+      case "treasurer":
+        return "Financial Management";
+      case "secretary":
+        return "Administrative Portal";
+      case "clergy":
+        return "Ministry Oversight";
+      default:
+        return "Member Portal";
+    }
+  };
+
+  const getRoleFooterText = (role: UserRole) => {
+    switch (role) {
+      case "system_admin":
+        return "System Administration Panel";
+      case "treasurer":
+        return "Financial Management System";
+      case "secretary":
+        return "Administrative System";
+      case "clergy":
+        return "Ministry Management System";
+      default:
+        return "Member Portal";
+    }
+  };
+
+  if (loading) {
+    return (
+      <aside className="flex flex-col bg-sidebar h-screen border-r shadow-sm w-64">
+        <div className="p-4">
+          <div className="text-sidebar-foreground">
+            <div className="text-xl font-bold">Living Rock</div>
+            <div className="text-sm opacity-80">Loading...</div>
+          </div>
+        </div>
+      </aside>
+    );
+  }
+
   return (
     <aside
       className={cn(
@@ -127,11 +181,15 @@ const Sidebar = () => {
           <div className="text-sidebar-foreground">
             <div className="text-xl font-bold">Living Rock</div>
             <div className="text-sm opacity-80">
+<<<<<<< HEAD
               {userRole === "system_admin" && "System Administration"}
               {userRole === "treasurer" && "Financial Management"}
               {userRole === "secretary" && "Administrative Portal"}
               {userRole === "clergy" && "Ministry Oversight"}
               {!["system_admin", "treasurer", "secretary", "clergy"].includes(userRole || "") && "Member Portal"}
+=======
+              {getRoleDisplayText(currentRole)}
+>>>>>>> 261d74c65cbd239d5b8574bd604eb73743e83f96
             </div>
           </div>
         )}
@@ -162,11 +220,15 @@ const Sidebar = () => {
           <div className="text-xs text-sidebar-foreground opacity-70">
             © {new Date().getFullYear()} Living Rock Church
             <br />
+<<<<<<< HEAD
             {userRole === "system_admin" && "System Administration Panel"}
             {userRole === "treasurer" && "Financial Management System"}
             {userRole === "secretary" && "Administrative System"}
             {userRole === "clergy" && "Ministry Management System"}
             {!["system_admin", "treasurer", "secretary", "clergy"].includes(userRole || "") && "Member Portal"}
+=======
+            {getRoleFooterText(currentRole)}
+>>>>>>> 261d74c65cbd239d5b8574bd604eb73743e83f96
           </div>
         )}
       </div>

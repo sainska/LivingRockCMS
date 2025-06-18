@@ -5,7 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./contexts/AuthContext";
+<<<<<<< HEAD
 import RoleBasedRoute from "./components/auth/RoleBasedRoute";
+=======
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import RoleBasedRedirect from "./components/auth/RoleBasedRedirect";
+>>>>>>> 261d74c65cbd239d5b8574bd604eb73743e83f96
 import Layout from "./components/layout/Layout";
 import Welcome from "./pages/Welcome";
 import Auth from "./pages/Auth";
@@ -44,11 +49,22 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             
+<<<<<<< HEAD
             {/* Role-based Dashboard Routes */}
             <Route path="/admin-dashboard" element={
               <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><AdminDashboard /></Layout>
               </RoleBasedRoute>
+=======
+            {/* Protected Routes with Layout - Role-based Dashboards */}
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Layout>
+                  <AdminDashboard />
+                  <RoleBasedRedirect />
+                </Layout>
+              </ProtectedRoute>
+>>>>>>> 261d74c65cbd239d5b8574bd604eb73743e83f96
             } />
             <Route path="/system-dashboard" element={
               <RoleBasedRoute allowedRoles={['system_admin']}>
