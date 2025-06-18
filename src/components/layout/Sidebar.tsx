@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   ChevronLeft, 
@@ -22,11 +22,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-<<<<<<< HEAD
-import { useUserRole } from "@/hooks/useUserRole";
-=======
 import { useUserRole, UserRole } from "@/hooks/useUserRole";
->>>>>>> 261d74c65cbd239d5b8574bd604eb73743e83f96
 
 type NavItemProps = {
   href: string;
@@ -58,14 +54,10 @@ const NavItem = ({ href, icon, title, isCollapsed }: NavItemProps) => {
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useAuth();
-<<<<<<< HEAD
-  const { userRole } = useUserRole();
-=======
   const { role: userRole, loading } = useUserRole();
 
   // Default to member role while loading or if no role found
   const currentRole: UserRole = userRole || "member";
->>>>>>> 261d74c65cbd239d5b8574bd604eb73743e83f96
 
   const getDashboardItems = () => {
     const items = [];
@@ -181,15 +173,7 @@ const Sidebar = () => {
           <div className="text-sidebar-foreground">
             <div className="text-xl font-bold">Living Rock</div>
             <div className="text-sm opacity-80">
-<<<<<<< HEAD
-              {userRole === "system_admin" && "System Administration"}
-              {userRole === "treasurer" && "Financial Management"}
-              {userRole === "secretary" && "Administrative Portal"}
-              {userRole === "clergy" && "Ministry Oversight"}
-              {!["system_admin", "treasurer", "secretary", "clergy"].includes(userRole || "") && "Member Portal"}
-=======
               {getRoleDisplayText(currentRole)}
->>>>>>> 261d74c65cbd239d5b8574bd604eb73743e83f96
             </div>
           </div>
         )}
@@ -220,15 +204,7 @@ const Sidebar = () => {
           <div className="text-xs text-sidebar-foreground opacity-70">
             © {new Date().getFullYear()} Living Rock Church
             <br />
-<<<<<<< HEAD
-            {userRole === "system_admin" && "System Administration Panel"}
-            {userRole === "treasurer" && "Financial Management System"}
-            {userRole === "secretary" && "Administrative System"}
-            {userRole === "clergy" && "Ministry Management System"}
-            {!["system_admin", "treasurer", "secretary", "clergy"].includes(userRole || "") && "Member Portal"}
-=======
             {getRoleFooterText(currentRole)}
->>>>>>> 261d74c65cbd239d5b8574bd604eb73743e83f96
           </div>
         )}
       </div>
