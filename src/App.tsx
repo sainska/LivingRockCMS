@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import RoleBasedRedirect from "./components/auth/RoleBasedRedirect";
 import Layout from "./components/layout/Layout";
 import Welcome from "./pages/Welcome";
 import Auth from "./pages/Auth";
@@ -47,7 +48,10 @@ const App = () => (
             {/* Protected Routes with Layout - Role-based Dashboards */}
             <Route path="/" element={
               <ProtectedRoute>
-                <Layout><AdminDashboard /></Layout>
+                <Layout>
+                  <AdminDashboard />
+                  <RoleBasedRedirect />
+                </Layout>
               </ProtectedRoute>
             } />
             <Route path="/system-dashboard" element={
