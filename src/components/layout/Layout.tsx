@@ -11,13 +11,17 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
-  const [pageTitle, setPageTitle] = useState("Admin Dashboard");
+  const [pageTitle, setPageTitle] = useState("Dashboard");
 
   useEffect(() => {
     // Update page title based on current route - each route has specific functionality
     const path = location.pathname;
     if (path === "/") setPageTitle("Admin Dashboard");
     else if (path === "/system-dashboard") setPageTitle("System Dashboard");
+    else if (path === "/treasurer-dashboard") setPageTitle("Treasurer Dashboard");
+    else if (path === "/secretary-dashboard") setPageTitle("Secretary Dashboard");
+    else if (path === "/clergy-dashboard") setPageTitle("Clergy Dashboard");
+    else if (path === "/user-dashboard") setPageTitle("My Dashboard");
     else if (path === "/church-info") setPageTitle("Church Information");
     else if (path === "/system-overview") setPageTitle("System Overview");
     else if (path === "/users") setPageTitle("User Management");
@@ -28,7 +32,7 @@ const Layout = ({ children }: LayoutProps) => {
     else if (path === "/security-logs") setPageTitle("Security Logs");
     else if (path === "/checkin-security") setPageTitle("Check-in Security");
     else if (path === "/integrations") setPageTitle("Integrations");
-    else setPageTitle("Admin Dashboard");
+    else setPageTitle("Dashboard");
 
     // Update page title in browser
     document.title = `Living Rock Church - ${pageTitle}`;

@@ -13,6 +13,10 @@ import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import SystemDashboard from "./components/admin/SystemDashboard";
+import TreasurerDashboard from "./components/admin/TreasurerDashboard";
+import SecretaryDashboard from "./components/admin/SecretaryDashboard";
+import ClergyDashboard from "./components/admin/ClergyDashboard";
+import UserDashboard from "./components/admin/UserDashboard";
 import ChurchSettings from "./components/settings/ChurchSettings";
 import SystemSettings from "./components/settings/SystemSettings";
 import UserManagement from "./components/settings/UserManagement";
@@ -40,7 +44,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             
-            {/* Protected Routes with Layout */}
+            {/* Protected Routes with Layout - Role-based Dashboards */}
             <Route path="/" element={
               <ProtectedRoute>
                 <Layout><AdminDashboard /></Layout>
@@ -51,6 +55,28 @@ const App = () => (
                 <Layout><SystemDashboard /></Layout>
               </ProtectedRoute>
             } />
+            <Route path="/treasurer-dashboard" element={
+              <ProtectedRoute>
+                <Layout><TreasurerDashboard /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/secretary-dashboard" element={
+              <ProtectedRoute>
+                <Layout><SecretaryDashboard /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/clergy-dashboard" element={
+              <ProtectedRoute>
+                <Layout><ClergyDashboard /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/user-dashboard" element={
+              <ProtectedRoute>
+                <Layout><UserDashboard /></Layout>
+              </ProtectedRoute>
+            } />
+            
+            {/* Settings Routes */}
             <Route path="/church-info" element={
               <ProtectedRoute>
                 <Layout><ChurchSettings /></Layout>
@@ -71,6 +97,8 @@ const App = () => (
                 <Layout><BackupSettings /></Layout>
               </ProtectedRoute>
             } />
+            
+            {/* Security Routes */}
             <Route path="/security-overview" element={
               <ProtectedRoute>
                 <Layout><SecurityOverview /></Layout>
