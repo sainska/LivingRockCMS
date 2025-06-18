@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 
 const TreasurerDashboard = () => {
+  const navigate = useNavigate();
+
   const financialMetrics = [
     {
       title: "Total Income (This Month)",
@@ -95,6 +97,35 @@ const TreasurerDashboard = () => {
     { name: "Staff Salaries", budget: 600000, spent: 600000, percentage: 100 }
   ];
 
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'record-donation':
+        console.log('Opening donation recording form...');
+        break;
+      case 'generate-receipt':
+        console.log('Opening receipt generator...');
+        break;
+      case 'financial-report':
+        console.log('Generating financial report...');
+        break;
+      case 'pending-approvals':
+        console.log('Opening pending approvals...');
+        break;
+      default:
+        console.log('Action not implemented:', action);
+    }
+  };
+
+  const handleGenerateReport = () => {
+    console.log('Generating comprehensive financial report...');
+    // Implement report generation logic
+  };
+
+  const handleExportData = () => {
+    console.log('Exporting financial data...');
+    // Implement data export logic
+  };
+
   const getStatusColor = (status: string) => {
     return status === "Completed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800";
   };
@@ -107,11 +138,11 @@ const TreasurerDashboard = () => {
           <p className="text-muted-foreground">Living Rock Church - Treasurer Portal</p>
         </div>
         <div className="flex gap-2">
-          <Button>
+          <Button onClick={handleGenerateReport}>
             <Receipt className="h-4 w-4 mr-2" />
             Generate Report
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExportData}>
             <BarChart3 className="h-4 w-4 mr-2" />
             Export Data
           </Button>
@@ -143,7 +174,7 @@ const TreasurerDashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5" />
+              <Receipt className="h-5 w-5" />
               Recent Transactions
             </CardTitle>
           </CardHeader>
@@ -158,7 +189,7 @@ const TreasurerDashboard = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-green-600">{transaction.amount}</p>
+                    <p className="font-medium">{transaction.amount}</p>
                     <Badge className={getStatusColor(transaction.status)}>
                       {transaction.status}
                     </Badge>
@@ -180,18 +211,15 @@ const TreasurerDashboard = () => {
           <CardContent>
             <div className="space-y-4">
               {budgetCategories.map((category, index) => (
-                <div key={index} className="space-y-2">
-                  <div className="flex justify-between text-sm">
+                <div key={index}>
+                  <div className="flex justify-between text-sm mb-2">
                     <span>{category.name}</span>
-                    <span className="font-medium">
-                      KSh {category.spent.toLocaleString()} / KSh {category.budget.toLocaleString()}
-                    </span>
+                    <span>KSh {category.spent.toLocaleString()} / KSh {category.budget.toLocaleString()}</span>
                   </div>
                   <Progress value={category.percentage} className="h-2" />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{category.percentage}% used</span>
-                    <span>KSh {(category.budget - category.spent).toLocaleString()} remaining</span>
-                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {category.percentage}% of budget used
+                  </p>
                 </div>
               ))}
             </div>
@@ -199,26 +227,41 @@ const TreasurerDashboard = () => {
         </Card>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Financial Actions */}
       <Card>
         <CardHeader>
           <CardTitle>Quick Financial Actions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Button className="h-16 flex-col gap-2">
+            <Button 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('record-donation')}
+            >
               <Banknote className="h-5 w-5" />
               Record Donation
             </Button>
-            <Button variant="outline" className="h-16 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('generate-receipt')}
+            >
               <Receipt className="h-5 w-5" />
               Generate Receipt
             </Button>
-            <Button variant="outline" className="h-16 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('financial-report')}
+            >
               <BarChart3 className="h-5 w-5" />
               Financial Report
             </Button>
-            <Button variant="outline" className="h-16 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('pending-approvals')}
+            >
               <AlertCircle className="h-5 w-5" />
               Pending Approvals
             </Button>

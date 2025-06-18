@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+
   // System Overview Data
   const systemStats = [
     {
@@ -97,13 +99,52 @@ const AdminDashboard = () => {
     }
   ];
 
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'user-management':
+        navigate('/users');
+        break;
+      case 'church-info':
+        navigate('/church-info');
+        break;
+      case 'backup-data':
+        navigate('/backup');
+        break;
+      case 'security-settings':
+        navigate('/security-overview');
+        break;
+      default:
+        console.log('Action not implemented:', action);
+    }
+  };
+
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case "user": return <Users className="h-4 w-4 text-blue-600" />;
-      case "system": return <Settings className="h-4 w-4 text-gray-600" />;
-      case "security": return <Shield className="h-4 w-4 text-red-600" />;
-      case "church": return <Church className="h-4 w-4 text-purple-600" />;
-      default: return <Activity className="h-4 w-4 text-gray-600" />;
+      case "user":
+        return <Users className="h-4 w-4" />;
+      case "system":
+        return <Database className="h-4 w-4" />;
+      case "security":
+        return <Shield className="h-4 w-4" />;
+      case "church":
+        return <Church className="h-4 w-4" />;
+      default:
+        return <Activity className="h-4 w-4" />;
+    }
+  };
+
+  const getActivityColor = (type: string) => {
+    switch (type) {
+      case "user":
+        return "text-blue-600 bg-blue-50";
+      case "system":
+        return "text-green-600 bg-green-50";
+      case "security":
+        return "text-purple-600 bg-purple-50";
+      case "church":
+        return "text-orange-600 bg-orange-50";
+      default:
+        return "text-gray-600 bg-gray-50";
     }
   };
 
@@ -143,7 +184,9 @@ const AdminDashboard = () => {
                   <p className="text-2xl font-bold">{stat.value}</p>
                   <p className="text-xs text-muted-foreground">{stat.change}</p>
                 </div>
-                <stat.icon className={`h-8 w-8 ${stat.color}`} />
+                <div className="p-3 rounded-lg bg-gray-50">
+                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -161,7 +204,10 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-3">
-              <Button className="justify-start h-12">
+              <Button 
+                className="justify-start h-12"
+                onClick={() => handleQuickAction('user-management')}
+              >
                 <Users className="h-4 w-4 mr-3" />
                 <div className="text-left">
                   <div className="font-medium">User Management</div>
@@ -169,7 +215,11 @@ const AdminDashboard = () => {
                 </div>
               </Button>
               
-              <Button variant="outline" className="justify-start h-12">
+              <Button 
+                variant="outline" 
+                className="justify-start h-12"
+                onClick={() => handleQuickAction('church-info')}
+              >
                 <Church className="h-4 w-4 mr-3" />
                 <div className="text-left">
                   <div className="font-medium">Church Information</div>
@@ -177,7 +227,11 @@ const AdminDashboard = () => {
                 </div>
               </Button>
               
-              <Button variant="outline" className="justify-start h-12">
+              <Button 
+                variant="outline" 
+                className="justify-start h-12"
+                onClick={() => handleQuickAction('backup-data')}
+              >
                 <Database className="h-4 w-4 mr-3" />
                 <div className="text-left">
                   <div className="font-medium">Backup & Data</div>
@@ -185,7 +239,11 @@ const AdminDashboard = () => {
                 </div>
               </Button>
               
-              <Button variant="outline" className="justify-start h-12">
+              <Button 
+                variant="outline" 
+                className="justify-start h-12"
+                onClick={() => handleQuickAction('security-settings')}
+              >
                 <Shield className="h-4 w-4 mr-3" />
                 <div className="text-left">
                   <div className="font-medium">Security Settings</div>
@@ -262,14 +320,16 @@ const AdminDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {recentActivity.map((activity, index) => (
-                <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
-                  {getActivityIcon(activity.type)}
+                <div key={index} className="flex items-center gap-3 p-3 rounded-lg border">
+                  <div className={`p-2 rounded-lg ${getActivityColor(activity.type)}`}>
+                    {getActivityIcon(activity.type)}
+                  </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{activity.action}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {activity.user} • {activity.time}
+                    <p className="font-medium">{activity.action}</p>
+                    <p className="text-sm text-muted-foreground">
+                      by {activity.user} • {activity.time}
                     </p>
                   </div>
                 </div>

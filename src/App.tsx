@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { supabase } from "./integrations/supabase/client";
 import RoleBasedRoute from "./components/auth/RoleBasedRoute";
+import DashboardRedirect from "./components/auth/DashboardRedirect";
 import Layout from "./components/layout/Layout";
 import Welcome from "./pages/Welcome";
 import Auth from "./pages/Auth";
@@ -28,6 +29,15 @@ import DataProtection from "./components/security/DataProtection";
 import SecurityLogs from "./components/security/SecurityLogs";
 import CheckInSecurity from "./components/security/CheckInSecurity";
 import IntegrationSettings from "./components/settings/IntegrationSettings";
+import UserProfile from "./components/user/UserProfile";
+import NotificationCenter from "./components/notifications/NotificationCenter";
+import Members from "./pages/Members";
+import Events from "./pages/Events";
+import Finances from "./pages/Finances";
+import Communication from "./pages/Communication";
+import Reports from "./pages/Reports";
+import Settings from "./pages/Settings";
+import Security from "./pages/Security";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -80,10 +90,12 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               {/* Public Routes */}
-              <Route path="/" element={<Welcome />} />
               <Route path="/welcome" element={<Welcome />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              
+              {/* Main Dashboard Route - Redirects based on role */}
+              <Route path="/" element={<DashboardRedirect />} />
               
               {/* Role-based Dashboard Routes */}
               <Route path="/admin-dashboard" element={
@@ -168,6 +180,57 @@ const App = () => {
               <Route path="/integrations" element={
                 <RoleBasedRoute allowedRoles={['system_admin']}>
                   <Layout><IntegrationSettings /></Layout>
+                </RoleBasedRoute>
+              } />
+              
+              {/* User Profile - All authenticated users */}
+              <Route path="/profile" element={
+                <RoleBasedRoute allowedRoles={['member', 'clergy', 'treasurer', 'secretary', 'system_admin']}>
+                  <Layout><UserProfile /></Layout>
+                </RoleBasedRoute>
+              } />
+              
+              {/* Notifications - All authenticated users */}
+              <Route path="/notifications" element={
+                <RoleBasedRoute allowedRoles={['member', 'clergy', 'treasurer', 'secretary', 'system_admin']}>
+                  <Layout><NotificationCenter /></Layout>
+                </RoleBasedRoute>
+              } />
+              
+              {/* Main Module Routes */}
+              <Route path="/members" element={
+                <RoleBasedRoute allowedRoles={['clergy', 'treasurer', 'secretary', 'system_admin']}>
+                  <Layout><Members /></Layout>
+                </RoleBasedRoute>
+              } />
+              <Route path="/events" element={
+                <RoleBasedRoute allowedRoles={['member', 'clergy', 'treasurer', 'secretary', 'system_admin']}>
+                  <Layout><Events /></Layout>
+                </RoleBasedRoute>
+              } />
+              <Route path="/finances" element={
+                <RoleBasedRoute allowedRoles={['treasurer', 'system_admin']}>
+                  <Layout><Finances /></Layout>
+                </RoleBasedRoute>
+              } />
+              <Route path="/communication" element={
+                <RoleBasedRoute allowedRoles={['clergy', 'secretary', 'system_admin']}>
+                  <Layout><Communication /></Layout>
+                </RoleBasedRoute>
+              } />
+              <Route path="/reports" element={
+                <RoleBasedRoute allowedRoles={['clergy', 'treasurer', 'secretary', 'system_admin']}>
+                  <Layout><Reports /></Layout>
+                </RoleBasedRoute>
+              } />
+              <Route path="/settings" element={
+                <RoleBasedRoute allowedRoles={['system_admin']}>
+                  <Layout><Settings /></Layout>
+                </RoleBasedRoute>
+              } />
+              <Route path="/security" element={
+                <RoleBasedRoute allowedRoles={['system_admin']}>
+                  <Layout><Security /></Layout>
                 </RoleBasedRoute>
               } />
               

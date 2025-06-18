@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 
 const UserDashboard = () => {
+  const navigate = useNavigate();
+
   const memberInfo = {
     name: "John Doe",
     membershipNumber: "LRC20240123",
@@ -89,16 +91,18 @@ const UserDashboard = () => {
 
   const ministryActivities = [
     {
+      id: 1,
       ministry: "Youth Ministry",
       role: "Member",
-      nextMeeting: "2024-06-18",
-      upcomingEvent: "Youth Conference"
+      nextMeeting: "2024-06-20",
+      status: "Active"
     },
     {
-      ministry: "Worship Team",
-      role: "Vocalist",
-      nextMeeting: "2024-06-15",
-      upcomingEvent: "Sunday Service"
+      id: 2,
+      ministry: "Prayer Team",
+      role: "Coordinator",
+      nextMeeting: "2024-06-18",
+      status: "Active"
     }
   ];
 
@@ -132,6 +136,34 @@ const UserDashboard = () => {
     }
   };
 
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'donation':
+        // Navigate to donation page or open donation modal
+        console.log('Opening donation form...');
+        break;
+      case 'event-registration':
+        // Navigate to events page
+        console.log('Opening event registration...');
+        break;
+      case 'prayer-request':
+        // Open prayer request form
+        console.log('Opening prayer request form...');
+        break;
+      case 'profile':
+        // Navigate to profile page
+        console.log('Opening profile...');
+        break;
+      default:
+        console.log('Action not implemented:', action);
+    }
+  };
+
+  const handleEventRegistration = (eventId: number) => {
+    console.log('Registering for event:', eventId);
+    // Implement event registration logic
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -148,6 +180,36 @@ const UserDashboard = () => {
           </p>
         </div>
       </div>
+
+      {/* Member Info Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Member Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Name</p>
+              <p className="font-medium">{memberInfo.name}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Membership Number</p>
+              <p className="font-medium">{memberInfo.membershipNumber}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Join Date</p>
+              <p className="font-medium">{memberInfo.joinDate}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Status</p>
+              <Badge className="bg-green-100 text-green-800">{memberInfo.status}</Badge>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Personal Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -197,7 +259,11 @@ const UserDashboard = () => {
                         Registered
                       </Badge>
                     ) : (
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleEventRegistration(event.id)}
+                      >
                         Register
                       </Button>
                     )}
@@ -213,25 +279,21 @@ const UserDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Heart className="h-5 w-5" />
-              My Ministry Involvement
+              Ministry Activities
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {ministryActivities.map((activity, index) => (
-                <div key={index} className="p-3 rounded-lg border">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium">{activity.ministry}</h4>
-                    <Badge variant="outline">
-                      {activity.role}
-                    </Badge>
+              {ministryActivities.map((activity) => (
+                <div key={activity.id} className="flex items-center justify-between p-3 rounded-lg border">
+                  <div>
+                    <p className="font-medium">{activity.ministry}</p>
+                    <p className="text-sm text-muted-foreground">Role: {activity.role}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Next meeting: {activity.nextMeeting}
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Next Meeting: {activity.nextMeeting}
-                  </p>
-                  <p className="text-sm text-blue-600">
-                    Upcoming: {activity.upcomingEvent}
-                  </p>
+                  <Badge className="bg-blue-100 text-blue-800">{activity.status}</Badge>
                 </div>
               ))}
             </div>
@@ -274,19 +336,34 @@ const UserDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Button className="h-16 flex-col gap-2">
+            <Button 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('donation')}
+            >
               <Gift className="h-5 w-5" />
               Make Donation
             </Button>
-            <Button variant="outline" className="h-16 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('event-registration')}
+            >
               <Calendar className="h-5 w-5" />
               Event Registration
             </Button>
-            <Button variant="outline" className="h-16 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('prayer-request')}
+            >
               <MessageCircle className="h-5 w-5" />
               Prayer Request
             </Button>
-            <Button variant="outline" className="h-16 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('profile')}
+            >
               <Users className="h-5 w-5" />
               My Profile
             </Button>

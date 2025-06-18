@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 
 const SecretaryDashboard = () => {
+  const navigate = useNavigate();
+
   const membershipMetrics = [
     {
       title: "Total Members",
@@ -83,30 +85,27 @@ const SecretaryDashboard = () => {
   const upcomingEvents = [
     {
       id: 1,
-      title: "Youth Conference",
-      date: "2024-06-15",
+      title: "Sunday Morning Service",
+      date: "2024-06-16",
       time: "9:00 AM",
-      location: "Main Sanctuary",
-      attendees: 150,
-      maxAttendees: 200
+      attendees: 450,
+      maxAttendees: 500
     },
     {
       id: 2,
-      title: "Women's Fellowship",
-      date: "2024-06-18",
-      time: "2:00 PM",
-      location: "Conference Hall",
-      attendees: 85,
-      maxAttendees: 100
+      title: "Youth Conference",
+      date: "2024-06-22",
+      time: "6:00 PM",
+      attendees: 120,
+      maxAttendees: 200
     },
     {
       id: 3,
       title: "Bible Study",
-      date: "2024-06-20",
+      date: "2024-06-19",
       time: "7:00 PM",
-      location: "Small Hall",
-      attendees: 45,
-      maxAttendees: 60
+      attendees: 35,
+      maxAttendees: 50
     }
   ];
 
@@ -116,6 +115,35 @@ const SecretaryDashboard = () => {
     { task: "Monthly newsletter", priority: "Low", dueDate: "This week" },
     { task: "Birthday wishes", priority: "Medium", dueDate: "Today" }
   ];
+
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'add-member':
+        console.log('Opening add member form...');
+        break;
+      case 'schedule-event':
+        console.log('Opening event scheduler...');
+        break;
+      case 'send-newsletter':
+        console.log('Opening newsletter composer...');
+        break;
+      case 'contact-directory':
+        console.log('Opening contact directory...');
+        break;
+      default:
+        console.log('Action not implemented:', action);
+    }
+  };
+
+  const handleSendCommunication = () => {
+    console.log('Opening communication center...');
+    // Implement communication logic
+  };
+
+  const handleGenerateReport = () => {
+    console.log('Generating administrative report...');
+    // Implement report generation logic
+  };
 
   const getStatusColor = (status: string) => {
     return status === "Active" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800";
@@ -138,11 +166,11 @@ const SecretaryDashboard = () => {
           <p className="text-muted-foreground">Living Rock Church - Administrative Portal</p>
         </div>
         <div className="flex gap-2">
-          <Button>
+          <Button onClick={handleSendCommunication}>
             <Mail className="h-4 w-4 mr-2" />
             Send Communication
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleGenerateReport}>
             <FileText className="h-4 w-4 mr-2" />
             Generate Report
           </Button>
@@ -185,9 +213,12 @@ const SecretaryDashboard = () => {
                   <div>
                     <p className="font-medium">{member.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {member.membershipNumber} • {member.phone}
+                      <Phone className="h-3 w-3 inline mr-1" />
+                      {member.phone}
                     </p>
-                    <p className="text-xs text-muted-foreground">Joined: {member.joinDate}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Joined: {member.joinDate} • {member.membershipNumber}
+                    </p>
                   </div>
                   <Badge className={getStatusColor(member.status)}>
                     {member.status}
@@ -213,15 +244,15 @@ const SecretaryDashboard = () => {
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium">{event.title}</h4>
                     <Badge variant="outline">
-                      {event.date}
+                      <Clock className="h-3 w-3 mr-1" />
+                      {event.time}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    <Clock className="h-3 w-3 inline mr-1" />
-                    {event.time} • {event.location}
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {event.date}
                   </p>
-                  <div className="mt-2">
-                    <div className="flex justify-between text-xs mb-1">
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-sm">
                       <span>Attendance</span>
                       <span>{event.attendees}/{event.maxAttendees}</span>
                     </div>
@@ -267,26 +298,41 @@ const SecretaryDashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Quick Actions */}
+      {/* Quick Administrative Actions */}
       <Card>
         <CardHeader>
           <CardTitle>Quick Administrative Actions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Button className="h-16 flex-col gap-2">
+            <Button 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('add-member')}
+            >
               <UserPlus className="h-5 w-5" />
               Add New Member
             </Button>
-            <Button variant="outline" className="h-16 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('schedule-event')}
+            >
               <Calendar className="h-5 w-5" />
               Schedule Event
             </Button>
-            <Button variant="outline" className="h-16 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('send-newsletter')}
+            >
               <Mail className="h-5 w-5" />
               Send Newsletter
             </Button>
-            <Button variant="outline" className="h-16 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-16 flex-col gap-2"
+              onClick={() => handleQuickAction('contact-directory')}
+            >
               <Phone className="h-5 w-5" />
               Contact Directory
             </Button>
