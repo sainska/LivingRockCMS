@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +9,6 @@ import {
   Heart,
   BookOpen,
   Church,
-  PrayingHands,
   UserCheck,
   Activity,
   TrendingUp,
@@ -231,7 +229,7 @@ const ClergyDashboard = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <PrayingHands className="h-5 w-5" />
+            <Heart className="h-5 w-5" />
             Pastoral Care Activities
           </CardTitle>
         </CardHeader>
@@ -320,7 +318,7 @@ const ClergyDashboard = () => {
               Schedule Visit
             </Button>
             <Button variant="outline" className="h-16 flex-col gap-2">
-              <PrayingHands className="h-5 w-5" />
+              <Heart className="h-5 w-5" />
               Prayer List
             </Button>
             <Button variant="outline" className="h-16 flex-col gap-2">

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,12 +5,45 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Church, Eye, EyeOff } from "lucide-react";
+import { Church, Eye, EyeOff, Shield, Users, DollarSign, FileText, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
+import { Database } from "@/integrations/supabase/types";
+
+type UserRole = Database['public']['Enums']['user_role'];
+
+const roleInfo: Record<UserRole, { label: string; icon: React.ReactNode; color: string }> = {
+  system_admin: {
+    label: 'System Admin',
+    icon: <Shield className="h-4 w-4" />,
+    color: 'text-red-600'
+  },
+  clergy: {
+    label: 'Clergy',
+    icon: <Church className="h-4 w-4" />,
+    color: 'text-purple-600'
+  },
+  treasurer: {
+    label: 'Treasurer',
+    icon: <DollarSign className="h-4 w-4" />,
+    color: 'text-green-600'
+  },
+  secretary: {
+    label: 'Secretary',
+    icon: <FileText className="h-4 w-4" />,
+    color: 'text-blue-600'
+  },
+  member: {
+    label: 'Member',
+    icon: <User className="h-4 w-4" />,
+    color: 'text-gray-600'
+  }
+};
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { signIn, signUp, resetPassword } = useAuth();
+  const { signIn, signUp, resetPassword, getUserRole, getDashboardRoute } = useAuth();
+  const { userRole } = useUserRole();
   
   const [loginData, setLoginData] = useState({
     email: "",
@@ -39,7 +71,16 @@ const Auth = () => {
     const { error } = await signIn(loginData.email, loginData.password);
     
     if (!error) {
-      navigate('/');
+      // Get user role and redirect to appropriate dashboard
+      const userRole = await getUserRole();
+      
+      if (userRole) {
+        const dashboardRoute = getDashboardRoute(userRole);
+        navigate(dashboardRoute);
+      } else {
+        // If no role assigned, default to member dashboard
+        navigate('/user-dashboard');
+      }
     }
     
     setIsLoading(false);
@@ -85,6 +126,9 @@ const Auth = () => {
             <Church className="h-8 w-8 text-xiracom-blue" />
             <CardTitle className="text-2xl text-xiracom-blue">Living Rock Church</CardTitle>
           </div>
+          <p className="text-sm text-gray-600">
+            Church Management System
+          </p>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -95,6 +139,18 @@ const Auth = () => {
             </TabsList>
 
             <TabsContent value="login" className="space-y-4">
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-3">Select your role to access the appropriate dashboard:</p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {Object.entries(roleInfo).map(([role, info]) => (
+                    <div key={role} className={`flex items-center gap-2 p-2 rounded border ${info.color}`}>
+                      {info.icon}
+                      <span>{info.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>

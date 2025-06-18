@@ -1,4 +1,3 @@
-
 import { ReactNode, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
@@ -39,11 +38,11 @@ const Layout = ({ children }: LayoutProps) => {
   }, [location.pathname, pageTitle]);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header pageTitle={pageTitle} />
-        <main className="flex-1 overflow-auto p-6 bg-gray-50">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6 bg-gray-50">{children}</main>
         <Footer />
       </div>
     </div>

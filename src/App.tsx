@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./contexts/AuthContext";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
+import RoleBasedRoute from "./components/auth/RoleBasedRoute";
 import Layout from "./components/layout/Layout";
 import Welcome from "./pages/Welcome";
 import Auth from "./pages/Auth";
@@ -40,94 +39,95 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             {/* Public Routes */}
+            <Route path="/" element={<Welcome />} />
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             
-            {/* Protected Routes with Layout - Role-based Dashboards */}
-            <Route path="/" element={
-              <ProtectedRoute>
+            {/* Role-based Dashboard Routes */}
+            <Route path="/admin-dashboard" element={
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><AdminDashboard /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/system-dashboard" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><SystemDashboard /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/treasurer-dashboard" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['treasurer', 'system_admin']}>
                 <Layout><TreasurerDashboard /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/secretary-dashboard" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['secretary', 'system_admin']}>
                 <Layout><SecretaryDashboard /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/clergy-dashboard" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['clergy', 'system_admin']}>
                 <Layout><ClergyDashboard /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/user-dashboard" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['member', 'clergy', 'treasurer', 'secretary', 'system_admin']}>
                 <Layout><UserDashboard /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             
-            {/* Settings Routes */}
+            {/* Settings Routes - Admin Only */}
             <Route path="/church-info" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><ChurchSettings /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/system-overview" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><SystemSettings /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/users" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><UserManagement /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/backup" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><BackupSettings /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             
-            {/* Security Routes */}
+            {/* Security Routes - Admin Only */}
             <Route path="/security-overview" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><SecurityOverview /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/access-control" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><UserAccessControl /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/data-protection" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><DataProtection /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/security-logs" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><SecurityLogs /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/checkin-security" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><CheckInSecurity /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             <Route path="/integrations" element={
-              <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['system_admin']}>
                 <Layout><IntegrationSettings /></Layout>
-              </ProtectedRoute>
+              </RoleBasedRoute>
             } />
             
             <Route path="*" element={<NotFound />} />

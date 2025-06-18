@@ -1,8 +1,10 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Database } from '@/integrations/supabase/types';
+
+type UserRole = Database['public']['Enums']['user_role'];
 
 interface AuthContextType {
   user: User | null;
@@ -12,6 +14,8 @@ interface AuthContextType {
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
+  getUserRole: () => Promise<UserRole | null>;
+  getDashboardRoute: (role: UserRole) => string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,6 +55,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
+  const getUserRole = async (): Promise<UserRole | null> => {
+    if (!user) return null;
+
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user role:', error);
+        return null;
+      }
+
+      return data?.role || null;
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+      return null;
+    }
+  };
+
+  const getDashboardRoute = (role: UserRole): string => {
+    const dashboardRoutes: Record<UserRole, string> = {
+      system_admin: '/',
+      clergy: '/clergy-dashboard',
+      treasurer: '/treasurer-dashboard',
+      secretary: '/secretary-dashboard',
+      member: '/user-dashboard'
+    };
+
+    return dashboardRoutes[role] || '/user-dashboard';
+  };
+
   const signIn = async (email: string, password: string) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -80,8 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -99,14 +137,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: error.message,
           variant: "destructive",
         });
-      } else {
-        toast({
-          title: "Registration Successful",
-          description: "Please check your email to verify your account.",
+        return { error };
+      }
+
+      // If registration is successful, assign 'member' role
+      if (data?.user?.id) {
+        await supabase.from('user_roles').insert({
+          user_id: data.user.id,
+          role: 'member',
+          is_active: true
         });
       }
 
-      return { error };
+      toast({
+        title: "Registration Successful",
+        description: "Please check your email to verify your account.",
+      });
+      return { error: null };
     } catch (error: any) {
       toast({
         title: "Registration Failed",
@@ -168,6 +215,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signUp,
     signOut,
     resetPassword,
+    getUserRole,
+    getDashboardRoute,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

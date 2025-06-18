@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
@@ -23,6 +22,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 
 type NavItemProps = {
   href: string;
@@ -39,14 +39,14 @@ const NavItem = ({ href, icon, title, isCollapsed }: NavItemProps) => {
     <Link
       to={href}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
+        "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         isActive
-          ? "bg-sidebar-primary text-sidebar-primary-foreground"
-          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+          : "text-sidebar-foreground"
       )}
     >
       {icon}
-      {!isCollapsed && <span>{title}</span>}
+      {!isCollapsed && <span className="font-medium">{title}</span>}
     </Link>
   );
 };
@@ -54,9 +54,7 @@ const NavItem = ({ href, icon, title, isCollapsed }: NavItemProps) => {
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useAuth();
-
-  // This would typically come from user context/role checking
-  const userRole = "system_admin"; // This should be fetched from user context
+  const { userRole } = useUserRole();
 
   const getDashboardItems = () => {
     const items = [];
@@ -120,11 +118,11 @@ const Sidebar = () => {
   return (
     <aside
       className={cn(
-        "flex flex-col bg-sidebar h-screen border-r shadow-sm transition-all duration-300",
+        "flex flex-col bg-sidebar h-full border-r border-sidebar-border shadow-sm transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
         {!collapsed && (
           <div className="text-sidebar-foreground">
             <div className="text-xl font-bold">Living Rock</div>
@@ -133,19 +131,19 @@ const Sidebar = () => {
               {userRole === "treasurer" && "Financial Management"}
               {userRole === "secretary" && "Administrative Portal"}
               {userRole === "clergy" && "Ministry Oversight"}
-              {!["system_admin", "treasurer", "secretary", "clergy"].includes(userRole) && "Member Portal"}
+              {!["system_admin", "treasurer", "secretary", "clergy"].includes(userRole || "") && "Member Portal"}
             </div>
           </div>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground"
+          className="p-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
         >
           {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
         </button>
       </div>
 
-      <div className="flex-1 overflow-auto py-4 px-2">
+      <div className="flex-1 overflow-y-auto py-4 px-2">
         <nav className="flex flex-col gap-1">
           {getMenuItems().map((item, index) => (
             <NavItem
@@ -159,7 +157,7 @@ const Sidebar = () => {
         </nav>
       </div>
 
-      <div className="p-4">
+      <div className="p-4 border-t border-sidebar-border">
         {!collapsed && (
           <div className="text-xs text-sidebar-foreground opacity-70">
             © {new Date().getFullYear()} Living Rock Church
@@ -168,7 +166,7 @@ const Sidebar = () => {
             {userRole === "treasurer" && "Financial Management System"}
             {userRole === "secretary" && "Administrative System"}
             {userRole === "clergy" && "Ministry Management System"}
-            {!["system_admin", "treasurer", "secretary", "clergy"].includes(userRole) && "Member Portal"}
+            {!["system_admin", "treasurer", "secretary", "clergy"].includes(userRole || "") && "Member Portal"}
           </div>
         )}
       </div>
