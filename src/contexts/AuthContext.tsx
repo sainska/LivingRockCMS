@@ -35,10 +35,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('AuthProvider: Setting up auth state listener...');
+    
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
+        console.log('Auth state changed:', event, session?.user?.email, 'Session:', session);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -46,7 +48,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     // Then check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    console.log('AuthProvider: Checking for existing session...');
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('AuthProvider: Session check result:', { session, error });
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -80,7 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getDashboardRoute = (role: UserRole): string => {
     const dashboardRoutes: Record<UserRole, string> = {
-      system_admin: '/',
+      system_admin: '/admin-dashboard',
       clergy: '/clergy-dashboard',
       treasurer: '/treasurer-dashboard',
       secretary: '/secretary-dashboard',
@@ -91,22 +95,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
+    console.log('AuthContext: Attempting sign in for:', email);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
+      console.log('AuthContext: Sign in result:', { data, error });
+      
       if (error) {
+        console.error('AuthContext: Sign in error:', error);
         toast({
           title: "Login Failed",
           description: error.message,
           variant: "destructive",
         });
+      } else {
+        console.log('AuthContext: Sign in successful, user:', data.user);
       }
       
       return { error };
     } catch (error: any) {
+      console.error('AuthContext: Unexpected sign in error:', error);
       toast({
         title: "Login Failed",
         description: "An unexpected error occurred",

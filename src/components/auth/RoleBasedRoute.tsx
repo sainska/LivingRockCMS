@@ -17,7 +17,7 @@ const RoleBasedRoute = ({
   redirectTo 
 }: RoleBasedRouteProps) => {
   const { user, loading: authLoading } = useAuth();
-  const { userRole, loading: roleLoading } = useUserRole();
+  const { role, loading: roleLoading } = useUserRole();
 
   // Show loading spinner while checking authentication and role
   if (authLoading || roleLoading) {
@@ -34,22 +34,22 @@ const RoleBasedRoute = ({
   }
 
   // If no role assigned, redirect to member dashboard
-  if (!userRole) {
+  if (!role) {
     return <Navigate to="/user-dashboard" replace />;
   }
 
   // If specific roles are required and user doesn't have access
-  if (allowedRoles && !allowedRoles.includes(userRole)) {
+  if (allowedRoles && !allowedRoles.includes(role)) {
     // Redirect to appropriate dashboard based on user role
     const dashboardRoutes: Record<UserRole, string> = {
-      system_admin: '/',
+      system_admin: '/admin-dashboard',
       clergy: '/clergy-dashboard',
       treasurer: '/treasurer-dashboard',
       secretary: '/secretary-dashboard',
       member: '/user-dashboard'
     };
 
-    const targetRoute = redirectTo || dashboardRoutes[userRole] || '/user-dashboard';
+    const targetRoute = redirectTo || dashboardRoutes[role] || '/user-dashboard';
     return <Navigate to={targetRoute} replace />;
   }
 
