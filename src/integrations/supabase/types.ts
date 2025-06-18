@@ -9,16 +9,677 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          record_id: string | null
+          table_name: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      church_settings: {
+        Row: {
+          description: string | null
+          id: string
+          is_public: boolean | null
+          setting_key: string
+          setting_type: string | null
+          setting_value: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          setting_key: string
+          setting_type?: string | null
+          setting_value?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          setting_key?: string
+          setting_type?: string | null
+          setting_value?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      donations: {
+        Row: {
+          amount: number
+          campaign_id: string | null
+          created_at: string | null
+          currency: string | null
+          donation_type: Database["public"]["Enums"]["donation_type"]
+          donor_id: string | null
+          id: string
+          is_anonymous: boolean | null
+          notes: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          purpose: string | null
+          receipt_issued: boolean | null
+          receipt_number: string | null
+          recorded_by: string
+          reference_number: string | null
+          transaction_date: string | null
+        }
+        Insert: {
+          amount: number
+          campaign_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          donation_type: Database["public"]["Enums"]["donation_type"]
+          donor_id?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          notes?: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          purpose?: string | null
+          receipt_issued?: boolean | null
+          receipt_number?: string | null
+          recorded_by: string
+          reference_number?: string | null
+          transaction_date?: string | null
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          donation_type?: Database["public"]["Enums"]["donation_type"]
+          donor_id?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          notes?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          purpose?: string | null
+          receipt_issued?: boolean | null
+          receipt_number?: string | null
+          recorded_by?: string
+          reference_number?: string | null
+          transaction_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donations_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_registrations: {
+        Row: {
+          attendance_status: string | null
+          event_id: string
+          id: string
+          notes: string | null
+          registration_date: string | null
+          user_id: string
+        }
+        Insert: {
+          attendance_status?: string | null
+          event_id: string
+          id?: string
+          notes?: string | null
+          registration_date?: string | null
+          user_id: string
+        }
+        Update: {
+          attendance_status?: string | null
+          event_id?: string
+          id?: string
+          notes?: string | null
+          registration_date?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_registrations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          description: string | null
+          end_date: string | null
+          event_type: Database["public"]["Enums"]["event_type"]
+          id: string
+          is_recurring: boolean | null
+          location: string | null
+          max_attendees: number | null
+          organizer_id: string | null
+          recurrence_pattern: string | null
+          registration_deadline: string | null
+          registration_required: boolean | null
+          start_date: string
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          end_date?: string | null
+          event_type?: Database["public"]["Enums"]["event_type"]
+          id?: string
+          is_recurring?: boolean | null
+          location?: string | null
+          max_attendees?: number | null
+          organizer_id?: string | null
+          recurrence_pattern?: string | null
+          registration_deadline?: string | null
+          registration_required?: boolean | null
+          start_date: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          end_date?: string | null
+          event_type?: Database["public"]["Enums"]["event_type"]
+          id?: string
+          is_recurring?: boolean | null
+          location?: string | null
+          max_attendees?: number | null
+          organizer_id?: string | null
+          recurrence_pattern?: string | null
+          registration_deadline?: string | null
+          registration_required?: boolean | null
+          start_date?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_organizer_id_fkey"
+            columns: ["organizer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_accounts: {
+        Row: {
+          account_name: string
+          account_number: string | null
+          account_type: string
+          bank_name: string | null
+          created_at: string | null
+          current_balance: number | null
+          id: string
+          is_active: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          account_name: string
+          account_number?: string | null
+          account_type: string
+          bank_name?: string | null
+          created_at?: string | null
+          current_balance?: number | null
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          account_name?: string
+          account_number?: string | null
+          account_type?: string
+          bank_name?: string | null
+          created_at?: string | null
+          current_balance?: number | null
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      financial_transactions: {
+        Row: {
+          account_id: string
+          amount: number
+          approval_status: string | null
+          approved_by: string | null
+          category: string | null
+          created_at: string | null
+          description: string
+          id: string
+          notes: string | null
+          recorded_by: string
+          reference_number: string | null
+          transaction_date: string
+          transaction_type: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          approval_status?: string | null
+          approved_by?: string | null
+          category?: string | null
+          created_at?: string | null
+          description: string
+          id?: string
+          notes?: string | null
+          recorded_by: string
+          reference_number?: string | null
+          transaction_date?: string
+          transaction_type: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          approval_status?: string | null
+          approved_by?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          notes?: string | null
+          recorded_by?: string
+          reference_number?: string | null
+          transaction_date?: string
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "financial_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_transactions_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_transactions_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      members: {
+        Row: {
+          baptism_date: string | null
+          confirmation_date: string | null
+          created_at: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          id: string
+          join_date: string
+          membership_number: string
+          ministry_involvement: string[] | null
+          notes: string | null
+          status: Database["public"]["Enums"]["member_status"] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          baptism_date?: string | null
+          confirmation_date?: string | null
+          created_at?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          id?: string
+          join_date?: string
+          membership_number: string
+          ministry_involvement?: string[] | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["member_status"] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          baptism_date?: string | null
+          confirmation_date?: string | null
+          created_at?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          id?: string
+          join_date?: string
+          membership_number?: string
+          ministry_involvement?: string[] | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["member_status"] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ministries: {
+        Row: {
+          co_leader_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          leader_id: string | null
+          meeting_day: string | null
+          meeting_location: string | null
+          meeting_time: string | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          co_leader_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          leader_id?: string | null
+          meeting_day?: string | null
+          meeting_location?: string | null
+          meeting_time?: string | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          co_leader_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          leader_id?: string | null
+          meeting_day?: string | null
+          meeting_location?: string | null
+          meeting_time?: string | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ministries_co_leader_id_fkey"
+            columns: ["co_leader_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ministries_leader_id_fkey"
+            columns: ["leader_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ministry_members: {
+        Row: {
+          id: string
+          is_active: boolean | null
+          joined_date: string | null
+          member_id: string
+          ministry_id: string
+          role: string | null
+        }
+        Insert: {
+          id?: string
+          is_active?: boolean | null
+          joined_date?: string | null
+          member_id: string
+          ministry_id: string
+          role?: string | null
+        }
+        Update: {
+          id?: string
+          is_active?: boolean | null
+          joined_date?: string | null
+          member_id?: string
+          ministry_id?: string
+          role?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ministry_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ministry_members_ministry_id_fkey"
+            columns: ["ministry_id"]
+            isOneToOne: false
+            referencedRelation: "ministries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          date_of_birth: string | null
+          email: string
+          first_name: string
+          gender: string | null
+          id: string
+          last_name: string
+          phone: string | null
+          profile_image_url: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          email: string
+          first_name: string
+          gender?: string | null
+          id: string
+          last_name: string
+          phone?: string | null
+          profile_image_url?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          email?: string
+          first_name?: string
+          gender?: string | null
+          id?: string
+          last_name?: string
+          phone?: string | null
+          profile_image_url?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          id: string
+          is_active: boolean | null
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          role: Database["public"]["Enums"]["user_role"]
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          role?: Database["public"]["Enums"]["user_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { user_uuid: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      has_role: {
+        Args: {
+          user_uuid: string
+          required_role: Database["public"]["Enums"]["user_role"]
+        }
+        Returns: boolean
+      }
+      is_admin_or_clergy: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      donation_type: "tithe" | "offering" | "special" | "project" | "missions"
+      event_type:
+        | "service"
+        | "meeting"
+        | "conference"
+        | "social"
+        | "outreach"
+        | "other"
+      member_status: "active" | "inactive" | "deceased" | "transferred"
+      payment_method:
+        | "cash"
+        | "check"
+        | "card"
+        | "bank_transfer"
+        | "mobile_money"
+      user_role:
+        | "system_admin"
+        | "clergy"
+        | "treasurer"
+        | "secretary"
+        | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +794,25 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      donation_type: ["tithe", "offering", "special", "project", "missions"],
+      event_type: [
+        "service",
+        "meeting",
+        "conference",
+        "social",
+        "outreach",
+        "other",
+      ],
+      member_status: ["active", "inactive", "deceased", "transferred"],
+      payment_method: [
+        "cash",
+        "check",
+        "card",
+        "bank_transfer",
+        "mobile_money",
+      ],
+      user_role: ["system_admin", "clergy", "treasurer", "secretary", "member"],
+    },
   },
 } as const

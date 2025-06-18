@@ -1,87 +1,161 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
-import { Church, Users, Calendar, Heart } from "lucide-react";
-import Footer from "@/components/layout/Footer";
+import { Church, Users, Calendar, DollarSign, Shield, Settings, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Welcome = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-xiracom-blue via-xiracom-darkblue to-blue-900 flex flex-col">
-      <div className="flex-1">
-        <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="text-center text-white mb-12">
-            <div className="flex justify-center items-center gap-3 mb-6">
-              <Church className="h-12 w-12" />
-              <h1 className="text-4xl font-bold">Living Rock Church</h1>
-            </div>
-            <p className="text-xl opacity-90">Welcome to our Church Management System</p>
-            <p className="text-lg opacity-75 mt-2">Building faith, community, and fellowship together</p>
+    <div className="min-h-screen bg-gradient-to-br from-xiracom-blue to-xiracom-darkblue">
+      {/* Header */}
+      <header className="p-6">
+        <div className="flex justify-between items-center max-w-6xl mx-auto">
+          <div className="flex items-center gap-3">
+            <Church className="h-8 w-8 text-white" />
+            <h1 className="text-2xl font-bold text-white">Living Rock Church</h1>
           </div>
+          <Link to="/auth">
+            <Button variant="secondary" className="bg-white text-xiracom-blue hover:bg-gray-100">
+              Sign In
+            </Button>
+          </Link>
+        </div>
+      </header>
 
-          {/* Action Cards */}
-          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <Card className="border-0 shadow-xl">
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl text-xiracom-blue">Existing Member?</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground text-center">
-                  Access your dashboard, view events, manage giving, and stay connected with your church family.
-                </p>
-                <Button 
-                  onClick={() => navigate('/login')}
-                  className="w-full bg-xiracom-blue hover:bg-xiracom-darkblue text-white py-3 text-lg"
-                >
-                  Login to Dashboard
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-xl">
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl text-xiracom-blue">New Member?</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground text-center">
-                  Join our congregation! Create your account to participate in events, give online, and connect with others.
-                </p>
-                <Button 
-                  onClick={() => navigate('/register')}
-                  variant="outline"
-                  className="w-full border-xiracom-blue text-xiracom-blue hover:bg-xiracom-blue hover:text-white py-3 text-lg"
-                >
-                  Create Account
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Features Overview */}
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center text-white">
-              <Users className="h-12 w-12 mx-auto mb-4 opacity-80" />
-              <h3 className="text-xl font-semibold mb-2">Community</h3>
-              <p className="opacity-75">Connect with fellow believers and grow together in faith</p>
-            </div>
-            
-            <div className="text-center text-white">
-              <Calendar className="h-12 w-12 mx-auto mb-4 opacity-80" />
-              <h3 className="text-xl font-semibold mb-2">Events</h3>
-              <p className="opacity-75">Stay updated with services, conferences, and activities</p>
-            </div>
-            
-            <div className="text-center text-white">
-              <Heart className="h-12 w-12 mx-auto mb-4 opacity-80" />
-              <h3 className="text-xl font-semibold mb-2">Giving</h3>
-              <p className="opacity-75">Support God's work through convenient online giving</p>
-            </div>
+      {/* Hero Section */}
+      <section className="px-6 py-20">
+        <div className="max-w-4xl mx-auto text-center text-white">
+          <h2 className="text-5xl font-bold mb-6">
+            Church Management<br />Made Simple
+          </h2>
+          <p className="text-xl mb-8 opacity-90">
+            Streamline your church operations with our comprehensive management system.
+            From member management to financial tracking, we've got you covered.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Link to="/auth">
+              <Button size="lg" className="bg-white text-xiracom-blue hover:bg-gray-100">
+                Get Started
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </div>
-      </div>
-      <Footer />
+      </section>
+
+      {/* Features Grid */}
+      <section className="px-6 py-16">
+        <div className="max-w-6xl mx-auto">
+          <h3 className="text-3xl font-bold text-white text-center mb-12">
+            Everything You Need to Manage Your Church
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card className="bg-white/10 border-white/20 text-white">
+              <CardHeader>
+                <Users className="h-10 w-10 mb-4 text-white" />
+                <CardTitle>Member Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="opacity-90">
+                  Keep track of all church members, their contact information, 
+                  involvement in ministries, and spiritual journey.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/10 border-white/20 text-white">
+              <CardHeader>
+                <Calendar className="h-10 w-10 mb-4 text-white" />
+                <CardTitle>Event Planning</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="opacity-90">
+                  Organize church events, track attendance, and manage 
+                  registrations with our integrated event management system.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/10 border-white/20 text-white">
+              <CardHeader>
+                <DollarSign className="h-10 w-10 mb-4 text-white" />
+                <CardTitle>Financial Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="opacity-90">
+                  Track donations, manage church finances, generate reports, 
+                  and maintain transparent financial records.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/10 border-white/20 text-white">
+              <CardHeader>
+                <Shield className="h-10 w-10 mb-4 text-white" />
+                <CardTitle>Security & Access Control</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="opacity-90">
+                  Role-based access control ensures that sensitive information 
+                  is protected and accessible only to authorized personnel.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/10 border-white/20 text-white">
+              <CardHeader>
+                <Settings className="h-10 w-10 mb-4 text-white" />
+                <CardTitle>System Administration</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="opacity-90">
+                  Comprehensive admin tools for managing users, system settings, 
+                  backups, and maintaining the overall system health.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/10 border-white/20 text-white">
+              <CardHeader>
+                <Church className="h-10 w-10 mb-4 text-white" />
+                <CardTitle>Ministry Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="opacity-90">
+                  Organize different ministries, track member involvement, 
+                  and coordinate ministry activities effectively.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="px-6 py-20">
+        <div className="max-w-4xl mx-auto text-center text-white">
+          <h3 className="text-3xl font-bold mb-6">
+            Ready to Transform Your Church Management?
+          </h3>
+          <p className="text-xl mb-8 opacity-90">
+            Join hundreds of churches already using our platform to streamline their operations.
+          </p>
+          <Link to="/auth">
+            <Button size="lg" className="bg-white text-xiracom-blue hover:bg-gray-100">
+              Start Your Journey
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="px-6 py-8 border-t border-white/20">
+        <div className="max-w-6xl mx-auto text-center text-white/80">
+          <p>© 2024 Living Rock Church Management System. Built with love for the church community.</p>
+        </div>
+      </footer>
     </div>
   );
 };
