@@ -1,73 +1,127 @@
-# Welcome to your Lovable project
 
-## Project info
+# ⛪ Living Rock CMS
 
-**URL**: https://lovable.dev/projects/fa6da6b5-abdb-4a4a-bd0e-b9b8fd08002a
+**Living Rock CMS** is a modern, responsive, and role-based Church Management System designed to support the operations and spiritual growth of a church community. Inspired by the professional design and color palette of [Xiracom.co.ke](https://xiracom.co.ke), it provides a seamless experience for members, clergy, and administrators.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ✨ Features
 
-**Use Lovable**
+### 🙋 Member Dashboard
+- View and update personal profile
+- Track spiritual journey (baptism, marriage, dedication)
+- Join and manage ministry groups
+- RSVP for events and services
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/fa6da6b5-abdb-4a4a-bd0e-b9b8fd08002a) and start prompting.
+### 🎫 Events & Services
+- View upcoming events and services
+- Register attendance and receive notifications
+- Access past event history and notes
 
-Changes made via Lovable will be committed automatically to this repo.
+### 💒 Giving & Donations
+- Tithing, offerings, and fundraising donations
+- Online payment integration (Mobile Money, Card)
+- Track giving history and download statements
+- Pledge tracking
 
-**Use your preferred IDE**
+### 📖 Sermons & Resources
+- Access sermon audio and video
+- Download devotionals and church publications
+- Search by theme, speaker, or date
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 👥 Ministries & Volunteering
+- Join ministry teams (Choir, Youth, Men, Women, etc.)
+- Volunteer for church duties
+- View personal duty roster
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 🔔 Announcements & Messaging
+- Central church bulletin
+- Real-time SMS/Email notifications
+- Direct messages from clergy or group leaders
 
-Follow these steps:
+### 🧑‍💼 Role-Based Access
+- Member, Treasurer, Secretary, Clergy, and Admin dashboards
+- Each role has dedicated modules and permissions
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🖥️ Tech Stack
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **Frontend:** React.js + Tailwind CSS
+- **Backend:** Node.js + Express *(or Laravel optional)*
+- **Database:** PostgreSQL / MongoDB
+- **Authentication:** JWT & Role-based access control
+- **APIs:** Email & SMS Gateway support
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+---
 
-**Edit a file directly in GitHub**
+## 🎨 UI & Design System
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- Modern, clean, mobile-first layout
+- Theme and color palette based on [Xiracom.co.ke](https://xiracom.co.ke)
+- Dark/Light mode toggle
+- Consistent card-based UI with elegant typography
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🚀 Getting Started
 
-## What technologies are used for this project?
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/yourusername/living-rock-cms.git
+   cd living-rock-cms
+   ```
 
-This project is built with:
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+3. **Configure Environment Variables**
+   - Create `.env` from `.env.example`
+   - Add your DB credentials, JWT secret, Email/SMS API keys
 
-## How can I deploy this project?
+4. **Run the Development Server**
+   ```bash
+   npm run dev
+   ```
 
-Simply open [Lovable](https://lovable.dev/projects/fa6da6b5-abdb-4a4a-bd0e-b9b8fd08002a) and click on Share -> Publish.
+5. **Build for Production**
+   ```bash
+   npm run build
+   ```
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## 📸 Screenshots
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+*(Insert screenshots or screen recordings of the system here)*
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
+
+## 📚 Documentation
+
+- System Architecture
+- API Reference
+- Admin Manual
+- User Manual
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome. Please open an issue to discuss improvements or major features before submitting a PR.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 🙏 Acknowledgements
+
+- UI inspiration from [Xiracom.co.ke](https://xiracom.co.ke)
+- Icon set: [Lucide](https://lucide.dev/)
+- Optional integrations: [Africa's Talking](https://africastalking.com/), [Twilio](https://www.twilio.com/), [Firebase](https://firebase.google.com/)
