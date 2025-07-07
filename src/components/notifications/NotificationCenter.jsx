@@ -15,7 +15,6 @@ import {
   Calendar, 
   DollarSign,
   Users,
-  Prayer,
   AlertCircle,
   Info,
   CheckCircle
@@ -98,7 +97,7 @@ const NotificationCenter = () => {
     switch (type) {
       case 'event': return Calendar;
       case 'donation': return DollarSign;
-      case 'prayer': return Prayer;
+      case 'prayer': return Info;
       case 'ministry': return Users;
       case 'success': return CheckCircle;
       case 'warning': return AlertCircle;
