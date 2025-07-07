@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +13,10 @@ import DashboardRedirect from "./components/auth/DashboardRedirect";
 import Layout from "./components/layout/Layout";
 import Welcome from "./pages/Welcome";
 import Auth from "./pages/Auth";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import RoleSelection from "./pages/RoleSelection";
+import RoleBasedRegister from "./pages/RoleBasedRegister";
 import ResetPassword from "./pages/ResetPassword";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import SystemDashboard from "./components/admin/SystemDashboard";
@@ -92,6 +97,10 @@ const App = () => {
               {/* Public Routes */}
               <Route path="/welcome" element={<Welcome />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/role-selection" element={<RoleSelection />} />
+              <Route path="/role-based-register" element={<RoleBasedRegister />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               
               {/* Main Dashboard Route - Redirects based on role */}

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -5,13 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Church, Eye, EyeOff } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signIn, getUserRole, getDashboardRoute } = useAuth();
   const [formData, setFormData] = useState({
-    emailOrPhone: "",
+    email: "",
     password: ""
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -21,51 +22,36 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    console.log('Login: Starting login process...');
+    
     try {
-      // TODO: Replace with actual authentication logic
-      // Simulate API call
+      const { error } = await signIn(formData.email, formData.password);
+      
+      if (error) {
+        console.error('Login: Login failed with error:', error);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('Login: Login successful, getting user role...');
+      
+      // Wait a moment for the session to be established
       await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Mock role-based redirection
-      const mockUser = {
-        email: formData.emailOrPhone,
-        role: formData.emailOrPhone.includes("admin") ? "admin" : 
-              formData.emailOrPhone.includes("clergy") ? "clergy" :
-              formData.emailOrPhone.includes("treasurer") ? "treasurer" :
-              formData.emailOrPhone.includes("secretary") ? "secretary" : "member"
-      };
-
-      toast({
-        title: "Login Successful",
-        description: `Welcome back! Redirecting to your dashboard...`,
-      });
-
-      // Role-based redirection
-      switch (mockUser.role) {
-        case 'admin':
-          navigate('/dashboard/admin');
-          break;
-        case 'clergy':
-          navigate('/dashboard/clergy');
-          break;
-        case 'treasurer':
-          navigate('/dashboard/treasurer');
-          break;
-        case 'secretary':
-          navigate('/dashboard/secretary');
-          break;
-        case 'member':
-          navigate('/');
-          break;
-        default:
-          navigate('/');
+      
+      // Get user role and redirect to appropriate dashboard
+      const userRole = await getUserRole();
+      console.log('Login: User role retrieved:', userRole);
+      
+      if (userRole) {
+        const dashboardRoute = getDashboardRoute(userRole);
+        console.log('Login: Redirecting to dashboard:', dashboardRoute);
+        navigate(dashboardRoute);
+      } else {
+        console.log('Login: No role found, redirecting to user dashboard');
+        navigate('/user-dashboard');
       }
     } catch (error) {
-      toast({
-        title: "Login Failed",
-        description: "Invalid credentials. Please try again.",
-        variant: "destructive",
-      });
+      console.error('Login: Unexpected error during login:', error);
     } finally {
       setIsLoading(false);
     }
@@ -84,13 +70,13 @@ const Login = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="emailOrPhone">Email or Phone Number</Label>
+              <Label htmlFor="email">Email Address</Label>
               <Input
-                id="emailOrPhone"
-                type="text"
-                placeholder="Enter your email or phone"
-                value={formData.emailOrPhone}
-                onChange={(e) => setFormData(prev => ({ ...prev, emailOrPhone: e.target.value }))}
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 required
               />
             </div>
@@ -127,13 +113,13 @@ const Login = () => {
             </Button>
 
             <div className="text-center space-y-2">
-              <Link to="/forgot-password" className="text-sm text-xiracom-blue hover:underline">
+              <Link to="/reset-password" className="text-sm text-xiracom-blue hover:underline">
                 Forgot your password?
               </Link>
               <div className="text-sm text-muted-foreground">
-                New member?{" "}
-                <Link to="/register" className="text-xiracom-blue hover:underline">
-                  Create an account
+                New to Living Rock Church?{" "}
+                <Link to="/role-selection" className="text-xiracom-blue hover:underline">
+                  Join us
                 </Link>
               </div>
               <div className="text-sm text-muted-foreground">

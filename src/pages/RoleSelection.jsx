@@ -1,162 +1,162 @@
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Church, Shield, Users, DollarSign, FileText, User } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Church, User, Shield, DollarSign, FileText, Users, ArrowRight } from "lucide-react";
 
-const roleOptions = [
+const roles = [
   {
-    value: 'system_admin',
-    label: 'System Administrator',
-    description: 'Full system access and management capabilities',
-    icon: <Shield className="h-8 w-8" />,
-    color: 'bg-red-500 hover:bg-red-600'
-  },
-  {
-    value: 'clergy',
-    label: 'Clergy',
-    description: 'Religious leadership and pastoral care functions',
-    icon: <Church className="h-8 w-8" />,
-    color: 'bg-purple-500 hover:bg-purple-600'
-  },
-  {
-    value: 'treasurer',
-    label: 'Treasurer',
-    description: 'Financial management and accounting functions',
-    icon: <DollarSign className="h-8 w-8" />,
-    color: 'bg-green-500 hover:bg-green-600'
-  },
-  {
-    value: 'secretary',
-    label: 'Secretary',
-    description: 'Administrative tasks and member management',
-    icon: <FileText className="h-8 w-8" />,
-    color: 'bg-blue-500 hover:bg-blue-600'
-  },
-  {
-    value: 'member',
-    label: 'Member',
-    description: 'Basic member access and personal functions',
+    id: 'member',
+    title: 'Church Member',
+    description: 'Join our church community as a regular member. Access member resources, events, and community features.',
     icon: <User className="h-8 w-8" />,
-    color: 'bg-gray-500 hover:bg-gray-600'
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200',
+    hoverBg: 'hover:bg-blue-100',
+    features: ['Event registration', 'Prayer requests', 'Community updates', 'Member directory']
+  },
+  {
+    id: 'clergy',
+    title: 'Clergy/Leadership',
+    description: 'Register as ordained clergy or church leadership. Manage sermons, pastoral care, and ministry activities.',
+    icon: <Users className="h-8 w-8" />,
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    borderColor: 'border-purple-200',
+    hoverBg: 'hover:bg-purple-100',
+    features: ['Sermon management', 'Member oversight', 'Event planning', 'Pastoral visits']
+  },
+  {
+    id: 'treasurer',
+    title: 'Treasurer',
+    description: 'Manage church finances, donations, and budgets. Handle financial reporting and accounting tasks.',
+    icon: <DollarSign className="h-8 w-8" />,
+    color: 'text-green-600',
+    bgColor: 'bg-green-50',
+    borderColor: 'border-green-200',
+    hoverBg: 'hover:bg-green-100',
+    features: ['Financial management', 'Donation tracking', 'Budget planning', 'Financial reports']
+  },
+  {
+    id: 'secretary',
+    title: 'Secretary',
+    description: 'Handle administrative tasks, communications, and record keeping for the church.',
+    icon: <FileText className="h-8 w-8" />,
+    color: 'text-orange-600',
+    bgColor: 'bg-orange-50',
+    borderColor: 'border-orange-200',
+    hoverBg: 'hover:bg-orange-100',
+    features: ['Record management', 'Communications', 'Meeting minutes', 'Administrative tasks']
+  },
+  {
+    id: 'system_admin',
+    title: 'System Administrator',
+    description: 'Manage the church management system, user accounts, and technical infrastructure.',
+    icon: <Shield className="h-8 w-8" />,
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    borderColor: 'border-red-200',
+    hoverBg: 'hover:bg-red-100',
+    features: ['User management', 'System settings', 'Security oversight', 'Data management']
   }
 ];
 
 const RoleSelection = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { role, loading: roleLoading } = useUserRole();
-  const { toast } = useToast();
   const [selectedRole, setSelectedRole] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // If user already has a role, redirect to appropriate dashboard
-    if (role && !roleLoading) {
-      const dashboardRoutes = {
-        system_admin: '/admin-dashboard',
-        clergy: '/clergy-dashboard',
-        treasurer: '/treasurer-dashboard',
-        secretary: '/secretary-dashboard',
-        member: '/user-dashboard'
-      };
-      
-      const targetRoute = dashboardRoutes[role];
-      if (targetRoute) {
-        navigate(targetRoute, { replace: true });
-      }
-    }
-  }, [role, roleLoading, navigate]);
-
-  const handleRoleSelection = async () => {
-    if (!selectedRole || !user) return;
-
-    toast({
-      title: "Role Selection",
-      description: `You have selected ${selectedRole.replace('_', ' ')} role. Redirecting to dashboard...`,
-    });
-
-    // Simulate role assignment and redirect
-    setTimeout(() => {
-      const dashboardRoutes = {
-        system_admin: '/admin-dashboard',
-        clergy: '/clergy-dashboard',
-        treasurer: '/treasurer-dashboard',
-        secretary: '/secretary-dashboard',
-        member: '/user-dashboard'
-      };
-
-      const targetRoute = dashboardRoutes[selectedRole];
-      navigate(targetRoute, { replace: true });
-    }, 1000);
+  const handleRoleSelect = (roleId) => {
+    setSelectedRole(roleId);
   };
 
-  if (roleLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-xiracom-blue to-xiracom-darkblue flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
-      </div>
-    );
-  }
+  const handleContinue = () => {
+    if (selectedRole) {
+      navigate(`/role-based-register?role=${selectedRole}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-xiracom-blue to-xiracom-darkblue flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl">
-        <CardHeader className="text-center">
-          <div className="flex justify-center items-center gap-2 mb-4">
-            <Church className="h-8 w-8 text-xiracom-blue" />
-            <CardTitle className="text-2xl text-xiracom-blue">
-              Welcome to Living Rock Church
-            </CardTitle>
-          </div>
-          <p className="text-gray-600">
-            Please select your role to continue to your dashboard
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {roleOptions.map((role) => (
-              <Card
-                key={role.value}
-                className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                  selectedRole === role.value
-                    ? 'ring-2 ring-xiracom-blue bg-blue-50'
-                    : 'hover:bg-gray-50'
-                }`}
-                onClick={() => setSelectedRole(role.value)}
-              >
-                <CardContent className="p-6 text-center">
-                  <div className="flex justify-center mb-4">
-                    <div className={`p-3 rounded-full text-white ${role.color}`}>
-                      {role.icon}
+      <div className="w-full max-w-6xl">
+        <Card className="w-full">
+          <CardHeader className="text-center">
+            <div className="flex justify-center items-center gap-2 mb-4">
+              <Church className="h-8 w-8 text-xiracom-blue" />
+              <CardTitle className="text-3xl text-xiracom-blue">Living Rock Church</CardTitle>
+            </div>
+            <h2 className="text-xl font-semibold mb-2">Choose Your Role</h2>
+            <p className="text-muted-foreground">
+              Select the role that best describes your position or intended involvement with Living Rock Church
+            </p>
+          </CardHeader>
+          
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {roles.map((role) => (
+                <Card
+                  key={role.id}
+                  className={`cursor-pointer transition-all duration-200 ${role.borderColor} ${role.hoverBg} ${
+                    selectedRole === role.id ? `ring-2 ring-offset-2 ring-xiracom-blue ${role.bgColor}` : ''
+                  }`}
+                  onClick={() => handleRoleSelect(role.id)}
+                >
+                  <CardContent className="p-6 space-y-4">
+                    <div className={`inline-flex items-center justify-center w-16 h-16 rounded-lg ${role.bgColor}`}>
+                      <div className={role.color}>
+                        {role.icon}
+                      </div>
                     </div>
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">{role.label}</h3>
-                  <p className="text-sm text-gray-600">{role.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold">{role.title}</h3>
+                      <p className="text-sm text-muted-foreground">{role.description}</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium">Key Features:</h4>
+                      <ul className="text-xs text-muted-foreground space-y-1">
+                        {role.features.map((feature, index) => (
+                          <li key={index} className="flex items-center gap-2">
+                            <div className="w-1 h-1 bg-current rounded-full" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
 
-          <div className="flex justify-center pt-4">
-            <Button
-              onClick={handleRoleSelection}
-              disabled={!selectedRole || isLoading}
-              className="bg-xiracom-blue hover:bg-xiracom-darkblue px-8"
-            >
-              {isLoading ? "Assigning Role..." : "Continue to Dashboard"}
-            </Button>
-          </div>
-
-          <div className="text-center text-sm text-gray-500">
-            <p>Your role can be changed later by a system administrator</p>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="flex flex-col items-center space-y-4">
+              <Button
+                onClick={handleContinue}
+                disabled={!selectedRole}
+                className="bg-xiracom-blue hover:bg-xiracom-darkblue px-8 py-2 flex items-center gap-2"
+              >
+                Continue with Selected Role
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+              
+              <div className="text-center space-y-2">
+                <div className="text-sm text-muted-foreground">
+                  Already have an account?{" "}
+                  <Link to="/login" className="text-xiracom-blue hover:underline">
+                    Sign in
+                  </Link>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  <Link to="/welcome" className="text-xiracom-blue hover:underline">
+                    Back to Welcome
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
