@@ -74,11 +74,11 @@ const UserManagement = () => {
     sessionTimeout: 30
   });
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status) => {
     return status === "Active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
   };
 
-  const getRoleColor = (role: string) => {
+  const getRoleColor = (role) => {
     switch (role) {
       case "Clergy": return "bg-purple-100 text-purple-800";
       case "Admin": return "bg-blue-100 text-blue-800";
@@ -89,11 +89,11 @@ const UserManagement = () => {
     }
   };
 
-  const handleDeleteUser = (userId: number) => {
+  const handleDeleteUser = (userId) => {
     setUsers(users.filter(user => user.id !== userId));
   };
 
-  const handleStatusToggle = (userId: number) => {
+  const handleStatusToggle = (userId) => {
     setUsers(users.map(user => 
       user.id === userId 
         ? { ...user, status: user.status === "Active" ? "Inactive" : "Active" }

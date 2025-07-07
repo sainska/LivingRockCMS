@@ -1,4 +1,3 @@
-
 import { Bell, Search, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,18 +12,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface HeaderProps {
-  pageTitle: string;
-}
-
-const Header = ({ pageTitle }: HeaderProps) => {
+const Header = ({ pageTitle }) => {
   const { user, signOut } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
   };
 
-  const getInitials = (email: string) => {
+  const getInitials = (email) => {
     return email.substring(0, 2).toUpperCase();
   };
 

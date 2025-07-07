@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Church, Eye, EyeOff, Shield, Users, DollarSign, FileText, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Database } from "@/integrations/supabase/types";
 
 const roleInfo = {
   system_admin: { label: "System Admin", icon: <span>🛡️</span>, color: "red" },

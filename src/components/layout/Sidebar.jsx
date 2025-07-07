@@ -22,16 +22,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import { useUserRole, UserRole } from "@/hooks/useUserRole";
+import { useUserRole } from "@/hooks/useUserRole";
 
-type NavItemProps = {
-  href: string;
-  icon: React.ReactNode;
-  title: string;
-  isCollapsed: boolean;
-};
-
-const NavItem = ({ href, icon, title, isCollapsed }: NavItemProps) => {
+const NavItem = ({ href, icon, title, isCollapsed }) => {
   const location = useLocation();
   const isActive = location.pathname === href;
 
@@ -57,7 +50,7 @@ const Sidebar = () => {
   const { role: userRole, loading } = useUserRole();
 
   // Default to member role while loading or if no role found
-  const currentRole: UserRole = userRole || "member";
+  const currentRole = userRole || "member";
 
   const getDashboardItems = () => {
     const items = [];
@@ -118,7 +111,7 @@ const Sidebar = () => {
     return [...dashboardItems, ...commonItems, ...adminItems];
   };
 
-  const getRoleDisplayText = (role: UserRole) => {
+  const getRoleDisplayText = (role) => {
     switch (role) {
       case "system_admin":
         return "System Administration";
@@ -133,7 +126,7 @@ const Sidebar = () => {
     }
   };
 
-  const getRoleFooterText = (role: UserRole) => {
+  const getRoleFooterText = (role) => {
     switch (role) {
       case "system_admin":
         return "System Administration Panel";

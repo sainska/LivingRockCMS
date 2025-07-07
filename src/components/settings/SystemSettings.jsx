@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,7 +48,7 @@ const SystemSettings = () => {
     { component: "Security Monitor", status: "Online", uptime: "100%" }
   ];
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status) => {
     return status === "Online" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
   };
 

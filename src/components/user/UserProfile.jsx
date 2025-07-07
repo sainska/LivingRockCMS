@@ -104,7 +104,7 @@ const UserProfile = () => {
     // In a real app, this would call the auth service
   };
 
-  const getRoleDisplayName = (role: string) => {
+  const getRoleDisplayName = (role) => {
     switch (role) {
       case "system_admin": return "System Administrator";
       case "clergy": return "Clergy";
@@ -115,7 +115,7 @@ const UserProfile = () => {
     }
   };
 
-  const getRoleColor = (role: string) => {
+  const getRoleColor = (role) => {
     switch (role) {
       case "system_admin": return "bg-red-100 text-red-800";
       case "clergy": return "bg-purple-100 text-purple-800";

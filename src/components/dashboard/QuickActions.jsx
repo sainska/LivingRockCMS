@@ -8,7 +8,7 @@ const QuickActions = () => {
   const navigate = useNavigate();
   const { role } = useUserRole();
 
-  const handleQuickAction = (action: string) => {
+  const handleQuickAction = (action) => {
     switch (action) {
       case 'add-member':
         console.log('Navigating to add member...');

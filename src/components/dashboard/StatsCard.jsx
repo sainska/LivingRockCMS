@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LucideIcon } from "lucide-react";
 
@@ -13,7 +12,7 @@ export interface StatsCardProps {
   };
 }
 
-const StatsCard = ({ title, value, icon: Icon, description, trend }: StatsCardProps) => {
+const StatsCard = ({ title, value, icon: Icon, description, trend }) => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

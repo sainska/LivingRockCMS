@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -87,7 +86,7 @@ const IntegrationSettings = () => {
     testMode: true
   });
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status) => {
     switch (status) {
       case "Connected": return "bg-green-100 text-green-800";
       case "Error": return "bg-red-100 text-red-800";
@@ -96,7 +95,7 @@ const IntegrationSettings = () => {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status) => {
     switch (status) {
       case "Connected": return CheckCircle;
       case "Error": return AlertTriangle;
@@ -104,7 +103,7 @@ const IntegrationSettings = () => {
     }
   };
 
-  const toggleIntegration = (id: string) => {
+  const toggleIntegration = (id) => {
     setIntegrations(integrations.map(integration => 
       integration.id === id 
         ? { ...integration, enabled: !integration.enabled }

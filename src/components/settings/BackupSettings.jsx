@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -85,13 +84,8 @@ const BackupSettings = () => {
     { label: "Success Rate", value: "98.7%", icon: Shield }
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Completed": return "bg-green-100 text-green-800";
-      case "Failed": return "bg-red-100 text-red-800";
-      case "In Progress": return "bg-yellow-100 text-yellow-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
+  const getStatusColor = (status) => {
+    return status === "Completed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800";
   };
 
   const handleBackupNow = () => {
@@ -99,7 +93,7 @@ const BackupSettings = () => {
     // In a real app, this would trigger a backup
   };
 
-  const handleRestore = (backupId: number) => {
+  const handleRestore = (backupId) => {
     console.log(`Restoring from backup ${backupId}...`);
     // In a real app, this would restore from the selected backup
   };
