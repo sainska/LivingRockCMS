@@ -4,9 +4,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Church, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -58,80 +58,72 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-xiracom-blue to-xiracom-darkblue flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center items-center gap-2 mb-4">
-            <Church className="h-8 w-8 text-xiracom-blue" />
-            <CardTitle className="text-2xl text-xiracom-blue">Living Rock Church</CardTitle>
-          </div>
-          <p className="text-muted-foreground">Sign in to your account</p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                required
-              />
-            </div>
+    <AuthLayout 
+      title="Welcome Back" 
+      subtitle="Sign in to your account"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email Address</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            value={formData.email}
+            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+            required
+          />
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  required
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+              required
+            />
             <Button
-              type="submit"
-              className="w-full bg-xiracom-blue hover:bg-xiracom-darkblue"
-              disabled={isLoading}
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+              onClick={() => setShowPassword(!showPassword)}
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </Button>
+          </div>
+        </div>
 
-            <div className="text-center space-y-2">
-              <Link to="/reset-password" className="text-sm text-xiracom-blue hover:underline">
-                Forgot your password?
-              </Link>
-              <div className="text-sm text-muted-foreground">
-                New to Living Rock Church?{" "}
-                <Link to="/role-selection" className="text-xiracom-blue hover:underline">
-                  Join us
-                </Link>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                <Link to="/welcome" className="text-xiracom-blue hover:underline">
-                  Back to Welcome
-                </Link>
-              </div>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+        <Button
+          type="submit"
+          className="w-full bg-xiracom-blue hover:bg-xiracom-darkblue"
+          disabled={isLoading}
+        >
+          {isLoading ? "Signing in..." : "Sign In"}
+        </Button>
+
+        <div className="text-center space-y-2">
+          <Link to="/reset-password" className="text-sm text-xiracom-blue hover:underline">
+            Forgot your password?
+          </Link>
+          <div className="text-sm text-muted-foreground">
+            New to Living Rock Church?{" "}
+            <Link to="/role-selection" className="text-xiracom-blue hover:underline">
+              Join us
+            </Link>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            <Link to="/welcome" className="text-xiracom-blue hover:underline">
+              Back to Welcome
+            </Link>
+          </div>
+        </div>
+      </form>
+    </AuthLayout>
   );
 };
 
