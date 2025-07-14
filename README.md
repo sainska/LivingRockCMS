@@ -1,4 +1,19 @@
 
+# Living Rock CMS
+
+## Monorepo Structure (Frontend/Backend Separation)
+
+- `/frontend` — React app (UI, state, API calls)
+- `/backend` — Node.js/Express API (custom endpoints, business logic, integrations)
+- `/supabase` — Database migrations, SQL, and Supabase config
+
+### Migration Steps
+1. Move all files and folders from `src/` and `public/` into a new `/frontend` folder.
+2. Initialize a new `/backend` folder for your Node.js/Express API (see below for starter code).
+3. Keep `/supabase` for your database migrations and SQL logic.
+
+---
+
 # ⛪ Living Rock CMS
 
 **Living Rock CMS** is a modern, responsive, and role-based Church Management System designed to support the operations and spiritual growth of a church community. Inspired by the professional design and color palette of [Xiracom.co.ke](https://xiracom.co.ke), it provides a seamless experience for members, clergy, and administrators.
