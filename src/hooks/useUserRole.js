@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -5,51 +6,61 @@ import { supabase } from '@/integrations/supabase/client';
 export const useUserRole = () => {
   const { user } = useAuth();
   const [role, setRole] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserRole = async () => {
-      console.log('useUserRole: Fetching role for user:', user?.id);
+    const fetchUserData = async () => {
+      console.log('useUserRole: Fetching user data for:', user?.id);
       
       if (!user) {
         console.log('useUserRole: No user, setting role to null');
         setRole(null);
+        setProfile(null);
         setLoading(false);
         return;
       }
 
       try {
-        console.log('useUserRole: Querying user_roles table...');
-        const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('is_active', true)
-          .order('role')
-          .limit(1);
+        // First, get user profile
+        console.log('useUserRole: Fetching profile...');
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
 
-        console.log('useUserRole: Query result:', { data, error });
-
-        if (error) {
-          console.error('Error fetching user role:', error);
-          setRole('member'); // Default to member role
-        } else if (data && data.length > 0) {
-          console.log('useUserRole: Setting role to:', data[0].role);
-          setRole(data[0].role);
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
         } else {
-          console.log('useUserRole: No role found, defaulting to member');
-          setRole('member'); // Default to member role if no role found
+          console.log('useUserRole: Profile data:', profileData);
+          setProfile(profileData);
+        }
+
+        // Then get user role using the database function
+        console.log('useUserRole: Fetching user role...');
+        const { data: roleData, error: roleError } = await supabase
+          .rpc('get_user_role', { user_uuid: user.id });
+
+        console.log('useUserRole: Role RPC result:', { roleData, roleError });
+
+        if (roleError) {
+          console.error('Error fetching user role:', roleError);
+          setRole('member'); // Default to member role
+        } else {
+          console.log('useUserRole: Setting role to:', roleData);
+          setRole(roleData || 'member');
         }
       } catch (error) {
-        console.error('Error fetching user role:', error);
+        console.error('Error in fetchUserData:', error);
         setRole('member'); // Default to member role
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserRole();
+    fetchUserData();
   }, [user]);
 
-  return { role, loading };
+  return { role, profile, loading };
 };

@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_logs: {
+        Row: {
+          action: string | null
+          id: string
+          status: string | null
+          time: string | null
+          user_name: string | null
+        }
+        Insert: {
+          action?: string | null
+          id?: string
+          status?: string | null
+          time?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          action?: string | null
+          id?: string
+          status?: string | null
+          time?: string | null
+          user_name?: string | null
+        }
+        Relationships: []
+      }
       attendance_records: {
         Row: {
           attendance_date: string
@@ -94,6 +118,27 @@ export type Database = {
           },
         ]
       }
+      budget: {
+        Row: {
+          category: string | null
+          id: string
+          planned: number | null
+          spent: number | null
+        }
+        Insert: {
+          category?: string | null
+          id?: string
+          planned?: number | null
+          spent?: number | null
+        }
+        Update: {
+          category?: string | null
+          id?: string
+          planned?: number | null
+          spent?: number | null
+        }
+        Relationships: []
+      }
       budget_categories: {
         Row: {
           allocated_amount: number
@@ -127,6 +172,84 @@ export type Database = {
           name?: string
           spent_amount?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      budgets: {
+        Row: {
+          amount: number
+          created_at: string | null
+          end_date: string
+          id: string
+          name: string
+          start_date: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          end_date: string
+          id?: string
+          name: string
+          start_date: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          end_date?: string
+          id?: string
+          name?: string
+          start_date?: string
+        }
+        Relationships: []
+      }
+      campaigns: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          goal_amount: number | null
+          id: string
+          name: string
+          start_date: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          goal_amount?: number | null
+          id?: string
+          name: string
+          start_date?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          goal_amount?: number | null
+          id?: string
+          name?: string
+          start_date?: string | null
+        }
+        Relationships: []
+      }
+      church_groups: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -207,6 +330,27 @@ export type Database = {
         }
         Relationships: []
       }
+      content: {
+        Row: {
+          date: string | null
+          id: string
+          title: string | null
+          type: string | null
+        }
+        Insert: {
+          date?: string | null
+          id?: string
+          title?: string | null
+          type?: string | null
+        }
+        Update: {
+          date?: string | null
+          id?: string
+          title?: string | null
+          type?: string | null
+        }
+        Relationships: []
+      }
       donation_campaigns: {
         Row: {
           created_at: string
@@ -255,6 +399,7 @@ export type Database = {
           campaign_id: string | null
           created_at: string | null
           currency: string | null
+          donation_date: string | null
           donation_type: Database["public"]["Enums"]["donation_type"]
           donor_id: string | null
           id: string
@@ -273,6 +418,7 @@ export type Database = {
           campaign_id?: string | null
           created_at?: string | null
           currency?: string | null
+          donation_date?: string | null
           donation_type: Database["public"]["Enums"]["donation_type"]
           donor_id?: string | null
           id?: string
@@ -291,6 +437,7 @@ export type Database = {
           campaign_id?: string | null
           created_at?: string | null
           currency?: string | null
+          donation_date?: string | null
           donation_type?: Database["public"]["Enums"]["donation_type"]
           donor_id?: string | null
           id?: string
@@ -369,6 +516,7 @@ export type Database = {
           created_by: string
           description: string | null
           end_date: string | null
+          event_date: string | null
           event_type: Database["public"]["Enums"]["event_type"]
           id: string
           is_recurring: boolean | null
@@ -388,6 +536,7 @@ export type Database = {
           created_by: string
           description?: string | null
           end_date?: string | null
+          event_date?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
           id?: string
           is_recurring?: boolean | null
@@ -407,6 +556,7 @@ export type Database = {
           created_by?: string
           description?: string | null
           end_date?: string | null
+          event_date?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
           id?: string
           is_recurring?: boolean | null
@@ -434,6 +584,44 @@ export type Database = {
             columns: ["organizer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string | null
+          description: string
+          expense_date: string
+          id: string
+          member_id: string | null
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          created_at?: string | null
+          description: string
+          expense_date: string
+          id?: string
+          member_id?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string | null
+          description?: string
+          expense_date?: string
+          id?: string
+          member_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
             referencedColumns: ["id"]
           },
         ]
@@ -544,18 +732,42 @@ export type Database = {
           },
         ]
       }
+      groups: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: number
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       members: {
         Row: {
           baptism_date: string | null
           confirmation_date: string | null
           created_at: string | null
+          email: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
           id: string
           join_date: string
+          joined_at: string | null
           membership_number: string
           ministry_involvement: string[] | null
           notes: string | null
+          phone: string | null
           status: Database["public"]["Enums"]["member_status"] | null
           updated_at: string | null
           user_id: string
@@ -564,13 +776,16 @@ export type Database = {
           baptism_date?: string | null
           confirmation_date?: string | null
           created_at?: string | null
+          email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           id?: string
           join_date?: string
+          joined_at?: string | null
           membership_number: string
           ministry_involvement?: string[] | null
           notes?: string | null
+          phone?: string | null
           status?: Database["public"]["Enums"]["member_status"] | null
           updated_at?: string | null
           user_id: string
@@ -579,13 +794,16 @@ export type Database = {
           baptism_date?: string | null
           confirmation_date?: string | null
           created_at?: string | null
+          email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           id?: string
           join_date?: string
+          joined_at?: string | null
           membership_number?: string
           ministry_involvement?: string[] | null
           notes?: string | null
+          phone?: string | null
           status?: Database["public"]["Enums"]["member_status"] | null
           updated_at?: string | null
           user_id?: string
@@ -738,6 +956,51 @@ export type Database = {
         }
         Relationships: []
       }
+      pledges: {
+        Row: {
+          amount: number
+          campaign_id: string | null
+          created_at: string | null
+          id: string
+          member_id: string | null
+          pledge_date: string
+          status: string | null
+        }
+        Insert: {
+          amount: number
+          campaign_id?: string | null
+          created_at?: string | null
+          id?: string
+          member_id?: string | null
+          pledge_date: string
+          status?: string | null
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string | null
+          created_at?: string | null
+          id?: string
+          member_id?: string | null
+          pledge_date?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pledges_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pledges_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prayer_requests: {
         Row: {
           created_at: string
@@ -822,6 +1085,30 @@ export type Database = {
         }
         Relationships: []
       }
+      reports: {
+        Row: {
+          date: string | null
+          id: string
+          title: string | null
+          type: string | null
+          url: string | null
+        }
+        Insert: {
+          date?: string | null
+          id?: string
+          title?: string | null
+          type?: string | null
+          url?: string | null
+        }
+        Update: {
+          date?: string | null
+          id?: string
+          title?: string | null
+          type?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
       sermons: {
         Row: {
           audio_url: string | null
@@ -861,6 +1148,81 @@ export type Database = {
         }
         Relationships: []
       }
+      system_events: {
+        Row: {
+          action: string
+          created_at: string | null
+          event_type: string | null
+          id: string
+          user_name: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          event_type?: string | null
+          id?: string
+          user_name?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          event_type?: string | null
+          id?: string
+          user_name?: string | null
+        }
+        Relationships: []
+      }
+      system_stats: {
+        Row: {
+          change_description: string | null
+          change_value: string | null
+          id: string
+          stat_type: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          change_description?: string | null
+          change_value?: string | null
+          id?: string
+          stat_type: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          change_description?: string | null
+          change_value?: string | null
+          id?: string
+          stat_type?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
+      tithes: {
+        Row: {
+          amount: number | null
+          date: string | null
+          donor: string | null
+          id: string
+          method: string | null
+        }
+        Insert: {
+          amount?: number | null
+          date?: string | null
+          donor?: string | null
+          id?: string
+          method?: string | null
+        }
+        Update: {
+          amount?: number | null
+          date?: string | null
+          donor?: string | null
+          id?: string
+          method?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           assigned_at: string | null
@@ -897,17 +1259,46 @@ export type Database = {
           {
             foreignKeyName: "user_roles_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
+      }
+      users: {
+        Row: {
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+        }
+        Insert: {
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+        }
+        Update: {
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_system_resources: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_users: number
+          db_size: string
+          active_connections: number
+        }[]
+      }
       get_user_role: {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["user_role"]

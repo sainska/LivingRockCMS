@@ -1,106 +1,42 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Calendar, DollarSign, TrendingUp } from "lucide-react";
-import StatsCard from "@/components/dashboard/StatsCard";
-import DonationChart from "@/components/dashboard/DonationChart";
-import RecentDonations from "@/components/dashboard/RecentDonations";
-import UpcomingEvents from "@/components/dashboard/UpcomingEvents";
-import SystemMetrics from "@/components/dashboard/SystemMetrics";
-import QuickActions from "@/components/dashboard/QuickActions";
+import React from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
+import { Navigate } from 'react-router-dom';
+import WelcomeDashboard from '@/components/dashboard/WelcomeDashboard';
 
 const Dashboard = () => {
-  return (
-    <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-xiracom-blue to-xiracom-darkblue text-white p-6 rounded-lg">
-        <h1 className="text-2xl font-bold mb-2">Welcome to Living Rock Church Management</h1>
-        <p className="opacity-90">Manage your congregation, events, and ministry with ease</p>
+  const { user, loading: authLoading } = useAuth();
+  const { role, loading: roleLoading } = useUserRole();
+
+  if (authLoading || roleLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-xiracom-blue"></div>
       </div>
+    );
+  }
 
-      {/* System Metrics */}
-      <SystemMetrics />
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
 
-      {/* Quick Actions */}
-      <QuickActions />
+  // Redirect to role-specific dashboard
+  const dashboardRoutes = {
+    system_admin: '/admin-dashboard',
+    clergy: '/clergy-dashboard',
+    treasurer: '/treasurer-dashboard',
+    secretary: '/secretary-dashboard',
+    member: '/user-dashboard'
+  };
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard
-          title="Total Members"
-          value={1247}
-          icon={Users}
-          description="Active congregation members"
-          trend={{ value: 5.2, isPositive: true }}
-        />
-        <StatsCard
-          title="This Month's Giving"
-          value="KSh 850,000"
-          icon={DollarSign}
-          description="Tithes and offerings"
-          trend={{ value: 12.3, isPositive: true }}
-        />
-        <StatsCard
-          title="Upcoming Events"
-          value={8}
-          icon={Calendar}
-          description="Events this month"
-        />
-        <StatsCard
-          title="Attendance Growth"
-          value="15.2%"
-          icon={TrendingUp}
-          description="Compared to last month"
-          trend={{ value: 15.2, isPositive: true }}
-        />
-      </div>
+  const targetRoute = dashboardRoutes[role || 'member'];
+  
+  if (targetRoute && window.location.pathname === '/') {
+    return <Navigate to={targetRoute} replace />;
+  }
 
-      {/* Dashboard Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <DonationChart />
-        </div>
-        
-        <div className="space-y-6">
-          <RecentDonations />
-          <UpcomingEvents />
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-xiracom-blue">Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium">New member registered</p>
-                <p className="text-sm text-muted-foreground">Sarah Johnson joined the congregation</p>
-              </div>
-              <span className="text-xs text-muted-foreground">2 hours ago</span>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium">Donation received</p>
-                <p className="text-sm text-muted-foreground">KSh 15,000 offering from Mark Wilson</p>
-              </div>
-              <span className="text-xs text-muted-foreground">4 hours ago</span>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium">Event scheduled</p>
-                <p className="text-sm text-muted-foreground">Youth Conference added for next Saturday</p>
-              </div>
-              <span className="text-xs text-muted-foreground">6 hours ago</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  return <WelcomeDashboard />;
 };
 
 export default Dashboard;

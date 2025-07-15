@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -40,21 +41,17 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('is_active', true)
-        .single();
+        .rpc('get_user_role', { user_uuid: user.id });
 
       if (error) {
         console.error('Error fetching user role:', error);
-        return null;
+        return 'member';
       }
 
-      return data?.role || null;
+      return data || 'member';
     } catch (error) {
       console.error('Error fetching user role:', error);
-      return null;
+      return 'member';
     }
   };
 
@@ -89,6 +86,10 @@ export const AuthProvider = ({ children }) => {
         });
       } else {
         console.log('AuthContext: Sign in successful, user:', data.user);
+        toast({
+          title: "Login Successful",
+          description: "Welcome to Living Rock Church Management System!",
+        });
       }
       
       return { error };
@@ -127,15 +128,6 @@ export const AuthProvider = ({ children }) => {
         return { error };
       }
 
-      // If registration is successful, assign 'member' role
-      if (data?.user?.id) {
-        await supabase.from('user_roles').insert({
-          user_id: data.user.id,
-          role: 'member',
-          is_active: true
-        });
-      }
-
       toast({
         title: "Registration Successful",
         description: "Please check your email to verify your account.",
@@ -158,6 +150,11 @@ export const AuthProvider = ({ children }) => {
         title: "Sign Out Failed",
         description: error.message,
         variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Signed Out",
+        description: "You have been successfully signed out.",
       });
     }
   };
@@ -194,16 +191,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = (userData, userRole) => {
-    setUser(userData);
-    setSession(userData.session);
-  };
-
-  const logout = () => {
-    setUser(null);
-    setSession(null);
-  };
-
   const value = {
     user,
     session,
@@ -214,8 +201,6 @@ export const AuthProvider = ({ children }) => {
     resetPassword,
     getUserRole,
     getDashboardRoute,
-    login,
-    logout,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
