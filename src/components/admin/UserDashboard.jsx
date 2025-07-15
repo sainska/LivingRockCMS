@@ -15,9 +15,15 @@ import {
   UserCheck,
   Clock
 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
+  const { role, profile, loading } = useUserRole();
 
   const memberInfo = {
     name: "John Doe",
@@ -139,20 +145,17 @@ const UserDashboard = () => {
   const handleQuickAction = (action) => {
     switch (action) {
       case 'donation':
-        // Navigate to donation page or open donation modal
-        console.log('Opening donation form...');
+        navigate('/donations'); // Navigate to donation page
         break;
       case 'event-registration':
-        // Navigate to events page
-        console.log('Opening event registration...');
+        navigate('/events'); // Navigate to events page
         break;
       case 'prayer-request':
-        // Open prayer request form
-        console.log('Opening prayer request form...');
+        // Open prayer request modal (example implementation)
+        setShowPrayerRequestModal(true);
         break;
       case 'profile':
-        // Navigate to profile page
-        console.log('Opening profile...');
+        navigate('/profile'); // Navigate to profile page
         break;
       default:
         console.log('Action not implemented:', action);
@@ -164,11 +167,94 @@ const UserDashboard = () => {
     // Implement event registration logic
   };
 
+  const [personalInfo, setPersonalInfo] = useState({ first_name: '', last_name: '', email: '', phone: '' });
+  const [saveStatus, setSaveStatus] = useState('');
+  const [milestones, setMilestones] = useState([]);
+  const [milestonesLoading, setMilestonesLoading] = useState(true);
+  const [showPrayerRequestModal, setShowPrayerRequestModal] = useState(false);
+  const [prayerRequestText, setPrayerRequestText] = useState('');
+  const [prayerRequestStatus, setPrayerRequestStatus] = useState('');
+
+  useEffect(() => {
+    if (profile) {
+      setPersonalInfo({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        email: profile.email || '',
+        phone: profile.phone || ''
+      });
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    if (!profile) return;
+    setMilestonesLoading(true);
+    const fetchMilestones = async () => {
+      const { data, error } = await supabase
+        .from('milestones')
+        .select('*')
+        .eq('member_id', profile.id)
+        .order('date', { ascending: false });
+      setMilestones(data || []);
+      setMilestonesLoading(false);
+    };
+    fetchMilestones();
+  }, [profile]);
+
+  const handleSavePersonalInfo = async (e) => {
+    e.preventDefault();
+    setSaveStatus('');
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        first_name: personalInfo.first_name,
+        last_name: personalInfo.last_name,
+        email: personalInfo.email,
+        phone: personalInfo.phone
+      })
+      .eq('id', profile.id);
+    if (error) {
+      setSaveStatus('Error saving changes');
+    } else {
+      setSaveStatus('Changes saved successfully');
+    }
+  };
+
+  const handlePrayerRequestSubmit = async (e) => {
+    e.preventDefault();
+    setPrayerRequestStatus('');
+    // Save prayer request to Supabase
+    const { error } = await supabase
+      .from('prayer_requests')
+      .insert({
+        member_id: profile.id,
+        request: prayerRequestText,
+        created_at: new Date().toISOString()
+      });
+    if (error) {
+      setPrayerRequestStatus('Error submitting request');
+    } else {
+      setPrayerRequestStatus('Request submitted successfully');
+      setPrayerRequestText('');
+      setTimeout(() => setShowPrayerRequestModal(false), 1500);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-xiracom-blue"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Welcome, {memberInfo.name}!</h1>
+          <h1 className="text-3xl font-bold">
+            Welcome, {profile?.first_name && profile?.last_name ? `${profile.first_name} ${profile.last_name}` : profile?.first_name || 'Member'}!
+          </h1>
           <p className="text-muted-foreground">Living Rock Church - Member Portal</p>
         </div>
         <div className="text-right">
@@ -193,19 +279,19 @@ const UserDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <p className="text-sm text-muted-foreground">Name</p>
-              <p className="font-medium">{memberInfo.name}</p>
+              <p className="font-medium">{profile?.first_name && profile?.last_name ? `${profile.first_name} ${profile.last_name}` : profile?.first_name || 'Member'}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Membership Number</p>
-              <p className="font-medium">{memberInfo.membershipNumber}</p>
+              <p className="font-medium">{profile?.membership_number || 'N/A'}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Join Date</p>
-              <p className="font-medium">{memberInfo.joinDate}</p>
+              <p className="font-medium">{profile?.join_date ? new Date(profile.join_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Status</p>
-              <Badge className="bg-green-100 text-green-800">{memberInfo.status}</Badge>
+              <Badge className="bg-green-100 text-green-800">{profile?.status || 'Active'}</Badge>
             </div>
           </div>
         </CardContent>
@@ -370,8 +456,215 @@ const UserDashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Member Profile Sections (Tabs) */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Member Profile Details</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="personal" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="personal">Personal Info</TabsTrigger>
+              <TabsTrigger value="milestones">Milestones</TabsTrigger>
+              <TabsTrigger value="groups">Groups & Ministries</TabsTrigger>
+            </TabsList>
+            <TabsContent value="personal">
+              {profile ? (
+                <form className="space-y-4" onSubmit={handleSavePersonalInfo}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-muted-foreground">First Name</label>
+                      <input type="text" className="input input-bordered w-full" value={personalInfo.first_name} onChange={e => setPersonalInfo({ ...personalInfo, first_name: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-muted-foreground">Last Name</label>
+                      <input type="text" className="input input-bordered w-full" value={personalInfo.last_name} onChange={e => setPersonalInfo({ ...personalInfo, last_name: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-muted-foreground">Email</label>
+                      <input type="email" className="input input-bordered w-full" value={personalInfo.email} onChange={e => setPersonalInfo({ ...personalInfo, email: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-muted-foreground">Phone</label>
+                      <input type="text" className="input input-bordered w-full" value={personalInfo.phone || ''} onChange={e => setPersonalInfo({ ...personalInfo, phone: e.target.value })} />
+                    </div>
+                  </div>
+                  <button type="submit" className="btn btn-primary mt-4">Save Changes</button>
+                  {saveStatus && <p className="text-green-600 mt-2">{saveStatus}</p>}
+                </form>
+              ) : (
+                <div>Loading personal info...</div>
+              )}
+            </TabsContent>
+            <TabsContent value="milestones">
+              {milestonesLoading ? (
+                <div>Loading milestones...</div>
+              ) : milestones.length === 0 ? (
+                <div>No milestones recorded yet.</div>
+              ) : (
+                <div className="space-y-4">
+                  {milestones.map((milestone, idx) => {
+                    return (
+                      <div key={idx} className="p-4 border rounded-lg flex justify-between items-center">
+                        <div>
+                          <p className="font-semibold">{milestone.type}</p>
+                          <p className="text-sm text-muted-foreground">{milestone.date ? new Date(milestone.date).toLocaleDateString() : ''}</p>
+                        </div>
+                        {milestone.certificate_url && (
+                          <a href={milestone.certificate_url} target="_blank" rel="noopener noreferrer" className="btn btn-outline">Download Certificate</a>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </TabsContent>
+            <TabsContent value="groups">
+              {/* Groups & Ministries Section */}
+              <GroupsAndMinistriesSection />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+
+      {showPrayerRequestModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Submit Prayer Request</h2>
+            <form onSubmit={handlePrayerRequestSubmit} className="space-y-4">
+              <textarea className="input input-bordered w-full" rows={4} placeholder="Your prayer request..." value={prayerRequestText} onChange={e => setPrayerRequestText(e.target.value)} />
+              <div className="flex justify-end gap-2">
+                <button type="button" className="btn btn-outline" onClick={() => setShowPrayerRequestModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary">Submit</button>
+              </div>
+            </form>
+            {prayerRequestStatus && <p className="text-green-600 mt-2">{prayerRequestStatus}</p>}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default UserDashboard;
+
+function GroupsAndMinistriesSection() {
+  const { user } = useAuth();
+  const [myMinistries, setMyMinistries] = useState([]);
+  const [allMinistries, setAllMinistries] = useState([]);
+  const [upcomingActivities, setUpcomingActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    setLoading(true);
+    const fetchMinistries = async () => {
+      // Fetch all ministries
+      const { data: ministries } = await supabase
+        .from('ministries')
+        .select('*')
+        .eq('is_active', true)
+        .order('name', { ascending: true });
+      setAllMinistries(ministries || []);
+
+      // Fetch member's ministry memberships
+      const { data: memberships } = await supabase
+        .from('ministry_members')
+        .select('*, ministries(*)')
+        .eq('member_id', user.id)
+        .eq('is_active', true);
+      setMyMinistries(memberships || []);
+
+      // Fetch upcoming activities for member's ministries (using meeting_day/time/location for now)
+      const ministryIds = (memberships || []).map(m => m.ministry_id);
+      const upcoming = (ministries || [])
+        .filter(m => ministryIds.includes(m.id))
+        .map(m => ({
+          id: m.id,
+          name: m.name,
+          meeting_day: m.meeting_day,
+          meeting_time: m.meeting_time,
+          meeting_location: m.meeting_location
+        }));
+      setUpcomingActivities(upcoming);
+      setLoading(false);
+    };
+    fetchMinistries();
+  }, [user]);
+
+  const handleJoinMinistry = async (ministryId) => {
+    // Placeholder: implement join logic
+    alert('Request to join ministry: ' + ministryId);
+  };
+
+  if (loading) return <div>Loading ministries...</div>;
+
+  // Ministries the member is not in
+  const myMinistryIds = myMinistries.map(m => m.ministry_id);
+  const availableMinistries = allMinistries.filter(m => !myMinistryIds.includes(m.id));
+
+  return (
+    <div className="space-y-8">
+      {/* My Ministries */}
+      <div>
+        <h3 className="text-lg font-semibold mb-2">My Ministries</h3>
+        {myMinistries.length === 0 ? (
+          <div className="text-muted-foreground">You are not in any ministries yet.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {myMinistries.map(m => (
+              <Card key={m.ministry_id}>
+                <CardContent className="p-4">
+                  <div className="font-medium text-xiracom-blue">{m.ministries?.name}</div>
+                  <div className="text-sm text-muted-foreground">Role: {m.role || 'Member'}</div>
+                  <div className="text-xs text-muted-foreground">Joined: {m.joined_date || 'N/A'}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+      {/* Available Ministries */}
+      <div>
+        <h3 className="text-lg font-semibold mb-2">Available Ministries</h3>
+        {availableMinistries.length === 0 ? (
+          <div className="text-muted-foreground">No other ministries available.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {availableMinistries.map(m => (
+              <Card key={m.id}>
+                <CardContent className="p-4 flex justify-between items-center">
+                  <div>
+                    <div className="font-medium">{m.name}</div>
+                    <div className="text-xs text-muted-foreground">{m.description}</div>
+                  </div>
+                  <Button size="sm" onClick={() => handleJoinMinistry(m.id)}>Join</Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+      {/* Upcoming Ministry Activities */}
+      <div>
+        <h3 className="text-lg font-semibold mb-2">Upcoming Ministry Activities</h3>
+        {upcomingActivities.length === 0 ? (
+          <div className="text-muted-foreground">No upcoming activities found.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {upcomingActivities.map(a => (
+              <Card key={a.id}>
+                <CardContent className="p-4">
+                  <div className="font-medium">{a.name}</div>
+                  <div className="text-sm text-muted-foreground">Meeting: {a.meeting_day || 'N/A'} {a.meeting_time ? `at ${a.meeting_time}` : ''}</div>
+                  <div className="text-xs text-muted-foreground">Location: {a.meeting_location || 'N/A'}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

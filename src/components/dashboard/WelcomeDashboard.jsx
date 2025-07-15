@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -117,10 +116,10 @@ const WelcomeDashboard = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
-                  Welcome back, {profile?.first_name || 'Member'}!
+                  Welcome, {profile?.first_name && profile?.last_name ? `${profile.first_name} ${profile.last_name}` : profile?.first_name || 'Member'}!
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  Living Rock Church Management System
+                  Living Rock Church - Member Portal
                 </p>
               </div>
             </div>
