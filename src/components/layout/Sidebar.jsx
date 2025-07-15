@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
@@ -18,7 +19,17 @@ import {
   DollarSign,
   FileText,
   Church,
-  User
+  User,
+  Calendar,
+  MessageSquare,
+  Heart,
+  Music,
+  UserCheck,
+  Building,
+  PieChart,
+  CreditCard,
+  Mail,
+  Bell
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -41,6 +52,29 @@ const NavItem = ({ href, icon, title, isCollapsed }) => {
       {icon}
       {!isCollapsed && <span className="font-medium">{title}</span>}
     </Link>
+  );
+};
+
+const SidebarSection = ({ title, items, isCollapsed }) => {
+  return (
+    <div className="mb-4">
+      {!isCollapsed && (
+        <h3 className="px-3 pb-2 text-xs font-semibold text-sidebar-foreground/70 uppercase tracking-wider">
+          {title}
+        </h3>
+      )}
+      <nav className="flex flex-col gap-1">
+        {items.map((item, index) => (
+          <NavItem
+            key={index}
+            href={item.href}
+            icon={item.icon}
+            title={item.title}
+            isCollapsed={isCollapsed}
+          />
+        ))}
+      </nav>
+    </div>
   );
 };
 
@@ -87,28 +121,57 @@ const Sidebar = () => {
     return items;
   };
 
-  const getMenuItems = () => {
-    const dashboardItems = getDashboardItems();
-    
-    // Common items available to all roles (with different access levels)
+  const getChurchManagementItems = () => {
     const commonItems = [
-      { href: "/church-info", icon: <BookOpen size={20} />, title: "Church Info" },
+      { href: "/church-info", icon: <Building size={20} />, title: "Church Info" },
+      { href: "/events", icon: <Calendar size={20} />, title: "Events" },
+      { href: "/members", icon: <Users size={20} />, title: "Members" },
+      { href: "/ministry", icon: <Heart size={20} />, title: "Ministry" },
     ];
 
-    // Admin-only items
-    const adminItems = currentRole === "system_admin" ? [
-      { href: "/system-overview", icon: <Settings size={20} />, title: "System Overview" },
-      { href: "/users", icon: <Users size={20} />, title: "User Management" },
-      { href: "/backup", icon: <Database size={20} />, title: "Backup & Data Management" },
-      { href: "/security-overview", icon: <Shield size={20} />, title: "Security Overview" },
-      { href: "/access-control", icon: <UserCog size={20} />, title: "Access Control" },
-      { href: "/data-protection", icon: <ShieldCheck size={20} />, title: "Data Protection" },
-      { href: "/security-logs", icon: <Eye size={20} />, title: "Security Logs" },
-      { href: "/checkin-security", icon: <Lock size={20} />, title: "Check-in Security" },
-      { href: "/integrations", icon: <BarChart size={20} />, title: "Integrations" },
-    ] : [];
+    // Role-specific items
+    if (currentRole === "clergy" || currentRole === "system_admin") {
+      commonItems.push(
+        { href: "/communication", icon: <MessageSquare size={20} />, title: "Communication" }
+      );
+    }
 
-    return [...dashboardItems, ...commonItems, ...adminItems];
+    return commonItems;
+  };
+
+  const getFinancialItems = () => {
+    if (currentRole === "treasurer" || currentRole === "system_admin") {
+      return [
+        { href: "/finances", icon: <CreditCard size={20} />, title: "Finances" },
+        { href: "/reports", icon: <PieChart size={20} />, title: "Reports" },
+      ];
+    }
+    return [];
+  };
+
+  const getSystemItems = () => {
+    if (currentRole === "system_admin") {
+      return [
+        { href: "/system-overview", icon: <Settings size={20} />, title: "System Overview" },
+        { href: "/users", icon: <UserCheck size={20} />, title: "User Management" },
+        { href: "/backup", icon: <Database size={20} />, title: "Backup & Data" },
+        { href: "/integrations", icon: <BarChart size={20} />, title: "Integrations" },
+      ];
+    }
+    return [];
+  };
+
+  const getSecurityItems = () => {
+    if (currentRole === "system_admin") {
+      return [
+        { href: "/security-overview", icon: <Shield size={20} />, title: "Security Overview" },
+        { href: "/access-control", icon: <UserCog size={20} />, title: "Access Control" },
+        { href: "/data-protection", icon: <ShieldCheck size={20} />, title: "Data Protection" },
+        { href: "/security-logs", icon: <Eye size={20} />, title: "Security Logs" },
+        { href: "/checkin-security", icon: <Lock size={20} />, title: "Check-in Security" },
+      ];
+    }
+    return [];
   };
 
   const getRoleDisplayText = (role) => {
@@ -154,6 +217,12 @@ const Sidebar = () => {
     );
   }
 
+  const dashboardItems = getDashboardItems();
+  const churchManagementItems = getChurchManagementItems();
+  const financialItems = getFinancialItems();
+  const systemItems = getSystemItems();
+  const securityItems = getSecurityItems();
+
   return (
     <aside
       className={cn(
@@ -179,17 +248,52 @@ const Sidebar = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto py-4 px-2">
-        <nav className="flex flex-col gap-1">
-          {getMenuItems().map((item, index) => (
-            <NavItem
-              key={index}
-              href={item.href}
-              icon={item.icon}
-              title={item.title}
+        <div className="flex flex-col gap-2">
+          {/* Dashboard Section */}
+          {dashboardItems.length > 0 && (
+            <SidebarSection
+              title="Dashboard"
+              items={dashboardItems}
               isCollapsed={collapsed}
             />
-          ))}
-        </nav>
+          )}
+
+          {/* Church Management Section */}
+          {churchManagementItems.length > 0 && (
+            <SidebarSection
+              title="Church Management"
+              items={churchManagementItems}
+              isCollapsed={collapsed}
+            />
+          )}
+
+          {/* Financial Management Section */}
+          {financialItems.length > 0 && (
+            <SidebarSection
+              title="Financial Management"
+              items={financialItems}
+              isCollapsed={collapsed}
+            />
+          )}
+
+          {/* System Administration Section */}
+          {systemItems.length > 0 && (
+            <SidebarSection
+              title="System Administration"
+              items={systemItems}
+              isCollapsed={collapsed}
+            />
+          )}
+
+          {/* Security Section */}
+          {securityItems.length > 0 && (
+            <SidebarSection
+              title="Security"
+              items={securityItems}
+              isCollapsed={collapsed}
+            />
+          )}
+        </div>
       </div>
 
       <div className="p-4 border-t border-sidebar-border">
