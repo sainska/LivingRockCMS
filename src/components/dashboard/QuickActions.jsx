@@ -1,53 +1,108 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Users, Calendar, DollarSign, MessageCircle, FileText, Settings, Bell, User, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useToast } from "@/components/ui/use-toast";
 
 const QuickActions = () => {
   const navigate = useNavigate();
   const { role } = useUserRole();
+  const { toast } = useToast();
 
   const handleQuickAction = (action) => {
-    switch (action) {
-      case 'add-member':
-        console.log('Navigating to add member...');
-        navigate('/members');
-        break;
-      case 'new-event':
-        console.log('Navigating to create event...');
-        navigate('/events');
-        break;
-      case 'record-donation':
-        console.log('Navigating to record donation...');
-        navigate('/finances');
-        break;
-      case 'send-message':
-        console.log('Navigating to communication...');
-        navigate('/communication');
-        break;
-      case 'view-reports':
-        console.log('Navigating to reports...');
-        navigate('/reports');
-        break;
-      case 'manage-settings':
-        console.log('Navigating to settings...');
-        navigate('/settings');
-        break;
-      case 'view-notifications':
-        console.log('Navigating to notifications...');
-        navigate('/notifications');
-        break;
-      case 'user-profile':
-        console.log('Navigating to user profile...');
-        navigate('/profile');
-        break;
-      case 'security-overview':
-        console.log('Navigating to security...');
-        navigate('/security');
-        break;
-      default:
-        console.log('Action not implemented:', action);
+    console.log(`Quick action triggered: ${action}`);
+    
+    try {
+      switch (action) {
+        case 'add-member':
+          console.log('Navigating to add member...');
+          navigate('/members');
+          toast({
+            title: "Navigation",
+            description: "Opening member management"
+          });
+          break;
+        case 'new-event':
+          console.log('Navigating to create event...');
+          navigate('/events');
+          toast({
+            title: "Navigation",
+            description: "Opening event management"
+          });
+          break;
+        case 'record-donation':
+          console.log('Navigating to record donation...');
+          navigate('/finances');
+          toast({
+            title: "Navigation",
+            description: "Opening financial management"
+          });
+          break;
+        case 'send-message':
+          console.log('Navigating to communication...');
+          navigate('/communication');
+          toast({
+            title: "Navigation",
+            description: "Opening communication center"
+          });
+          break;
+        case 'view-reports':
+          console.log('Navigating to reports...');
+          navigate('/reports');
+          toast({
+            title: "Navigation",
+            description: "Opening reports dashboard"
+          });
+          break;
+        case 'manage-settings':
+          console.log('Navigating to settings...');
+          navigate('/settings');
+          toast({
+            title: "Navigation",
+            description: "Opening system settings"
+          });
+          break;
+        case 'view-notifications':
+          console.log('Navigating to notifications...');
+          navigate('/notifications');
+          toast({
+            title: "Navigation",
+            description: "Opening notifications"
+          });
+          break;
+        case 'user-profile':
+          console.log('Navigating to user profile...');
+          navigate('/profile');
+          toast({
+            title: "Navigation",
+            description: "Opening user profile"
+          });
+          break;
+        case 'security-overview':
+          console.log('Navigating to security...');
+          navigate('/security');
+          toast({
+            title: "Navigation",
+            description: "Opening security dashboard"
+          });
+          break;
+        default:
+          console.log('Action not implemented:', action);
+          toast({
+            title: "Coming Soon",
+            description: "This feature is being developed",
+            variant: "default"
+          });
+      }
+    } catch (error) {
+      console.error('Error handling quick action:', error);
+      toast({
+        title: "Error",
+        description: "Failed to perform action",
+        variant: "destructive"
+      });
     }
   };
 

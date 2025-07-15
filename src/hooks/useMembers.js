@@ -44,7 +44,50 @@ export const useMembers = () => {
     };
 
     fetchMembers();
+
+    // Set up real-time subscription
+    const subscription = supabase
+      .channel('members-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'members'
+        },
+        () => {
+          fetchMembers();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [user]);
+
+  const addMember = async (memberData) => {
+    try {
+      const { data, error } = await supabase
+        .from('members')
+        .insert([{
+          ...memberData,
+          user_id: memberData.user_id || user.id,
+          membership_number: `MEM${Date.now()}`,
+          join_date: new Date().toISOString().split('T')[0]
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setMembers(prev => [data, ...prev]);
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error adding member:', error);
+      return { data: null, error };
+    }
+  };
 
   const updateMember = async (memberId, updates) => {
     try {
@@ -68,10 +111,29 @@ export const useMembers = () => {
     }
   };
 
+  const deleteMember = async (memberId) => {
+    try {
+      const { error } = await supabase
+        .from('members')
+        .delete()
+        .eq('id', memberId);
+
+      if (error) throw error;
+
+      setMembers(prev => prev.filter(member => member.id !== memberId));
+      return { error: null };
+    } catch (error) {
+      console.error('Error deleting member:', error);
+      return { error };
+    }
+  };
+
   return {
     members,
     loading,
     error,
-    updateMember
+    addMember,
+    updateMember,
+    deleteMember
   };
 };

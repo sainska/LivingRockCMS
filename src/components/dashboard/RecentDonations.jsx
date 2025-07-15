@@ -1,109 +1,93 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
-
-// Sample data for recent donations
-const recentDonations = [
-  {
-    id: "DON-1234",
-    name: "Jane Cooper",
-    amount: "$350.00",
-    type: "Tithe",
-    date: "2025-05-20",
-    status: "completed"
-  },
-  {
-    id: "DON-1235",
-    name: "Michael Johnson",
-    amount: "$75.00",
-    type: "Offering",
-    date: "2025-05-19",
-    status: "completed"
-  },
-  {
-    id: "DON-1236",
-    name: "Sarah Williams",
-    amount: "$500.00",
-    type: "Campaign",
-    date: "2025-05-19",
-    status: "completed"
-  },
-  {
-    id: "DON-1237",
-    name: "Robert Brown",
-    amount: "$250.00",
-    type: "Tithe",
-    date: "2025-05-18",
-    status: "pending"
-  },
-  {
-    id: "DON-1238",
-    name: "Elizabeth Davis",
-    amount: "$1,000.00",
-    type: "Building Fund",
-    date: "2025-05-17",
-    status: "completed"
-  }
-];
-
-const getStatusBadge = (status) => {
-  switch (status) {
-    case "completed":
-      return <Badge variant="default" className="bg-green-500">Completed</Badge>;
-    case "pending":
-      return <Badge variant="outline" className="text-amber-600 border-amber-600">Pending</Badge>;
-    case "failed":
-      return <Badge variant="destructive">Failed</Badge>;
-    default:
-      return null;
-  }
-};
+import { DollarSign, Plus } from "lucide-react";
+import { useChurchData } from "@/hooks/useChurchData";
+import { useNavigate } from "react-router-dom";
 
 const RecentDonations = () => {
+  const { stats, loading, error } = useChurchData();
+  const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Donations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-16 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Donations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-red-600">Error loading donations: {error}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Recent Donations</CardTitle>
-          <CardDescription>Recent contributions received</CardDescription>
-        </div>
-        <Button variant="outline" size="sm">
-          View All
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-base font-semibold">Recent Donations</CardTitle>
+        <Button 
+          size="sm" 
+          onClick={() => navigate('/finances')}
+          className="bg-xiracom-blue hover:bg-xiracom-darkblue"
+        >
+          <Plus className="h-4 w-4 mr-1" />
+          Add Donation
         </Button>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {recentDonations.map((donation) => (
-              <TableRow key={donation.id}>
-                <TableCell className="font-medium">{donation.id}</TableCell>
-                <TableCell>{donation.name}</TableCell>
-                <TableCell>{donation.amount}</TableCell>
-                <TableCell>{donation.type}</TableCell>
-                <TableCell>{donation.date}</TableCell>
-                <TableCell>{getStatusBadge(donation.status)}</TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="icon">
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="space-y-4">
+          {stats.recentDonations.length > 0 ? (
+            stats.recentDonations.slice(0, 5).map((donation) => (
+              <div key={donation.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-green-100 rounded-full">
+                    <DollarSign className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">KSh {parseFloat(donation.amount).toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {donation.purpose || 'General Donation'}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-muted-foreground">
+                    {new Date(donation.donation_date).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-8">
+              <DollarSign className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-muted-foreground">No donations recorded yet</p>
+              <Button 
+                className="mt-4 bg-xiracom-blue hover:bg-xiracom-darkblue"
+                onClick={() => navigate('/finances')}
+              >
+                Record First Donation
+              </Button>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
