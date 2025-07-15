@@ -1,14 +1,17 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Plus, Filter } from "lucide-react";
+import { Download, Plus, Filter, Trash2, FileText } from "lucide-react";
 import DonationChart from "@/components/dashboard/DonationChart";
 import RecentDonations from "@/components/dashboard/RecentDonations";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
 
 // Sample data for expenses
 const expenses = [
@@ -52,6 +55,100 @@ const getPledgeStatusBadge = (status) => {
 
 const Finances = () => {
   const [year, setYear] = useState("2025");
+  const { toast } = useToast();
+
+  const generateFinancialPDF = (type, data) => {
+    try {
+      const doc = new jsPDF();
+      const currentDate = new Date().toLocaleDateString();
+      
+      // Header
+      doc.setFontSize(20);
+      doc.text('Living Rock Church', 20, 20);
+      doc.setFontSize(16);
+      doc.text(`${type} Report`, 20, 30);
+      doc.setFontSize(12);
+      doc.text(`Generated on: ${currentDate}`, 20, 40);
+      
+      // Content
+      doc.setFontSize(12);
+      let yPos = 60;
+      
+      if (type === 'Expenses') {
+        doc.text('Expense Details:', 20, yPos);
+        yPos += 15;
+        expenses.forEach((expense, index) => {
+          if (yPos > 250) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.text(`${index + 1}. ${expense.description} - ${expense.amount} (${expense.date})`, 20, yPos);
+          yPos += 10;
+        });
+      } else if (type === 'Pledges') {
+        doc.text('Pledge Details:', 20, yPos);
+        yPos += 15;
+        pledges.forEach((pledge, index) => {
+          if (yPos > 250) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.text(`${index + 1}. ${pledge.name} - ${pledge.pledged} for ${pledge.campaign}`, 20, yPos);
+          yPos += 10;
+        });
+      } else if (type === 'Budget') {
+        doc.text('Budget Categories:', 20, yPos);
+        yPos += 15;
+        budgetCategories.forEach((category, index) => {
+          if (yPos > 250) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.text(`${index + 1}. ${category.name}: ${category.spent} / ${category.budgeted} (${category.percentUsed}%)`, 20, yPos);
+          yPos += 10;
+        });
+      }
+      
+      // Footer
+      doc.setFontSize(8);
+      doc.text('Living Rock Church Management System © 2025 | Powered by Xiracom', 20, 280);
+      
+      doc.save(`${type}_Report_${currentDate.replace(/\//g, '-')}.pdf`);
+      
+      toast({
+        title: "Export Complete",
+        description: `${type} report has been downloaded successfully.`,
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate report.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddNew = (type) => {
+    toast({
+      title: `Add New ${type}`,
+      description: `Opening form to add new ${type.toLowerCase()}...`,
+    });
+  };
+
+  const handleDelete = (type, id) => {
+    toast({
+      title: `Delete ${type}`,
+      description: `${type} ${id} would be deleted (feature in development)`,
+    });
+  };
+
+  const handleFilter = (type) => {
+    toast({
+      title: `Filter ${type}`,
+      description: `Opening ${type.toLowerCase()} filters...`,
+    });
+  };
   
   return (
     <div className="space-y-6">
@@ -71,7 +168,7 @@ const Finances = () => {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue">
+          <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue" onClick={() => handleAddNew("Transaction")}>
             <Plus className="mr-2 h-4 w-4" /> New Transaction
           </Button>
         </div>
@@ -98,13 +195,13 @@ const Finances = () => {
                 <CardDescription>Manage and track church expenses</CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline">
+                <Button variant="outline" onClick={() => handleFilter("Expenses")}>
                   <Filter className="mr-2 h-4 w-4" /> Filter
                 </Button>
-                <Button variant="outline">
+                <Button variant="outline" onClick={() => generateFinancialPDF("Expenses", expenses)}>
                   <Download className="mr-2 h-4 w-4" /> Export
                 </Button>
-                <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue">
+                <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue" onClick={() => handleAddNew("Expense")}>
                   <Plus className="mr-2 h-4 w-4" /> Add Expense
                 </Button>
               </div>
@@ -136,6 +233,9 @@ const Finances = () => {
                           <div className="flex space-x-1">
                             <Button variant="outline" size="sm">View</Button>
                             <Button variant="outline" size="sm">Edit</Button>
+                            <Button variant="outline" size="sm" onClick={() => handleDelete("Expense", expense.id)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -155,10 +255,13 @@ const Finances = () => {
                 <CardDescription>Track pledge campaigns and fulfillment</CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline">
+                <Button variant="outline" onClick={() => handleFilter("Pledges")}>
                   <Filter className="mr-2 h-4 w-4" /> Filter by Campaign
                 </Button>
-                <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue">
+                <Button variant="outline" onClick={() => generateFinancialPDF("Pledges", pledges)}>
+                  <Download className="mr-2 h-4 w-4" /> Export
+                </Button>
+                <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue" onClick={() => handleAddNew("Campaign")}>
                   <Plus className="mr-2 h-4 w-4" /> New Campaign
                 </Button>
               </div>
@@ -175,6 +278,7 @@ const Finances = () => {
                       <TableHead>Fulfilled</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>End Date</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -187,6 +291,14 @@ const Finances = () => {
                         <TableCell>{pledge.fulfilled}</TableCell>
                         <TableCell>{getPledgeStatusBadge(pledge.status)}</TableCell>
                         <TableCell>{pledge.endDate}</TableCell>
+                        <TableCell>
+                          <div className="flex space-x-1">
+                            <Button variant="outline" size="sm">Edit</Button>
+                            <Button variant="outline" size="sm" onClick={() => handleDelete("Pledge", pledge.id)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -204,10 +316,10 @@ const Finances = () => {
                 <CardDescription>Yearly budget allocation and tracking</CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline">
+                <Button variant="outline" onClick={() => generateFinancialPDF("Budget", budgetCategories)}>
                   <Download className="mr-2 h-4 w-4" /> Export
                 </Button>
-                <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue">
+                <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue" onClick={() => handleAddNew("Budget Category")}>
                   <Plus className="mr-2 h-4 w-4" /> Update Budget
                 </Button>
               </div>
@@ -244,7 +356,12 @@ const Finances = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Button variant="outline" size="sm">Details</Button>
+                          <div className="flex space-x-1">
+                            <Button variant="outline" size="sm">Details</Button>
+                            <Button variant="outline" size="sm" onClick={() => handleDelete("Budget Category", category.id)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

@@ -1,19 +1,23 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon, Download, Users, DollarSign, Calendar, TrendingUp, FileText, BarChart3 } from "lucide-react";
+import { CalendarIcon, Download, Users, DollarSign, Calendar, TrendingUp, FileText, BarChart3, Trash2 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import AttendanceReport from "@/components/reports/AttendanceReport";
 import FinancialReport from "@/components/reports/FinancialReport";
 import MembershipReport from "@/components/reports/MembershipReport";
 import EventsReport from "@/components/reports/EventsReport";
 import CustomReportBuilder from "@/components/reports/CustomReportBuilder";
+import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
 
 const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("month");
   const [activeTab, setActiveTab] = useState("overview");
+  const { toast } = useToast();
 
   const reportSummary = [
     {
@@ -46,9 +50,161 @@ const Reports = () => {
     }
   ];
 
+  const generateOverviewReportPDF = () => {
+    try {
+      const doc = new jsPDF();
+      const currentDate = new Date().toLocaleDateString();
+      
+      // Header
+      doc.setFontSize(20);
+      doc.text('Living Rock Church', 20, 20);
+      doc.setFontSize(16);
+      doc.text('Church Overview Report', 20, 30);
+      doc.setFontSize(12);
+      doc.text(`Period: ${selectedPeriod} | Generated on: ${currentDate}`, 20, 40);
+      
+      // Summary Statistics
+      doc.setFontSize(14);
+      doc.text('Summary Statistics', 20, 60);
+      doc.setFontSize(12);
+      
+      let yPos = 75;
+      reportSummary.forEach((item) => {
+        doc.text(`${item.title}: ${item.value} (${item.change})`, 20, yPos);
+        yPos += 10;
+      });
+      
+      // Monthly Trends
+      yPos += 20;
+      doc.setFontSize(14);
+      doc.text('Monthly Trends', 20, yPos);
+      yPos += 15;
+      doc.setFontSize(12);
+      
+      const trends = [
+        'Attendance Growth: +8.1%',
+        'Giving Growth: +12.3%',
+        'New Members: +15',
+        'Events Hosted: 8'
+      ];
+      
+      trends.forEach((trend) => {
+        doc.text(trend, 20, yPos);
+        yPos += 10;
+      });
+      
+      // Key Metrics
+      yPos += 20;
+      doc.setFontSize(14);
+      doc.text('Key Metrics', 20, yPos);
+      yPos += 15;
+      doc.setFontSize(12);
+      
+      const metrics = [
+        'Active Members: 1,247',
+        'Regular Attendees: 890',
+        'Volunteer Rate: 35%',
+        'Giving Families: 456'
+      ];
+      
+      metrics.forEach((metric) => {
+        doc.text(metric, 20, yPos);
+        yPos += 10;
+      });
+      
+      // Footer
+      doc.setFontSize(8);
+      doc.text('Living Rock Church Management System © 2025 | Powered by Xiracom', 20, 280);
+      
+      doc.save(`Church_Overview_Report_${selectedPeriod}_${currentDate.replace(/\//g, '-')}.pdf`);
+      
+      toast({
+        title: "Report Generated",
+        description: "Overview report has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate report.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleExportReport = (reportType) => {
     console.log(`Exporting ${reportType} report for period: ${selectedPeriod}`);
-    // In a real app, this would trigger a file download
+    
+    try {
+      const doc = new jsPDF();
+      const currentDate = new Date().toLocaleDateString();
+      
+      // Header
+      doc.setFontSize(20);
+      doc.text('Living Rock Church', 20, 20);
+      doc.setFontSize(16);
+      doc.text(`${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report`, 20, 30);
+      doc.setFontSize(12);
+      doc.text(`Period: ${selectedPeriod} | Generated on: ${currentDate}`, 20, 40);
+      
+      // Content based on report type
+      doc.setFontSize(12);
+      let content = '';
+      
+      switch (reportType) {
+        case 'summary':
+          content = 'Complete summary of all church activities and statistics.';
+          break;
+        case 'attendance':
+          content = 'Detailed attendance records and trends.';
+          break;
+        case 'financial':
+          content = 'Financial reports including donations and expenses.';
+          break;
+        case 'membership':
+          content = 'Membership statistics and growth analysis.';
+          break;
+        case 'events':
+          content = 'Event reports and attendance statistics.';
+          break;
+        default:
+          content = 'General church report.';
+      }
+      
+      doc.text(content, 20, 60);
+      
+      // Add sample data
+      doc.text('Report Data:', 20, 80);
+      doc.text('• Total records processed: 1,247', 20, 95);
+      doc.text('• Analysis period: ' + selectedPeriod, 20, 105);
+      doc.text('• Growth rate: +15.2%', 20, 115);
+      doc.text('• Active participation: 890 members', 20, 125);
+      
+      // Footer
+      doc.setFontSize(8);
+      doc.text('Living Rock Church Management System © 2025 | Powered by Xiracom', 20, 280);
+      
+      doc.save(`${reportType}_Report_${selectedPeriod}_${currentDate.replace(/\//g, '-')}.pdf`);
+      
+      toast({
+        title: "Export Complete",
+        description: `${reportType} report has been downloaded successfully.`,
+      });
+    } catch (error) {
+      console.error('Error exporting report:', error);
+      toast({
+        title: "Error",
+        description: "Failed to export report.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteReport = (reportId) => {
+    toast({
+      title: "Delete Report",
+      description: `Report ${reportId} would be deleted (feature in development)`,
+    });
   };
 
   return (
@@ -116,7 +272,19 @@ const Reports = () => {
 
             <TabsContent value="overview">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Church Overview Report</h3>
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">Church Overview Report</h3>
+                  <div className="flex gap-2">
+                    <Button onClick={generateOverviewReportPDF}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Generate Report
+                    </Button>
+                    <Button variant="outline" onClick={() => handleExportReport("overview")}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Export
+                    </Button>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>

@@ -16,11 +16,15 @@ import {
   CreditCard,
   Banknote,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Download,
+  FileText,
+  Trash2
 } from "lucide-react";
 import { useDonations } from '@/hooks/useDonations';
 import { useFinancialData } from '@/hooks/useFinancialData';
 import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
 
 const TreasurerDashboard = () => {
   const navigate = useNavigate();
@@ -67,6 +71,180 @@ const TreasurerDashboard = () => {
 
   const metrics = calculateMetrics();
 
+  const generateFinancialReportPDF = () => {
+    try {
+      const doc = new jsPDF();
+      const currentDate = new Date().toLocaleDateString();
+      
+      // Header
+      doc.setFontSize(20);
+      doc.text('Living Rock Church', 20, 20);
+      doc.setFontSize(16);
+      doc.text('Financial Report', 20, 30);
+      doc.setFontSize(12);
+      doc.text(`Generated on: ${currentDate}`, 20, 40);
+      
+      // Financial Summary
+      doc.setFontSize(14);
+      doc.text('Financial Summary', 20, 60);
+      doc.setFontSize(12);
+      doc.text(`Monthly Income: ${formatCurrency(metrics.monthlyIncome)}`, 20, 75);
+      doc.text(`Monthly Expenses: ${formatCurrency(metrics.monthlyExpenses)}`, 20, 85);
+      doc.text(`Net Balance: ${formatCurrency(metrics.netBalance)}`, 20, 95);
+      doc.text(`Pending Receipts: ${metrics.pendingDonations}`, 20, 105);
+      
+      // Recent Transactions
+      doc.setFontSize(14);
+      doc.text('Recent Transactions', 20, 125);
+      doc.setFontSize(10);
+      
+      let yPosition = 140;
+      transactions.slice(0, 10).forEach((transaction, index) => {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        const date = new Date(transaction.transaction_date).toLocaleDateString();
+        const line = `${index + 1}. ${transaction.description} - ${formatCurrency(transaction.amount)} (${date})`;
+        doc.text(line, 20, yPosition);
+        yPosition += 10;
+      });
+      
+      // Budget Categories
+      if (yPosition > 220) {
+        doc.addPage();
+        yPosition = 20;
+      } else {
+        yPosition += 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.text('Budget Overview', 20, yPosition);
+      yPosition += 15;
+      doc.setFontSize(10);
+      
+      budgetCategories.forEach((category, index) => {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        const percentage = Math.round((category.spent_amount / category.allocated_amount) * 100);
+        const line = `${category.name}: ${formatCurrency(category.spent_amount)} / ${formatCurrency(category.allocated_amount)} (${percentage}%)`;
+        doc.text(line, 20, yPosition);
+        yPosition += 10;
+      });
+      
+      // Footer
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.text('Living Rock Church Management System © 2025 | Powered by Xiracom', 20, 280);
+        doc.text(`Page ${i} of ${pageCount}`, 180, 280);
+      }
+      
+      // Download the PDF
+      doc.save(`Living_Rock_Church_Financial_Report_${currentDate.replace(/\//g, '-')}.pdf`);
+      
+      toast({
+        title: "PDF Generated",
+        description: "Financial report has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF report.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const exportAllData = () => {
+    try {
+      const doc = new jsPDF();
+      const currentDate = new Date().toLocaleDateString();
+      
+      // Header
+      doc.setFontSize(20);
+      doc.text('Living Rock Church', 20, 20);
+      doc.setFontSize(16);
+      doc.text('Complete Data Export', 20, 30);
+      doc.setFontSize(12);
+      doc.text(`Generated on: ${currentDate}`, 20, 40);
+      
+      let yPosition = 60;
+      
+      // All Donations
+      doc.setFontSize(14);
+      doc.text('All Donations', 20, yPosition);
+      yPosition += 15;
+      doc.setFontSize(10);
+      
+      donations.forEach((donation, index) => {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        const date = new Date(donation.created_at).toLocaleDateString();
+        const line = `${index + 1}. ${formatCurrency(donation.amount)} - ${donation.donation_type} (${date})`;
+        doc.text(line, 20, yPosition);
+        yPosition += 8;
+      });
+      
+      // All Transactions
+      if (yPosition > 220) {
+        doc.addPage();
+        yPosition = 20;
+      } else {
+        yPosition += 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.text('All Transactions', 20, yPosition);
+      yPosition += 15;
+      doc.setFontSize(10);
+      
+      transactions.forEach((transaction, index) => {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        const date = new Date(transaction.transaction_date).toLocaleDateString();
+        const line = `${index + 1}. ${transaction.description} - ${formatCurrency(transaction.amount)} (${date})`;
+        doc.text(line, 20, yPosition);
+        yPosition += 8;
+      });
+      
+      // Footer
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.text('Living Rock Church Management System © 2025 | Powered by Xiracom', 20, 280);
+        doc.text(`Page ${i} of ${pageCount}`, 180, 280);
+      }
+      
+      doc.save(`Living_Rock_Church_Complete_Export_${currentDate.replace(/\//g, '-')}.pdf`);
+      
+      toast({
+        title: "Complete Export Generated",
+        description: "All data has been exported successfully.",
+      });
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to export all data.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleQuickAction = (action) => {
     switch (action) {
       case 'record-donation':
@@ -74,6 +252,7 @@ const TreasurerDashboard = () => {
           title: "Record Donation",
           description: "Opening donation recording form...",
         });
+        navigate('/finances');
         break;
       case 'generate-receipt':
         toast({
@@ -82,7 +261,7 @@ const TreasurerDashboard = () => {
         });
         break;
       case 'financial-report':
-        handleGenerateReport();
+        generateFinancialReportPDF();
         break;
       case 'pending-approvals':
         toast({
@@ -95,17 +274,10 @@ const TreasurerDashboard = () => {
     }
   };
 
-  const handleGenerateReport = () => {
+  const handleDeleteTransaction = (transactionId) => {
     toast({
-      title: "Financial Report",
-      description: "Generating comprehensive financial report...",
-    });
-  };
-
-  const handleExportData = () => {
-    toast({
-      title: "Export Data",
-      description: "Exporting financial data...",
+      title: "Delete Transaction",
+      description: `Transaction ${transactionId} would be deleted (feature in development)`,
     });
   };
 
@@ -148,20 +320,20 @@ const TreasurerDashboard = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-h-screen pb-16">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Financial Dashboard</h1>
           <p className="text-muted-foreground">Living Rock Church - Treasurer Portal</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={handleGenerateReport}>
+          <Button onClick={generateFinancialReportPDF}>
             <Receipt className="h-4 w-4 mr-2" />
             Generate Report
           </Button>
-          <Button variant="outline" onClick={handleExportData}>
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Export Data
+          <Button variant="outline" onClick={exportAllData}>
+            <Download className="h-4 w-4 mr-2" />
+            Export All
           </Button>
         </div>
       </div>
@@ -232,11 +404,16 @@ const TreasurerDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Transactions */}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Receipt className="h-5 w-5" />
               Recent Transactions
             </CardTitle>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => exportAllData()}>
+                <Download className="h-4 w-4" />
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -248,11 +425,20 @@ const TreasurerDashboard = () => {
                       {new Date(transaction.transaction_date).toLocaleDateString()} • {transaction.transaction_type}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">{formatCurrency(transaction.amount)}</p>
-                    <Badge className={getStatusColor(transaction.approval_status)}>
-                      {transaction.approval_status}
-                    </Badge>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <p className="font-medium">{formatCurrency(transaction.amount)}</p>
+                      <Badge className={getStatusColor(transaction.approval_status)}>
+                        {transaction.approval_status}
+                      </Badge>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => handleDeleteTransaction(transaction.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -265,11 +451,14 @@ const TreasurerDashboard = () => {
 
         {/* Budget Overview */}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <PieChart className="h-5 w-5" />
               Budget Overview
             </CardTitle>
+            <Button size="sm" variant="outline" onClick={() => generateFinancialReportPDF()}>
+              <FileText className="h-4 w-4" />
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -340,8 +529,12 @@ const TreasurerDashboard = () => {
 
       {/* Active Campaigns */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Active Campaigns</CardTitle>
+          <Button size="sm" variant="outline" onClick={() => exportAllData()}>
+            <Download className="h-4 w-4 mr-2" />
+            Export Data
+          </Button>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
