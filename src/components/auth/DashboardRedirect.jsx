@@ -1,40 +1,42 @@
+
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserRole } from '@/hooks/useUserRole';
 
 const DashboardRedirect = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
-  const { role, loading: roleLoading } = useUserRole();
+  const { user, loading, role } = useAuth();
 
   useEffect(() => {
-    if (authLoading || roleLoading) return;
+    console.log('DashboardRedirect: Auth state', { user: !!user, loading, role });
+    
+    if (loading) {
+      console.log('DashboardRedirect: Still loading...');
+      return;
+    }
 
     if (!user) {
+      console.log('DashboardRedirect: No user, redirecting to auth');
       navigate('/auth');
       return;
     }
 
-    // Redirect to appropriate dashboard based on role
-    const dashboardRoutes = {
-      system_admin: '/admin-dashboard',
-      clergy: '/clergy-dashboard',
-      treasurer: '/treasurer-dashboard',
-      secretary: '/secretary-dashboard',
-      member: '/user-dashboard'
-    };
-
-    const targetRoute = dashboardRoutes[role || 'member'] || '/user-dashboard';
-    navigate(targetRoute);
-  }, [user, role, authLoading, roleLoading, navigate]);
+    // User is authenticated, redirect to dashboard
+    console.log('DashboardRedirect: User authenticated, redirecting to dashboard');
+    navigate('/dashboard');
+  }, [user, loading, role, navigate]);
 
   // Show loading while determining redirect
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-xiracom-blue"></div>
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Show nothing while redirecting
+  return null;
 };
 
-export default DashboardRedirect; 
+export default DashboardRedirect;

@@ -5,8 +5,10 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/sonner';
 import Layout from '@/components/layout/Layout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import DashboardRedirect from '@/components/auth/DashboardRedirect';
 
 // Pages
+import Welcome from '@/pages/Welcome';
 import Auth from '@/pages/Auth';
 import Dashboard from '@/pages/Dashboard';
 import Members from '@/pages/Members';
@@ -40,10 +42,13 @@ function App() {
           <Layout>
             <Routes>
               {/* Public Routes */}
+              <Route path="/welcome" element={<Welcome />} />
               <Route path="/auth" element={<Auth />} />
               
+              {/* Root route - redirects based on authentication */}
+              <Route path="/" element={<DashboardRedirect />} />
+              
               {/* Protected Routes */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />

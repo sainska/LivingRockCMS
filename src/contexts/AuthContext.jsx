@@ -20,14 +20,17 @@ export const AuthProvider = ({ children }) => {
   const { role, profile, loading: roleLoading } = useUserRole();
 
   useEffect(() => {
+    console.log('AuthProvider: Setting up auth listener');
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
+        console.log('AuthProvider: Auth state changed:', { event, user: session?.user?.email });
         setSession(session);
         setUser(session?.user ?? null);
         
         if (event === 'SIGNED_OUT') {
+          console.log('AuthProvider: User signed out');
           setUser(null);
           setSession(null);
         }
@@ -36,15 +39,20 @@ export const AuthProvider = ({ children }) => {
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('AuthProvider: Initial session check:', { user: session?.user?.email });
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log('AuthProvider: Cleaning up auth listener');
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email, password, userData = {}) => {
+    console.log('AuthProvider: Signing up user:', email);
     const redirectUrl = `${window.location.origin}/`;
     
     const { data, error } = await supabase.auth.signUp({
@@ -56,19 +64,23 @@ export const AuthProvider = ({ children }) => {
       }
     });
     
+    console.log('AuthProvider: Sign up result:', { user: data?.user?.email, error });
     return { data, error };
   };
 
   const signIn = async (email, password) => {
+    console.log('AuthProvider: Signing in user:', email);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
     
+    console.log('AuthProvider: Sign in result:', { user: data?.user?.email, error });
     return { data, error };
   };
 
   const signOut = async () => {
+    console.log('AuthProvider: Signing out user');
     const { error } = await supabase.auth.signOut();
     return { error };
   };
@@ -89,6 +101,13 @@ export const AuthProvider = ({ children }) => {
 
   const isAuthenticated = !!user;
   const isLoading = loading || roleLoading;
+
+  console.log('AuthProvider: Current auth state:', { 
+    isAuthenticated, 
+    isLoading, 
+    user: user?.email, 
+    role 
+  });
 
   const value = {
     user,
