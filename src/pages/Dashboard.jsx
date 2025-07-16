@@ -1,42 +1,52 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserRole } from '@/hooks/useUserRole';
-import { Navigate } from 'react-router-dom';
+import DashboardStats from '@/components/dashboard/DashboardStats';
+import QuickActions from '@/components/dashboard/QuickActions';
+import UpcomingEvents from '@/components/dashboard/UpcomingEvents';
+import RecentDonations from '@/components/dashboard/RecentDonations';
 import WelcomeDashboard from '@/components/dashboard/WelcomeDashboard';
 
 const Dashboard = () => {
-  const { user, loading: authLoading } = useAuth();
-  const { role, loading: roleLoading } = useUserRole();
+  const { user, profile, role } = useAuth();
 
-  if (authLoading || roleLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-xiracom-blue"></div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  // Redirect to role-specific dashboard
-  const dashboardRoutes = {
-    system_admin: '/admin-dashboard',
-    clergy: '/clergy-dashboard',
-    treasurer: '/treasurer-dashboard',
-    secretary: '/secretary-dashboard',
-    member: '/user-dashboard'
+  const getRoleDisplayName = (userRole) => {
+    const roleNames = {
+      'system_admin': 'System Administrator',
+      'clergy': 'Clergy Member',
+      'treasurer': 'Treasurer',
+      'secretary': 'Secretary',
+      'member': 'Member'
+    };
+    return roleNames[userRole] || 'Member';
   };
 
-  const targetRoute = dashboardRoutes[role || 'member'];
-  
-  if (targetRoute && window.location.pathname === '/') {
-    return <Navigate to={targetRoute} replace />;
-  }
+  return (
+    <div className="space-y-6">
+      {/* Welcome Section */}
+      <WelcomeDashboard
+        userName={profile?.first_name ? `${profile.first_name} ${profile.last_name}` : user?.email}
+        userRole={getRoleDisplayName(role)}
+      />
 
-  return <WelcomeDashboard />;
+      {/* Dashboard Statistics */}
+      <DashboardStats />
+
+      {/* Quick Actions */}
+      <QuickActions role={role} />
+
+      {/* Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Upcoming Events */}
+        <UpcomingEvents />
+
+        {/* Recent Donations (for treasurers and admins) */}
+        {(role === 'treasurer' || role === 'system_admin') && (
+          <RecentDonations />
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Dashboard;
