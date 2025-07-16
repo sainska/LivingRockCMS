@@ -13,18 +13,26 @@ const Layout = ({ children }) => {
   const publicRoutes = ['/auth', '/welcome'];
   const isPublicRoute = publicRoutes.includes(location.pathname);
 
-  console.log('Layout: Auth state', { isAuthenticated, loading, pathname: location.pathname, isPublicRoute });
+  console.log('Layout: Rendering with auth state', { 
+    isAuthenticated, 
+    loading, 
+    pathname: location.pathname, 
+    isPublicRoute 
+  });
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="text-gray-600">Loading application...</p>
+        </div>
       </div>
     );
   }
 
   if (!isAuthenticated || isPublicRoute) {
-    return <div className="min-h-screen">{children}</div>;
+    return <div className="min-h-screen bg-gray-50">{children}</div>;
   }
 
   return (

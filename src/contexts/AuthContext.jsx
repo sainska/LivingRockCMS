@@ -17,15 +17,21 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
   const { role, profile, loading: roleLoading } = useUserRole();
 
   useEffect(() => {
+    let mounted = true;
+    
     console.log('AuthProvider: Setting up auth listener');
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
+        if (!mounted) return;
+        
         console.log('AuthProvider: Auth state changed:', { event, user: session?.user?.email });
+        
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -34,22 +40,42 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
           setSession(null);
         }
+        
+        if (!authInitialized) {
+          setAuthInitialized(true);
+          setLoading(false);
+        }
       }
     );
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('AuthProvider: Initial session check:', { user: session?.user?.email });
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const getInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!mounted) return;
+        
+        console.log('AuthProvider: Initial session check:', { user: session?.user?.email });
+        setSession(session);
+        setUser(session?.user ?? null);
+        setAuthInitialized(true);
+        setLoading(false);
+      } catch (error) {
+        console.error('AuthProvider: Error getting initial session:', error);
+        if (mounted) {
+          setLoading(false);
+          setAuthInitialized(true);
+        }
+      }
+    };
+
+    getInitialSession();
 
     return () => {
+      mounted = false;
       console.log('AuthProvider: Cleaning up auth listener');
       subscription.unsubscribe();
     };
-  }, []);
+  }, []); // Remove dependencies to prevent re-initialization
 
   const signUp = async (email, password, userData = {}) => {
     console.log('AuthProvider: Signing up user:', email);
@@ -106,7 +132,8 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated, 
     isLoading, 
     user: user?.email, 
-    role 
+    role,
+    authInitialized 
   });
 
   const value = {

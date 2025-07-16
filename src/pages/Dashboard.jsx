@@ -6,9 +6,10 @@ import QuickActions from '@/components/dashboard/QuickActions';
 import UpcomingEvents from '@/components/dashboard/UpcomingEvents';
 import RecentDonations from '@/components/dashboard/RecentDonations';
 import WelcomeDashboard from '@/components/dashboard/WelcomeDashboard';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Dashboard = () => {
-  const { user, profile, role } = useAuth();
+  const { user, profile, role, loading } = useAuth();
 
   const getRoleDisplayName = (userRole) => {
     const roleNames = {
@@ -20,6 +21,29 @@ const Dashboard = () => {
     };
     return roleNames[userRole] || 'Member';
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Alert className="max-w-md">
+          <AlertDescription>
+            Please log in to access your dashboard.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
