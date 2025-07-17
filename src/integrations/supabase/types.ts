@@ -381,6 +381,45 @@ export type Database = {
           },
         ]
       }
+      communication_templates: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string
+          id: string
+          is_active: boolean | null
+          name: string
+          subject: string | null
+          template_type: string
+          updated_at: string | null
+          variables: Json | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          subject?: string | null
+          template_type?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          subject?: string | null
+          template_type?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Relationships: []
+      }
       communications: {
         Row: {
           content: string
@@ -647,6 +686,47 @@ export type Database = {
           },
         ]
       }
+      event_resources: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          notes: string | null
+          quantity: number | null
+          resource_name: string
+          resource_type: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          notes?: string | null
+          quantity?: number | null
+          resource_name: string
+          resource_type: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          notes?: string | null
+          quantity?: number | null
+          resource_name?: string
+          resource_type?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_resources_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           created_at: string | null
@@ -889,6 +969,48 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      household_members: {
+        Row: {
+          created_at: string | null
+          household_id: string
+          id: string
+          is_head: boolean | null
+          member_id: string
+          relationship: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          household_id: string
+          id?: string
+          is_head?: boolean | null
+          member_id: string
+          relationship?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          household_id?: string
+          id?: string
+          is_head?: boolean | null
+          member_id?: string
+          relationship?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "household_members_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "household_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       households: {
         Row: {
@@ -1158,6 +1280,48 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          created_at: string | null
+          donation_receipts: boolean | null
+          email_notifications: boolean | null
+          event_reminders: boolean | null
+          id: string
+          newsletter: boolean | null
+          prayer_updates: boolean | null
+          sms_notifications: boolean | null
+          updated_at: string | null
+          user_id: string
+          whatsapp_notifications: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          donation_receipts?: boolean | null
+          email_notifications?: boolean | null
+          event_reminders?: boolean | null
+          id?: string
+          newsletter?: boolean | null
+          prayer_updates?: boolean | null
+          sms_notifications?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          whatsapp_notifications?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          donation_receipts?: boolean | null
+          email_notifications?: boolean | null
+          event_reminders?: boolean | null
+          id?: string
+          newsletter?: boolean | null
+          prayer_updates?: boolean | null
+          sms_notifications?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          whatsapp_notifications?: boolean | null
+        }
+        Relationships: []
+      }
       pastoral_visits: {
         Row: {
           created_at: string
@@ -1278,6 +1442,41 @@ export type Database = {
         }
         Relationships: []
       }
+      prayer_responses: {
+        Row: {
+          id: string
+          is_private: boolean | null
+          prayer_request_id: string
+          responder_id: string
+          response_date: string | null
+          response_text: string
+        }
+        Insert: {
+          id?: string
+          is_private?: boolean | null
+          prayer_request_id: string
+          responder_id: string
+          response_date?: string | null
+          response_text: string
+        }
+        Update: {
+          id?: string
+          is_private?: boolean | null
+          prayer_request_id?: string
+          responder_id?: string
+          response_date?: string | null
+          response_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prayer_responses_prayer_request_id_fkey"
+            columns: ["prayer_request_id"]
+            isOneToOne: false
+            referencedRelation: "prayer_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
@@ -1355,6 +1554,62 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      recurring_donations: {
+        Row: {
+          amount: number
+          campaign_id: string | null
+          created_at: string | null
+          donor_id: string | null
+          end_date: string | null
+          frequency: string
+          id: string
+          is_active: boolean | null
+          next_donation_date: string | null
+          payment_method: string | null
+          purpose: string | null
+          start_date: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          campaign_id?: string | null
+          created_at?: string | null
+          donor_id?: string | null
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          next_donation_date?: string | null
+          payment_method?: string | null
+          purpose?: string | null
+          start_date: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string | null
+          created_at?: string | null
+          donor_id?: string | null
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          next_donation_date?: string | null
+          payment_method?: string | null
+          purpose?: string | null
+          start_date?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_donations_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "donation_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reports: {
         Row: {
@@ -1469,6 +1724,50 @@ export type Database = {
         }
         Relationships: []
       }
+      spiritual_milestones: {
+        Row: {
+          certificate_issued: boolean | null
+          created_at: string | null
+          id: string
+          location: string | null
+          member_id: string
+          milestone_date: string
+          milestone_type: string
+          notes: string | null
+          officiant_id: string | null
+        }
+        Insert: {
+          certificate_issued?: boolean | null
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          member_id: string
+          milestone_date: string
+          milestone_type: string
+          notes?: string | null
+          officiant_id?: string | null
+        }
+        Update: {
+          certificate_issued?: boolean | null
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          member_id?: string
+          milestone_date?: string
+          milestone_type?: string
+          notes?: string | null
+          officiant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spiritual_milestones_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff: {
         Row: {
           contract_type: string | null
@@ -1535,6 +1834,42 @@ export type Database = {
           event_type?: string | null
           id?: string
           user_name?: string | null
+        }
+        Relationships: []
+      }
+      system_notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          metadata: Json | null
+          notification_type: string | null
+          recipient_id: string
+          title: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          metadata?: Json | null
+          notification_type?: string | null
+          recipient_id: string
+          title: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          metadata?: Json | null
+          notification_type?: string | null
+          recipient_id?: string
+          title?: string
         }
         Relationships: []
       }

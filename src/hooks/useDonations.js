@@ -1,46 +1,33 @@
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useDonations = () => {
-  const { user } = useAuth();
   const [donations, setDonations] = useState([]);
-  const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user) return;
-
     const fetchDonations = async () => {
       try {
-        console.log('Fetching donations...');
-        const { data: donationsData, error: donationsError } = await supabase
+        const { data, error } = await supabase
           .from('donations')
-          .select('*')
-          .order('created_at', { ascending: false });
+          .select(`
+            *,
+            profiles!donations_donor_id_fkey (
+              first_name,
+              last_name
+            ),
+            donation_campaigns (
+              name
+            )
+          `)
+          .order('donation_date', { ascending: false });
 
-        if (donationsError) {
-          console.error('Error fetching donations:', donationsError);
-          setError(donationsError.message);
-        } else {
-          setDonations(donationsData || []);
-        }
-
-        const { data: campaignsData, error: campaignsError } = await supabase
-          .from('donation_campaigns')
-          .select('*')
-          .eq('is_active', true)
-          .order('created_at', { ascending: false });
-
-        if (campaignsError) {
-          console.error('Error fetching campaigns:', campaignsError);
-        } else {
-          setCampaigns(campaignsData || []);
-        }
+        if (error) throw error;
+        setDonations(data || []);
       } catch (err) {
-        console.error('Error in fetchDonations:', err);
+        console.error('Error fetching donations:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -48,34 +35,18 @@ export const useDonations = () => {
     };
 
     fetchDonations();
-  }, [user]);
 
-  const addDonation = async (donationData) => {
-    try {
-      const { data, error } = await supabase
-        .from('donations')
-        .insert([{
-          ...donationData,
-          recorded_by: user.id
-        }])
-        .select()
-        .single();
+    // Real-time subscription
+    const subscription = supabase
+      .channel('donations-realtime')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'donations' },
+        () => fetchDonations()
+      )
+      .subscribe();
 
-      if (error) throw error;
+    return () => supabase.removeChannel(subscription);
+  }, []);
 
-      setDonations(prev => [data, ...prev]);
-      return { data, error: null };
-    } catch (error) {
-      console.error('Error adding donation:', error);
-      return { data: null, error };
-    }
-  };
-
-  return {
-    donations,
-    campaigns,
-    loading,
-    error,
-    addDonation
-  };
+  return { donations, loading, error };
 };

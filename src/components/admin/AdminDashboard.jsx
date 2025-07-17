@@ -357,7 +357,7 @@ const AdminDashboard = () => {
             </div>
             
             <div className="mt-4 pt-3 border-t">
-              <Button variant="outline" size="sm" className="w-full">
+              <Button variant="outline" size="sm" className="w-full" onClick={() => navigate('/notifications')}>
                 View All Alerts
               </Button>
             </div>

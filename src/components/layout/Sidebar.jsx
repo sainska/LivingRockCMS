@@ -1,143 +1,310 @@
 
-import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { cn } from '@/lib/utils';
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { 
-  LayoutDashboard, Users, Calendar, DollarSign, MessageSquare, 
-  Heart, Church, BookOpen, Settings, BarChart3, Shield, 
-  UserCheck, FileText, Headphones, Briefcase
-} from 'lucide-react';
+  ChevronLeft, 
+  ChevronRight, 
+  LayoutDashboard, 
+  Users, 
+  Database, 
+  BookOpen, 
+  Settings, 
+  BarChart, 
+  Shield,
+  Activity,
+  Lock,
+  Eye,
+  UserCog,
+  ShieldCheck,
+  DollarSign,
+  FileText,
+  Church,
+  User,
+  Calendar,
+  MessageSquare,
+  Heart,
+  Music,
+  UserCheck,
+  Building,
+  PieChart,
+  CreditCard,
+  Mail,
+  Bell
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 
-const Sidebar = () => {
-  const { role } = useAuth();
+const NavItem = ({ href, icon, title, isCollapsed }) => {
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const menuItems = [
-    {
-      title: 'Dashboard',
-      icon: LayoutDashboard,
-      path: '/dashboard',
-      roles: ['system_admin', 'clergy', 'treasurer', 'secretary', 'member']
-    },
-    {
-      title: 'Members',
-      icon: Users,
-      path: '/members',
-      roles: ['system_admin', 'clergy', 'secretary']
-    },
-    {
-      title: 'Events',
-      icon: Calendar,
-      path: '/events',
-      roles: ['system_admin', 'clergy', 'secretary', 'member']
-    },
-    {
-      title: 'Finances',
-      icon: DollarSign,
-      path: '/finances',
-      roles: ['system_admin', 'treasurer']
-    },
-    {
-      title: 'Communication',
-      icon: MessageSquare,
-      path: '/communication',
-      roles: ['system_admin', 'clergy', 'secretary']
-    },
-    {
-      title: 'Prayer Requests',
-      icon: Heart,
-      path: '/prayer-requests',
-      roles: ['system_admin', 'clergy', 'member']
-    },
-    {
-      title: 'Ministries',
-      icon: Church,
-      path: '/ministries',
-      roles: ['system_admin', 'clergy', 'member']
-    },
-    {
-      title: 'Bible Study',
-      icon: BookOpen,
-      path: '/bible-study',
-      roles: ['system_admin', 'clergy', 'member']
-    },
-    {
-      title: 'Sermons',
-      icon: Headphones,
-      path: '/sermons',
-      roles: ['system_admin', 'clergy', 'member']
-    },
-    {
-      title: 'Volunteers',
-      icon: UserCheck,
-      path: '/volunteers',
-      roles: ['system_admin', 'secretary']
-    },
-    {
-      title: 'Staff',
-      icon: Briefcase,
-      path: '/staff',
-      roles: ['system_admin']
-    },
-    {
-      title: 'Reports',
-      icon: BarChart3,
-      path: '/reports',
-      roles: ['system_admin', 'clergy', 'treasurer']
-    },
-    {
-      title: 'Church Info',
-      icon: FileText,
-      path: '/church-info',
-      roles: ['system_admin', 'clergy', 'secretary', 'member']
-    },
-    {
-      title: 'Security',
-      icon: Shield,
-      path: '/security',
-      roles: ['system_admin']
-    },
-    {
-      title: 'Settings',
-      icon: Settings,
-      path: '/settings',
-      roles: ['system_admin', 'clergy']
-    }
-  ];
-
-  const filteredMenuItems = menuItems.filter(item => 
-    item.roles.includes(role) || role === 'system_admin'
-  );
-
-  const isActive = (path) => {
-    return location.pathname === path || 
-           (path !== '/dashboard' && location.pathname.startsWith(path));
-  };
+  const isActive = location.pathname === href;
 
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-64 bg-white border-r border-gray-200 overflow-y-auto">
-      <nav className="p-4 space-y-2">
-        {filteredMenuItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className={cn(
-                "w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors",
-                isActive(item.path)
-                  ? "bg-blue-50 text-blue-600 border border-blue-200"
-                  : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-              )}
-            >
-              <Icon className="h-5 w-5" />
-              <span className="font-medium">{item.title}</span>
-            </button>
-          );
-        })}
+    <Link
+      to={href}
+      className={cn(
+        "flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        isActive
+          ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+          : "text-sidebar-foreground"
+      )}
+    >
+      {icon}
+      {!isCollapsed && <span className="font-medium">{title}</span>}
+    </Link>
+  );
+};
+
+const SidebarSection = ({ title, items, isCollapsed }) => {
+  return (
+    <div className="mb-4">
+      {!isCollapsed && (
+        <h3 className="px-3 pb-2 text-xs font-semibold text-sidebar-foreground/70 uppercase tracking-wider">
+          {title}
+        </h3>
+      )}
+      <nav className="flex flex-col gap-1">
+        {items.map((item, index) => (
+          <NavItem
+            key={index}
+            href={item.href}
+            icon={item.icon}
+            title={item.title}
+            isCollapsed={isCollapsed}
+          />
+        ))}
       </nav>
+    </div>
+  );
+};
+
+const Sidebar = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const { user } = useAuth();
+  const { role: userRole, loading } = useUserRole();
+
+  // Default to member role while loading or if no role found
+  const currentRole = userRole || "member";
+
+  const getDashboardItems = () => {
+    const items = [];
+    
+    // Role-specific dashboard items
+    switch (currentRole) {
+      case "system_admin":
+        items.push(
+          { href: "/", icon: <LayoutDashboard size={20} />, title: "Admin Dashboard" },
+          { href: "/system-dashboard", icon: <Activity size={20} />, title: "System Dashboard" }
+        );
+        break;
+      case "treasurer":
+        items.push(
+          { href: "/treasurer-dashboard", icon: <DollarSign size={20} />, title: "Treasurer Dashboard" }
+        );
+        break;
+      case "secretary":
+        items.push(
+          { href: "/secretary-dashboard", icon: <FileText size={20} />, title: "Secretary Dashboard" }
+        );
+        break;
+      case "clergy":
+        items.push(
+          { href: "/clergy-dashboard", icon: <Church size={20} />, title: "Clergy Dashboard" }
+        );
+        break;
+      default:
+        items.push(
+          { href: "/user-dashboard", icon: <User size={20} />, title: "My Dashboard" }
+        );
+    }
+
+    return items;
+  };
+
+  const getChurchManagementItems = () => {
+    const commonItems = [
+      { href: "/church-info", icon: <Building size={20} />, title: "Church Info" },
+      { href: "/events", icon: <Calendar size={20} />, title: "Events" },
+      { href: "/members", icon: <Users size={20} />, title: "Members" },
+      { href: "/ministry", icon: <Heart size={20} />, title: "Ministry" },
+    ];
+
+    // Role-specific items
+    if (currentRole === "clergy" || currentRole === "system_admin") {
+      commonItems.push(
+        { href: "/communication", icon: <MessageSquare size={20} />, title: "Communication" }
+      );
+    }
+
+    return commonItems;
+  };
+
+  const getFinancialItems = () => {
+    if (currentRole === "treasurer" || currentRole === "system_admin") {
+      return [
+        { href: "/finances", icon: <CreditCard size={20} />, title: "Finances" },
+        { href: "/reports", icon: <PieChart size={20} />, title: "Reports" },
+      ];
+    }
+    return [];
+  };
+
+  const getSystemItems = () => {
+    if (currentRole === "system_admin") {
+      return [
+        { href: "/system-overview", icon: <Settings size={20} />, title: "System Overview" },
+        { href: "/users", icon: <UserCheck size={20} />, title: "User Management" },
+        { href: "/backup", icon: <Database size={20} />, title: "Backup & Data" },
+        { href: "/integrations", icon: <BarChart size={20} />, title: "Integrations" },
+      ];
+    }
+    return [];
+  };
+
+  const getSecurityItems = () => {
+    if (currentRole === "system_admin") {
+      return [
+        { href: "/security-overview", icon: <Shield size={20} />, title: "Security Overview" },
+        { href: "/access-control", icon: <UserCog size={20} />, title: "Access Control" },
+        { href: "/data-protection", icon: <ShieldCheck size={20} />, title: "Data Protection" },
+        { href: "/security-logs", icon: <Eye size={20} />, title: "Security Logs" },
+        { href: "/checkin-security", icon: <Lock size={20} />, title: "Check-in Security" },
+      ];
+    }
+    return [];
+  };
+
+  const getRoleDisplayText = (role) => {
+    switch (role) {
+      case "system_admin":
+        return "System Administration";
+      case "treasurer":
+        return "Financial Management";
+      case "secretary":
+        return "Administrative Portal";
+      case "clergy":
+        return "Ministry Oversight";
+      default:
+        return "Member Portal";
+    }
+  };
+
+  const getRoleFooterText = (role) => {
+    switch (role) {
+      case "system_admin":
+        return "System Administration Panel";
+      case "treasurer":
+        return "Financial Management System";
+      case "secretary":
+        return "Administrative System";
+      case "clergy":
+        return "Ministry Management System";
+      default:
+        return "Member Portal";
+    }
+  };
+
+  if (loading) {
+    return (
+      <aside className="flex flex-col bg-sidebar h-screen border-r shadow-sm w-64">
+        <div className="p-4">
+          <div className="text-sidebar-foreground">
+            <div className="text-xl font-bold">Living Rock</div>
+            <div className="text-sm opacity-80">Loading...</div>
+          </div>
+        </div>
+      </aside>
+    );
+  }
+
+  const dashboardItems = getDashboardItems();
+  const churchManagementItems = getChurchManagementItems();
+  const financialItems = getFinancialItems();
+  const systemItems = getSystemItems();
+  const securityItems = getSecurityItems();
+
+  return (
+    <aside
+      className={cn(
+        "flex flex-col bg-sidebar h-full border-r border-sidebar-border shadow-sm transition-all duration-300",
+        collapsed ? "w-16" : "w-64"
+      )}
+    >
+      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
+        {!collapsed && (
+          <div className="text-sidebar-foreground">
+            <div className="text-xl font-bold">Living Rock</div>
+            <div className="text-sm opacity-80">
+              {getRoleDisplayText(currentRole)}
+            </div>
+          </div>
+        )}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="p-2 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground transition-colors"
+        >
+          {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto py-4 px-2">
+        <div className="flex flex-col gap-2">
+          {/* Dashboard Section */}
+          {dashboardItems.length > 0 && (
+            <SidebarSection
+              title="Dashboard"
+              items={dashboardItems}
+              isCollapsed={collapsed}
+            />
+          )}
+
+          {/* Church Management Section */}
+          {churchManagementItems.length > 0 && (
+            <SidebarSection
+              title="Church Management"
+              items={churchManagementItems}
+              isCollapsed={collapsed}
+            />
+          )}
+
+          {/* Financial Management Section */}
+          {financialItems.length > 0 && (
+            <SidebarSection
+              title="Financial Management"
+              items={financialItems}
+              isCollapsed={collapsed}
+            />
+          )}
+
+          {/* System Administration Section */}
+          {systemItems.length > 0 && (
+            <SidebarSection
+              title="System Administration"
+              items={systemItems}
+              isCollapsed={collapsed}
+            />
+          )}
+
+          {/* Security Section */}
+          {securityItems.length > 0 && (
+            <SidebarSection
+              title="Security"
+              items={securityItems}
+              isCollapsed={collapsed}
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="p-4 border-t border-sidebar-border">
+        {!collapsed && (
+          <div className="text-xs text-sidebar-foreground opacity-70">
+            © {new Date().getFullYear()} Living Rock Church
+            <br />
+            {getRoleFooterText(currentRole)}
+          </div>
+        )}
+      </div>
     </aside>
   );
 };

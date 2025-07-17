@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,14 +6,25 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { DatePicker } from "@/components/ui/date-picker";
-import { Download, Search, Filter, RefreshCw, AlertTriangle } from "lucide-react";
+import { Download, Search, Filter, RefreshCw, AlertTriangle, Activity } from "lucide-react";
 import { useRealTimeSecurityLogs } from '@/hooks/useRealTimeSecurityLogs';
+import { usePDFExport } from '@/hooks/usePDFExport';
+import { toast } from 'sonner';
 
-const SecurityLogs = () => {
-  const { securityLogs, securityStats, loading, error, refetch } = useRealTimeSecurityLogs();
+const RealTimeSecurityLogs = () => {
+  const { securityLogs, securityStats, loading, refetch } = useRealTimeSecurityLogs();
+  const { exportSecurityReport, isExporting } = usePDFExport();
   const [filterType, setFilterType] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+
+  const handleExportPDF = async () => {
+    try {
+      await exportSecurityReport(securityLogs);
+      toast.success('Security report exported successfully!');
+    } catch (error) {
+      toast.error('Failed to export security report');
+    }
+  };
 
   const getSeverityColor = (severity) => {
     switch (severity) {
@@ -37,45 +49,77 @@ const SecurityLogs = () => {
     const matchesSearch = searchTerm === "" || 
       log.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (log.user && log.user.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (log.ip && log.ip.toString().includes(searchTerm));
+      log.ip.includes(searchTerm);
     return matchesType && matchesSearch;
   });
 
-  const securitySummary = [
-    { label: "Total Events", value: securityStats.totalEvents, color: "text-blue-600" },
-    { label: "High Severity", value: securityStats.highSeverity, color: "text-red-600" },
-    { label: "Failed Attempts", value: securityStats.failedAttempts, color: "text-yellow-600" },
-    { label: "Blocked Events", value: securityStats.blockedEvents, color: "text-orange-600" }
-  ];
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-muted rounded w-1/4"></div>
+          <div className="h-64 bg-muted rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Security Logs & Audit Trail</h3>
+        <div className="flex items-center gap-2">
+          <Activity className="h-6 w-6 text-blue-600" />
+          <h3 className="text-lg font-semibold">Real-Time Security Logs</h3>
+          <Badge variant="outline" className="bg-green-50 text-green-700">
+            Live
+          </Badge>
+        </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={refetch}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={isExporting}>
             <Download className="h-4 w-4 mr-2" />
-            Export Logs
+            {isExporting ? 'Exporting...' : 'Export PDF'}
           </Button>
         </div>
       </div>
 
-      {/* Security Summary */}
+      {/* Real-time Security Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {securitySummary.map((item, index) => (
-          <Card key={index}>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">{item.label}</p>
-                <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">Total Events</p>
+              <p className="text-2xl font-bold text-blue-600">{securityStats.totalEvents}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">High Severity</p>
+              <p className="text-2xl font-bold text-red-600">{securityStats.highSeverity}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">Failed Attempts</p>
+              <p className="text-2xl font-bold text-yellow-600">{securityStats.failedAttempts}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">Blocked Events</p>
+              <p className="text-2xl font-bold text-orange-600">{securityStats.blockedEvents}</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}
@@ -115,10 +159,13 @@ const SecurityLogs = () => {
         </CardContent>
       </Card>
 
-      {/* Security Logs Table */}
+      {/* Real-time Security Logs Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Security Event Log</CardTitle>
+          <CardTitle className="text-base flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            Live Security Event Log
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -134,11 +181,13 @@ const SecurityLogs = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredLogs.map((log) => (
+              {filteredLogs.slice(0, 50).map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell className="font-mono text-sm">{log.timestamp}</TableCell>
+                  <TableCell className="font-mono text-sm">
+                    {new Date(log.timestamp).toLocaleString()}
+                  </TableCell>
                   <TableCell className="font-medium">{log.event}</TableCell>
-                  <TableCell>{log.user}</TableCell>
+                  <TableCell>{log.user || 'System'}</TableCell>
                   <TableCell className="font-mono text-sm">{log.ip}</TableCell>
                   <TableCell>
                     <Badge className={getResultColor(log.result)}>
@@ -157,43 +206,16 @@ const SecurityLogs = () => {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
-
-      {/* Security Alerts */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4" />
-            Recent Security Alerts
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {securityLogs
-              .filter(log => log.severity === "high" || log.result === "Failed" || log.result === "Blocked")
-              .slice(0, 5)
-              .map((alert, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                    <div>
-                      <p className="font-medium text-sm">{alert.event}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {alert.user} • {alert.ip} • {alert.timestamp}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge className={getSeverityColor(alert.severity)}>
-                    {alert.severity}
-                  </Badge>
-                </div>
-              ))}
-          </div>
+          
+          {filteredLogs.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              No security events found matching your criteria
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default SecurityLogs;
+export default RealTimeSecurityLogs;
