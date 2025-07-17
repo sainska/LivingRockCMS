@@ -2,7 +2,7 @@
 import React from 'react';
 import UserAccessControl from '@/components/security/UserAccessControl';
 import SecurityOverview from '@/components/security/SecurityOverview';
-import SecurityLogs from '@/components/security/SecurityLogs';
+import RealTimeSecurityLogs from '@/components/security/RealTimeSecurityLogs';
 import DataProtection from '@/components/security/DataProtection';
 import CheckInSecurity from '@/components/security/CheckInSecurity';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -43,7 +43,7 @@ const Security = () => {
         </TabsContent>
         
         <TabsContent value="logs">
-          <SecurityLogs />
+          <RealTimeSecurityLogs />
         </TabsContent>
         
         <TabsContent value="data-protection">
