@@ -1,42 +1,27 @@
 
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { Navigate } from 'react-router-dom';
-import WelcomeDashboard from '@/components/dashboard/WelcomeDashboard';
+import SystemDashboard from '@/components/admin/SystemDashboard';
+import ClergyDashboard from '@/components/admin/ClergyDashboard';
+import TreasurerDashboard from '@/components/admin/TreasurerDashboard';
+import SecretaryDashboard from '@/components/admin/SecretaryDashboard';
+import UserDashboard from '@/components/admin/UserDashboard';
+import EnhancedDashboard from '@/components/dashboard/EnhancedDashboard';
+import DashboardRedirect from '@/components/auth/DashboardRedirect';
 
 const Dashboard = () => {
-  const { user, loading: authLoading } = useAuth();
-  const { role, loading: roleLoading } = useUserRole();
+  const { role, loading } = useUserRole();
 
-  if (authLoading || roleLoading) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-xiracom-blue"></div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  // Redirect to role-specific dashboard
-  const dashboardRoutes = {
-    system_admin: '/admin-dashboard',
-    clergy: '/clergy-dashboard',
-    treasurer: '/treasurer-dashboard',
-    secretary: '/secretary-dashboard',
-    member: '/user-dashboard'
-  };
-
-  const targetRoute = dashboardRoutes[role || 'member'];
-  
-  if (targetRoute && window.location.pathname === '/') {
-    return <Navigate to={targetRoute} replace />;
-  }
-
-  return <WelcomeDashboard />;
+  // Use the enhanced dashboard for all users with role-based content filtering
+  return <EnhancedDashboard />;
 };
 
 export default Dashboard;

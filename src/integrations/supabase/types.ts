@@ -118,6 +118,93 @@ export type Database = {
           },
         ]
       }
+      bible_study_attendance: {
+        Row: {
+          attendance_date: string
+          created_at: string | null
+          group_id: string | null
+          id: string
+          member_id: string | null
+          notes: string | null
+          recorded_by: string | null
+          status: string | null
+        }
+        Insert: {
+          attendance_date: string
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          member_id?: string | null
+          notes?: string | null
+          recorded_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          attendance_date?: string
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          member_id?: string | null
+          notes?: string | null
+          recorded_by?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bible_study_attendance_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "bible_study_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bible_study_attendance_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bible_study_groups: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          leader_id: string | null
+          location: string | null
+          meeting_day: string | null
+          meeting_time: string | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          leader_id?: string | null
+          location?: string | null
+          meeting_day?: string | null
+          meeting_time?: string | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          leader_id?: string | null
+          location?: string | null
+          meeting_day?: string | null
+          meeting_time?: string | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       budget: {
         Row: {
           category: string | null
@@ -294,6 +381,45 @@ export type Database = {
           },
         ]
       }
+      communication_templates: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string
+          id: string
+          is_active: boolean | null
+          name: string
+          subject: string | null
+          template_type: string
+          updated_at: string | null
+          variables: Json | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          subject?: string | null
+          template_type?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          subject?: string | null
+          template_type?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Relationships: []
+      }
       communications: {
         Row: {
           content: string
@@ -350,6 +476,56 @@ export type Database = {
           type?: string | null
         }
         Relationships: []
+      }
+      counseling_sessions: {
+        Row: {
+          counselor_id: string | null
+          created_at: string | null
+          follow_up_date: string | null
+          follow_up_required: boolean | null
+          id: string
+          member_id: string | null
+          notes: string | null
+          session_date: string
+          session_time: string | null
+          status: string | null
+          topic: string
+        }
+        Insert: {
+          counselor_id?: string | null
+          created_at?: string | null
+          follow_up_date?: string | null
+          follow_up_required?: boolean | null
+          id?: string
+          member_id?: string | null
+          notes?: string | null
+          session_date: string
+          session_time?: string | null
+          status?: string | null
+          topic: string
+        }
+        Update: {
+          counselor_id?: string | null
+          created_at?: string | null
+          follow_up_date?: string | null
+          follow_up_required?: boolean | null
+          id?: string
+          member_id?: string | null
+          notes?: string | null
+          session_date?: string
+          session_time?: string | null
+          status?: string | null
+          topic?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "counseling_sessions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       donation_campaigns: {
         Row: {
@@ -506,6 +682,47 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_resources: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          notes: string | null
+          quantity: number | null
+          resource_name: string
+          resource_type: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          notes?: string | null
+          quantity?: number | null
+          resource_name: string
+          resource_type: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          notes?: string | null
+          quantity?: number | null
+          resource_name?: string
+          resource_type?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_resources_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]
@@ -753,56 +970,169 @@ export type Database = {
         }
         Relationships: []
       }
+      household_members: {
+        Row: {
+          created_at: string | null
+          household_id: string
+          id: string
+          is_head: boolean | null
+          member_id: string
+          relationship: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          household_id: string
+          id?: string
+          is_head?: boolean | null
+          member_id: string
+          relationship?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          household_id?: string
+          id?: string
+          is_head?: boolean | null
+          member_id?: string
+          relationship?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "household_members_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "household_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      households: {
+        Row: {
+          address: string | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          email: string | null
+          head_of_household_id: string | null
+          id: string
+          name: string
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          head_of_household_id?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          head_of_household_id?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "households_head_of_household_id_fkey"
+            columns: ["head_of_household_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       members: {
         Row: {
+          address: string | null
           baptism_date: string | null
+          city: string | null
           confirmation_date: string | null
+          country: string | null
           created_at: string | null
+          date_of_birth: string | null
           email: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
+          gender: string | null
+          household_id: string | null
           id: string
           join_date: string
           joined_at: string | null
+          marital_status: string | null
           membership_number: string
           ministry_involvement: string[] | null
           notes: string | null
+          occupation: string | null
           phone: string | null
           status: Database["public"]["Enums"]["member_status"] | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          address?: string | null
           baptism_date?: string | null
+          city?: string | null
           confirmation_date?: string | null
+          country?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
           email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
+          gender?: string | null
+          household_id?: string | null
           id?: string
           join_date?: string
           joined_at?: string | null
+          marital_status?: string | null
           membership_number: string
           ministry_involvement?: string[] | null
           notes?: string | null
+          occupation?: string | null
           phone?: string | null
           status?: Database["public"]["Enums"]["member_status"] | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          address?: string | null
           baptism_date?: string | null
+          city?: string | null
           confirmation_date?: string | null
+          country?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
           email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
+          gender?: string | null
+          household_id?: string | null
           id?: string
           join_date?: string
           joined_at?: string | null
+          marital_status?: string | null
           membership_number?: string
           ministry_involvement?: string[] | null
           notes?: string | null
+          occupation?: string | null
           phone?: string | null
           status?: Database["public"]["Enums"]["member_status"] | null
           updated_at?: string | null
@@ -817,6 +1147,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      message_recipients: {
+        Row: {
+          created_at: string | null
+          delivered_at: string | null
+          delivery_status: string | null
+          id: string
+          message_id: string
+          read_at: string | null
+          recipient_id: string | null
+          recipient_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_status?: string | null
+          id?: string
+          message_id: string
+          read_at?: string | null
+          recipient_id?: string | null
+          recipient_type: string
+        }
+        Update: {
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_status?: string | null
+          id?: string
+          message_id?: string
+          read_at?: string | null
+          recipient_id?: string | null
+          recipient_type?: string
+        }
+        Relationships: []
       }
       ministries: {
         Row: {
@@ -916,6 +1279,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notification_preferences: {
+        Row: {
+          created_at: string | null
+          donation_receipts: boolean | null
+          email_notifications: boolean | null
+          event_reminders: boolean | null
+          id: string
+          newsletter: boolean | null
+          prayer_updates: boolean | null
+          sms_notifications: boolean | null
+          updated_at: string | null
+          user_id: string
+          whatsapp_notifications: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          donation_receipts?: boolean | null
+          email_notifications?: boolean | null
+          event_reminders?: boolean | null
+          id?: string
+          newsletter?: boolean | null
+          prayer_updates?: boolean | null
+          sms_notifications?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          whatsapp_notifications?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          donation_receipts?: boolean | null
+          email_notifications?: boolean | null
+          event_reminders?: boolean | null
+          id?: string
+          newsletter?: boolean | null
+          prayer_updates?: boolean | null
+          sms_notifications?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          whatsapp_notifications?: boolean | null
+        }
+        Relationships: []
       }
       pastoral_visits: {
         Row: {
@@ -1037,53 +1442,174 @@ export type Database = {
         }
         Relationships: []
       }
+      prayer_responses: {
+        Row: {
+          id: string
+          is_private: boolean | null
+          prayer_request_id: string
+          responder_id: string
+          response_date: string | null
+          response_text: string
+        }
+        Insert: {
+          id?: string
+          is_private?: boolean | null
+          prayer_request_id: string
+          responder_id: string
+          response_date?: string | null
+          response_text: string
+        }
+        Update: {
+          id?: string
+          is_private?: boolean | null
+          prayer_request_id?: string
+          responder_id?: string
+          response_date?: string | null
+          response_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prayer_responses_prayer_request_id_fkey"
+            columns: ["prayer_request_id"]
+            isOneToOne: false
+            referencedRelation: "prayer_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
+          baptism_status: boolean | null
           city: string | null
+          confirmation_status: boolean | null
           country: string | null
           created_at: string | null
           date_of_birth: string | null
           email: string
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
           first_name: string
           gender: string | null
+          household_id: string | null
           id: string
           last_name: string
+          marital_status: string | null
+          next_of_kin_name: string | null
+          next_of_kin_phone: string | null
+          next_of_kin_relationship: string | null
+          occupation: string | null
           phone: string | null
           profile_image_url: string | null
           updated_at: string | null
         }
         Insert: {
           address?: string | null
+          baptism_status?: boolean | null
           city?: string | null
+          confirmation_status?: boolean | null
           country?: string | null
           created_at?: string | null
           date_of_birth?: string | null
           email: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           first_name: string
           gender?: string | null
+          household_id?: string | null
           id: string
           last_name: string
+          marital_status?: string | null
+          next_of_kin_name?: string | null
+          next_of_kin_phone?: string | null
+          next_of_kin_relationship?: string | null
+          occupation?: string | null
           phone?: string | null
           profile_image_url?: string | null
           updated_at?: string | null
         }
         Update: {
           address?: string | null
+          baptism_status?: boolean | null
           city?: string | null
+          confirmation_status?: boolean | null
           country?: string | null
           created_at?: string | null
           date_of_birth?: string | null
           email?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           first_name?: string
           gender?: string | null
+          household_id?: string | null
           id?: string
           last_name?: string
+          marital_status?: string | null
+          next_of_kin_name?: string | null
+          next_of_kin_phone?: string | null
+          next_of_kin_relationship?: string | null
+          occupation?: string | null
           phone?: string | null
           profile_image_url?: string | null
           updated_at?: string | null
         }
         Relationships: []
+      }
+      recurring_donations: {
+        Row: {
+          amount: number
+          campaign_id: string | null
+          created_at: string | null
+          donor_id: string | null
+          end_date: string | null
+          frequency: string
+          id: string
+          is_active: boolean | null
+          next_donation_date: string | null
+          payment_method: string | null
+          purpose: string | null
+          start_date: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          campaign_id?: string | null
+          created_at?: string | null
+          donor_id?: string | null
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          next_donation_date?: string | null
+          payment_method?: string | null
+          purpose?: string | null
+          start_date: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string | null
+          created_at?: string | null
+          donor_id?: string | null
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          next_donation_date?: string | null
+          payment_method?: string | null
+          purpose?: string | null
+          start_date?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_donations_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "donation_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reports: {
         Row: {
@@ -1108,6 +1634,56 @@ export type Database = {
           url?: string | null
         }
         Relationships: []
+      }
+      resource_bookings: {
+        Row: {
+          booked_by: string | null
+          booking_date: string
+          created_at: string | null
+          end_time: string | null
+          event_id: string | null
+          id: string
+          notes: string | null
+          resource_name: string
+          resource_type: string
+          start_time: string | null
+          status: string | null
+        }
+        Insert: {
+          booked_by?: string | null
+          booking_date: string
+          created_at?: string | null
+          end_time?: string | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          resource_name: string
+          resource_type: string
+          start_time?: string | null
+          status?: string | null
+        }
+        Update: {
+          booked_by?: string | null
+          booking_date?: string
+          created_at?: string | null
+          end_time?: string | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          resource_name?: string
+          resource_type?: string
+          start_time?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_bookings_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sermons: {
         Row: {
@@ -1148,6 +1724,95 @@ export type Database = {
         }
         Relationships: []
       }
+      spiritual_milestones: {
+        Row: {
+          certificate_issued: boolean | null
+          created_at: string | null
+          id: string
+          location: string | null
+          member_id: string
+          milestone_date: string
+          milestone_type: string
+          notes: string | null
+          officiant_id: string | null
+        }
+        Insert: {
+          certificate_issued?: boolean | null
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          member_id: string
+          milestone_date: string
+          milestone_type: string
+          notes?: string | null
+          officiant_id?: string | null
+        }
+        Update: {
+          certificate_issued?: boolean | null
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          member_id?: string
+          milestone_date?: string
+          milestone_type?: string
+          notes?: string | null
+          officiant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spiritual_milestones_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff: {
+        Row: {
+          contract_type: string | null
+          created_at: string | null
+          department: string
+          employee_id: string
+          hire_date: string
+          id: string
+          is_active: boolean | null
+          position: string
+          salary: number | null
+          supervisor_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          contract_type?: string | null
+          created_at?: string | null
+          department: string
+          employee_id: string
+          hire_date: string
+          id?: string
+          is_active?: boolean | null
+          position: string
+          salary?: number | null
+          supervisor_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          contract_type?: string | null
+          created_at?: string | null
+          department?: string
+          employee_id?: string
+          hire_date?: string
+          id?: string
+          is_active?: boolean | null
+          position?: string
+          salary?: number | null
+          supervisor_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       system_events: {
         Row: {
           action: string
@@ -1169,6 +1834,42 @@ export type Database = {
           event_type?: string | null
           id?: string
           user_name?: string | null
+        }
+        Relationships: []
+      }
+      system_notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          metadata: Json | null
+          notification_type: string | null
+          recipient_id: string
+          title: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          metadata?: Json | null
+          notification_type?: string | null
+          recipient_id: string
+          title: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          metadata?: Json | null
+          notification_type?: string | null
+          recipient_id?: string
+          title?: string
         }
         Relationships: []
       }
@@ -1286,11 +1987,102 @@ export type Database = {
         }
         Relationships: []
       }
+      volunteers: {
+        Row: {
+          created_at: string | null
+          department: string
+          end_date: string | null
+          hours_per_week: number | null
+          id: string
+          is_active: boolean | null
+          role: string
+          skills: string[] | null
+          start_date: string | null
+          supervisor_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          department: string
+          end_date?: string | null
+          hours_per_week?: number | null
+          id?: string
+          is_active?: boolean | null
+          role: string
+          skills?: string[] | null
+          start_date?: string | null
+          supervisor_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          department?: string
+          end_date?: string | null
+          hours_per_week?: number | null
+          id?: string
+          is_active?: boolean | null
+          role?: string
+          skills?: string[] | null
+          start_date?: string | null
+          supervisor_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      whatsapp_logs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          id: string
+          message_content: string
+          message_type: string
+          recipient_phone: string
+          sent_by: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          message_content: string
+          message_type: string
+          recipient_phone: string
+          sent_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          message_content?: string
+          message_type?: string
+          recipient_phone?: string
+          sent_by?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_dashboard_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_members: number
+          new_members_this_month: number
+          upcoming_events: number
+          total_donations: number
+          monthly_donations: number
+          active_ministries: number
+          pending_communications: number
+          prayer_requests: number
+        }[]
+      }
       get_system_resources: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1317,6 +2109,7 @@ export type Database = {
     }
     Enums: {
       donation_type: "tithe" | "offering" | "special" | "project" | "missions"
+      event_status: "scheduled" | "in_progress" | "completed" | "cancelled"
       event_type:
         | "service"
         | "meeting"
@@ -1325,6 +2118,14 @@ export type Database = {
         | "outreach"
         | "other"
       member_status: "active" | "inactive" | "deceased" | "transferred"
+      message_status: "draft" | "sent" | "failed" | "delivered"
+      message_type:
+        | "announcement"
+        | "reminder"
+        | "alert"
+        | "newsletter"
+        | "prayer_update"
+      ministry_role: "leader" | "co_leader" | "member" | "volunteer"
       payment_method:
         | "cash"
         | "check"
@@ -1465,6 +2266,7 @@ export const Constants = {
   public: {
     Enums: {
       donation_type: ["tithe", "offering", "special", "project", "missions"],
+      event_status: ["scheduled", "in_progress", "completed", "cancelled"],
       event_type: [
         "service",
         "meeting",
@@ -1474,6 +2276,15 @@ export const Constants = {
         "other",
       ],
       member_status: ["active", "inactive", "deceased", "transferred"],
+      message_status: ["draft", "sent", "failed", "delivered"],
+      message_type: [
+        "announcement",
+        "reminder",
+        "alert",
+        "newsletter",
+        "prayer_update",
+      ],
+      ministry_role: ["leader", "co_leader", "member", "volunteer"],
       payment_method: [
         "cash",
         "check",
