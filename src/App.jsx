@@ -36,7 +36,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router>
+        <Router
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
           <Layout>
             <Routes>
               {/* Public Routes */}
@@ -45,9 +50,7 @@ function App() {
               {/* Protected Routes */}
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
+                <Dashboard />
               } />
               
               <Route path="/members" element={
