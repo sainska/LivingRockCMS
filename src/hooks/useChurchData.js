@@ -1,100 +1,135 @@
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
-let isDataFetching = false;
-let cachedData = null;
-let cacheExpiry = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
 export const useChurchData = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     totalMembers: 0,
     totalEvents: 0,
-    monthlyDonations: 0,
-    weeklyAttendance: 0,
+    totalDonations: 0,
+    totalSermons: 0,
+    recentDonations: [],
     upcomingEvents: [],
-    recentDonations: []
+    recentMembers: [],
+    monthlyDonations: 0,
+    weeklyAttendance: 0
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      // Check cache first
-      const now = Date.now();
-      if (cachedData && now < cacheExpiry) {
-        console.log('useChurchData: Using cached data');
-        setStats(cachedData);
-        setLoading(false);
-        return;
-      }
+    if (!user) return;
 
-      // Prevent multiple simultaneous fetches
-      if (isDataFetching) {
-        console.log('useChurchData: Data fetch already in progress, waiting...');
-        return;
-      }
-
-      isDataFetching = true;
-      console.log('Fetching church data...');
-
+    const fetchChurchData = async () => {
       try {
-        // Fetch basic stats with error handling
-        const statsPromises = [
-          supabase.from('members').select('id', { count: 'exact', head: true }).then(r => r.count || 0),
-          supabase.from('events').select('id', { count: 'exact', head: true }).gte('start_date', new Date().toISOString()).then(r => r.count || 0),
-          supabase.from('donations').select('amount').gte('donation_date', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()).then(r => {
-            return r.data?.reduce((sum, donation) => sum + (parseFloat(donation.amount) || 0), 0) || 0;
-          }),
-          supabase.from('attendance_records').select('id', { count: 'exact', head: true }).gte('attendance_date', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()).then(r => r.count || 0)
-        ];
+        console.log('Fetching church data...');
+        
+        // Fetch total members
+        const { data: membersData, error: membersError } = await supabase
+          .from('members')
+          .select('id, created_at, profiles:user_id(first_name, last_name)')
+          .eq('status', 'active');
 
-        const [totalMembers, totalEvents, monthlyDonations, weeklyAttendance] = await Promise.allSettled(statsPromises);
+        if (membersError) {
+          console.error('Error fetching members:', membersError);
+        }
 
-        // Fetch recent data with error handling
-        const [eventsResponse, donationsResponse] = await Promise.allSettled([
-          supabase.from('events').select('*').gte('start_date', new Date().toISOString()).order('start_date', { ascending: true }).limit(5),
-          supabase.from('donations').select('*').order('created_at', { ascending: false }).limit(5)
-        ]);
+        // Fetch total events
+        const { data: eventsData, error: eventsError } = await supabase
+          .from('events')
+          .select('id, title, start_date, location')
+          .gte('start_date', new Date().toISOString())
+          .order('start_date', { ascending: true })
+          .limit(5);
 
-        const newStats = {
-          totalMembers: totalMembers.status === 'fulfilled' ? totalMembers.value : 0,
-          totalEvents: totalEvents.status === 'fulfilled' ? totalEvents.value : 0,
-          monthlyDonations: monthlyDonations.status === 'fulfilled' ? monthlyDonations.value : 0,
-          weeklyAttendance: weeklyAttendance.status === 'fulfilled' ? weeklyAttendance.value : 0,
-          upcomingEvents: eventsResponse.status === 'fulfilled' && eventsResponse.value.data ? eventsResponse.value.data : [],
-          recentDonations: donationsResponse.status === 'fulfilled' && donationsResponse.value.data ? donationsResponse.value.data : []
-        };
+        if (eventsError) {
+          console.error('Error fetching events:', eventsError);
+        }
 
-        // Cache the data
-        cachedData = newStats;
-        cacheExpiry = now + CACHE_DURATION;
+        // Fetch donations
+        const { data: donationsData, error: donationsError } = await supabase
+          .from('donations')
+          .select('id, amount, donation_date, purpose')
+          .order('created_at', { ascending: false })
+          .limit(10);
 
-        setStats(newStats);
-        setError(null);
+        if (donationsError) {
+          console.error('Error fetching donations:', donationsError);
+        }
+
+        // Fetch monthly donations
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        const { data: monthlyData, error: monthlyError } = await supabase
+          .from('donations')
+          .select('amount')
+          .gte('donation_date', `${currentMonth}-01`)
+          .lt('donation_date', `${currentMonth}-31`);
+
+        if (monthlyError) {
+          console.error('Error fetching monthly donations:', monthlyError);
+        }
+
+        // Fetch sermons
+        const { data: sermonsData, error: sermonsError } = await supabase
+          .from('sermons')
+          .select('count');
+
+        if (sermonsError) {
+          console.error('Error fetching sermons count:', sermonsError);
+        }
+
+        // Calculate stats
+        const totalMembers = membersData?.length || 0;
+        const totalEvents = eventsData?.length || 0;
+        const totalDonations = donationsData?.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0) || 0;
+        const monthlyDonations = monthlyData?.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0) || 0;
+
+        setStats({
+          totalMembers,
+          totalEvents,
+          totalDonations,
+          totalSermons: sermonsData?.[0]?.count || 0,
+          recentDonations: donationsData || [],
+          upcomingEvents: eventsData || [],
+          recentMembers: membersData?.slice(0, 5) || [],
+          monthlyDonations,
+          weeklyAttendance: Math.floor(totalMembers * 0.75) // Estimate based on members
+        });
+
       } catch (err) {
         console.error('Error fetching church data:', err);
         setError(err.message);
-        
-        // Use empty data on error
-        const emptyStats = {
-          totalMembers: 0,
-          totalEvents: 0,
-          monthlyDonations: 0,
-          weeklyAttendance: 0,
-          upcomingEvents: [],
-          recentDonations: []
-        };
-        setStats(emptyStats);
       } finally {
         setLoading(false);
-        isDataFetching = false;
       }
     };
 
-    fetchData();
-  }, []);
+    fetchChurchData();
+
+    // Set up real-time subscriptions
+    const membersSubscription = supabase
+      .channel('members-stats')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, fetchChurchData)
+      .subscribe();
+
+    const donationsSubscription = supabase
+      .channel('donations-stats')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'donations' }, fetchChurchData)
+      .subscribe();
+
+    const eventsSubscription = supabase
+      .channel('events-stats')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, fetchChurchData)
+      .subscribe();
+
+    return () => {
+      membersSubscription.unsubscribe();
+      donationsSubscription.unsubscribe();
+      eventsSubscription.unsubscribe();
+    };
+  }, [user]);
 
   return { stats, loading, error };
 };

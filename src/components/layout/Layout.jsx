@@ -1,48 +1,54 @@
 
-import React from 'react';
-import { useLocation } from 'react-router-dom';
-import Header from './Header';
-import Sidebar from './Sidebar';
-import { useAuth } from '@/contexts/AuthContext';
+import { ReactNode, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import Sidebar from "./Sidebar";
+import Header from "./Header";
+import Footer from "./Footer";
 
 const Layout = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
-  
-  // Public routes that don't need the sidebar/header
-  const publicRoutes = ['/auth', '/welcome'];
-  const isPublicRoute = publicRoutes.includes(location.pathname);
+  const [pageTitle, setPageTitle] = useState("Dashboard");
 
-  console.log('Layout: Rendering with auth state', { 
-    isAuthenticated, 
-    loading, 
-    pathname: location.pathname, 
-    isPublicRoute 
-  });
+  useEffect(() => {
+    // Update page title based on current route - each route has specific functionality
+    const path = location.pathname;
+    if (path === "/") setPageTitle("Admin Dashboard");
+    else if (path === "/system-dashboard") setPageTitle("System Dashboard");
+    else if (path === "/treasurer-dashboard") setPageTitle("Treasurer Dashboard");
+    else if (path === "/secretary-dashboard") setPageTitle("Secretary Dashboard");
+    else if (path === "/clergy-dashboard") setPageTitle("Clergy Dashboard");
+    else if (path === "/user-dashboard") setPageTitle("My Dashboard");
+    else if (path === "/church-info") setPageTitle("Church Information");
+    else if (path === "/events") setPageTitle("Events Management");
+    else if (path === "/members") setPageTitle("Member Management");
+    else if (path === "/ministry") setPageTitle("Ministry Management");
+    else if (path === "/communication") setPageTitle("Communication");
+    else if (path === "/finances") setPageTitle("Financial Management");
+    else if (path === "/reports") setPageTitle("Reports & Analytics");
+    else if (path === "/system-overview") setPageTitle("System Overview");
+    else if (path === "/users") setPageTitle("User Management");
+    else if (path === "/backup") setPageTitle("Backup & Data Management");
+    else if (path === "/security-overview") setPageTitle("Security Overview");
+    else if (path === "/access-control") setPageTitle("Access Control");
+    else if (path === "/data-protection") setPageTitle("Data Protection");
+    else if (path === "/security-logs") setPageTitle("Security Logs");
+    else if (path === "/checkin-security") setPageTitle("Check-in Security");
+    else if (path === "/integrations") setPageTitle("Integrations");
+    else setPageTitle("Dashboard");
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-600">Loading application...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated || isPublicRoute) {
-    return <div className="min-h-screen bg-gray-50">{children}</div>;
-  }
+    // Update page title in browser
+    document.title = `Living Rock Church - ${pageTitle}`;
+  }, [location.pathname, pageTitle]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 ml-64 mt-16 p-6">
+    <div className="flex h-screen overflow-hidden bg-background">
+      <Sidebar />
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <Header pageTitle={pageTitle} />
+        <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
           {children}
         </main>
+        <Footer />
       </div>
     </div>
   );

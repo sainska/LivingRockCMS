@@ -118,93 +118,6 @@ export type Database = {
           },
         ]
       }
-      bible_study_attendance: {
-        Row: {
-          attendance_date: string
-          created_at: string | null
-          group_id: string | null
-          id: string
-          member_id: string | null
-          notes: string | null
-          recorded_by: string | null
-          status: string | null
-        }
-        Insert: {
-          attendance_date: string
-          created_at?: string | null
-          group_id?: string | null
-          id?: string
-          member_id?: string | null
-          notes?: string | null
-          recorded_by?: string | null
-          status?: string | null
-        }
-        Update: {
-          attendance_date?: string
-          created_at?: string | null
-          group_id?: string | null
-          id?: string
-          member_id?: string | null
-          notes?: string | null
-          recorded_by?: string | null
-          status?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bible_study_attendance_group_id_fkey"
-            columns: ["group_id"]
-            isOneToOne: false
-            referencedRelation: "bible_study_groups"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bible_study_attendance_member_id_fkey"
-            columns: ["member_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      bible_study_groups: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          is_active: boolean | null
-          leader_id: string | null
-          location: string | null
-          meeting_day: string | null
-          meeting_time: string | null
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          leader_id?: string | null
-          location?: string | null
-          meeting_day?: string | null
-          meeting_time?: string | null
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          leader_id?: string | null
-          location?: string | null
-          meeting_day?: string | null
-          meeting_time?: string | null
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       budget: {
         Row: {
           category: string | null
@@ -437,56 +350,6 @@ export type Database = {
           type?: string | null
         }
         Relationships: []
-      }
-      counseling_sessions: {
-        Row: {
-          counselor_id: string | null
-          created_at: string | null
-          follow_up_date: string | null
-          follow_up_required: boolean | null
-          id: string
-          member_id: string | null
-          notes: string | null
-          session_date: string
-          session_time: string | null
-          status: string | null
-          topic: string
-        }
-        Insert: {
-          counselor_id?: string | null
-          created_at?: string | null
-          follow_up_date?: string | null
-          follow_up_required?: boolean | null
-          id?: string
-          member_id?: string | null
-          notes?: string | null
-          session_date: string
-          session_time?: string | null
-          status?: string | null
-          topic: string
-        }
-        Update: {
-          counselor_id?: string | null
-          created_at?: string | null
-          follow_up_date?: string | null
-          follow_up_required?: boolean | null
-          id?: string
-          member_id?: string | null
-          notes?: string | null
-          session_date?: string
-          session_time?: string | null
-          status?: string | null
-          topic?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "counseling_sessions_member_id_fkey"
-            columns: ["member_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       donation_campaigns: {
         Row: {
@@ -890,127 +753,56 @@ export type Database = {
         }
         Relationships: []
       }
-      households: {
-        Row: {
-          address: string | null
-          city: string | null
-          country: string | null
-          created_at: string | null
-          email: string | null
-          head_of_household_id: string | null
-          id: string
-          name: string
-          phone: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          address?: string | null
-          city?: string | null
-          country?: string | null
-          created_at?: string | null
-          email?: string | null
-          head_of_household_id?: string | null
-          id?: string
-          name: string
-          phone?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          address?: string | null
-          city?: string | null
-          country?: string | null
-          created_at?: string | null
-          email?: string | null
-          head_of_household_id?: string | null
-          id?: string
-          name?: string
-          phone?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "households_head_of_household_id_fkey"
-            columns: ["head_of_household_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       members: {
         Row: {
-          address: string | null
           baptism_date: string | null
-          city: string | null
           confirmation_date: string | null
-          country: string | null
           created_at: string | null
-          date_of_birth: string | null
           email: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
-          gender: string | null
-          household_id: string | null
           id: string
           join_date: string
           joined_at: string | null
-          marital_status: string | null
           membership_number: string
           ministry_involvement: string[] | null
           notes: string | null
-          occupation: string | null
           phone: string | null
           status: Database["public"]["Enums"]["member_status"] | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
-          address?: string | null
           baptism_date?: string | null
-          city?: string | null
           confirmation_date?: string | null
-          country?: string | null
           created_at?: string | null
-          date_of_birth?: string | null
           email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
-          gender?: string | null
-          household_id?: string | null
           id?: string
           join_date?: string
           joined_at?: string | null
-          marital_status?: string | null
           membership_number: string
           ministry_involvement?: string[] | null
           notes?: string | null
-          occupation?: string | null
           phone?: string | null
           status?: Database["public"]["Enums"]["member_status"] | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
-          address?: string | null
           baptism_date?: string | null
-          city?: string | null
           confirmation_date?: string | null
-          country?: string | null
           created_at?: string | null
-          date_of_birth?: string | null
           email?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
-          gender?: string | null
-          household_id?: string | null
           id?: string
           join_date?: string
           joined_at?: string | null
-          marital_status?: string | null
           membership_number?: string
           ministry_involvement?: string[] | null
           notes?: string | null
-          occupation?: string | null
           phone?: string | null
           status?: Database["public"]["Enums"]["member_status"] | null
           updated_at?: string | null
@@ -1025,39 +817,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      message_recipients: {
-        Row: {
-          created_at: string | null
-          delivered_at: string | null
-          delivery_status: string | null
-          id: string
-          message_id: string
-          read_at: string | null
-          recipient_id: string | null
-          recipient_type: string
-        }
-        Insert: {
-          created_at?: string | null
-          delivered_at?: string | null
-          delivery_status?: string | null
-          id?: string
-          message_id: string
-          read_at?: string | null
-          recipient_id?: string | null
-          recipient_type: string
-        }
-        Update: {
-          created_at?: string | null
-          delivered_at?: string | null
-          delivery_status?: string | null
-          id?: string
-          message_id?: string
-          read_at?: string | null
-          recipient_id?: string | null
-          recipient_type?: string
-        }
-        Relationships: []
       }
       ministries: {
         Row: {
@@ -1281,75 +1040,45 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
-          baptism_status: boolean | null
           city: string | null
-          confirmation_status: boolean | null
           country: string | null
           created_at: string | null
           date_of_birth: string | null
           email: string
-          emergency_contact_name: string | null
-          emergency_contact_phone: string | null
           first_name: string
           gender: string | null
-          household_id: string | null
           id: string
           last_name: string
-          marital_status: string | null
-          next_of_kin_name: string | null
-          next_of_kin_phone: string | null
-          next_of_kin_relationship: string | null
-          occupation: string | null
           phone: string | null
           profile_image_url: string | null
           updated_at: string | null
         }
         Insert: {
           address?: string | null
-          baptism_status?: boolean | null
           city?: string | null
-          confirmation_status?: boolean | null
           country?: string | null
           created_at?: string | null
           date_of_birth?: string | null
           email: string
-          emergency_contact_name?: string | null
-          emergency_contact_phone?: string | null
           first_name: string
           gender?: string | null
-          household_id?: string | null
           id: string
           last_name: string
-          marital_status?: string | null
-          next_of_kin_name?: string | null
-          next_of_kin_phone?: string | null
-          next_of_kin_relationship?: string | null
-          occupation?: string | null
           phone?: string | null
           profile_image_url?: string | null
           updated_at?: string | null
         }
         Update: {
           address?: string | null
-          baptism_status?: boolean | null
           city?: string | null
-          confirmation_status?: boolean | null
           country?: string | null
           created_at?: string | null
           date_of_birth?: string | null
           email?: string
-          emergency_contact_name?: string | null
-          emergency_contact_phone?: string | null
           first_name?: string
           gender?: string | null
-          household_id?: string | null
           id?: string
           last_name?: string
-          marital_status?: string | null
-          next_of_kin_name?: string | null
-          next_of_kin_phone?: string | null
-          next_of_kin_relationship?: string | null
-          occupation?: string | null
           phone?: string | null
           profile_image_url?: string | null
           updated_at?: string | null
@@ -1379,56 +1108,6 @@ export type Database = {
           url?: string | null
         }
         Relationships: []
-      }
-      resource_bookings: {
-        Row: {
-          booked_by: string | null
-          booking_date: string
-          created_at: string | null
-          end_time: string | null
-          event_id: string | null
-          id: string
-          notes: string | null
-          resource_name: string
-          resource_type: string
-          start_time: string | null
-          status: string | null
-        }
-        Insert: {
-          booked_by?: string | null
-          booking_date: string
-          created_at?: string | null
-          end_time?: string | null
-          event_id?: string | null
-          id?: string
-          notes?: string | null
-          resource_name: string
-          resource_type: string
-          start_time?: string | null
-          status?: string | null
-        }
-        Update: {
-          booked_by?: string | null
-          booking_date?: string
-          created_at?: string | null
-          end_time?: string | null
-          event_id?: string | null
-          id?: string
-          notes?: string | null
-          resource_name?: string
-          resource_type?: string
-          start_time?: string | null
-          status?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "resource_bookings_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       sermons: {
         Row: {
@@ -1466,51 +1145,6 @@ export type Database = {
           title?: string
           updated_at?: string
           video_url?: string | null
-        }
-        Relationships: []
-      }
-      staff: {
-        Row: {
-          contract_type: string | null
-          created_at: string | null
-          department: string
-          employee_id: string
-          hire_date: string
-          id: string
-          is_active: boolean | null
-          position: string
-          salary: number | null
-          supervisor_id: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          contract_type?: string | null
-          created_at?: string | null
-          department: string
-          employee_id: string
-          hire_date: string
-          id?: string
-          is_active?: boolean | null
-          position: string
-          salary?: number | null
-          supervisor_id?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          contract_type?: string | null
-          created_at?: string | null
-          department?: string
-          employee_id?: string
-          hire_date?: string
-          id?: string
-          is_active?: boolean | null
-          position?: string
-          salary?: number | null
-          supervisor_id?: string | null
-          updated_at?: string | null
-          user_id?: string | null
         }
         Relationships: []
       }
@@ -1652,102 +1286,11 @@ export type Database = {
         }
         Relationships: []
       }
-      volunteers: {
-        Row: {
-          created_at: string | null
-          department: string
-          end_date: string | null
-          hours_per_week: number | null
-          id: string
-          is_active: boolean | null
-          role: string
-          skills: string[] | null
-          start_date: string | null
-          supervisor_id: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          department: string
-          end_date?: string | null
-          hours_per_week?: number | null
-          id?: string
-          is_active?: boolean | null
-          role: string
-          skills?: string[] | null
-          start_date?: string | null
-          supervisor_id?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          department?: string
-          end_date?: string | null
-          hours_per_week?: number | null
-          id?: string
-          is_active?: boolean | null
-          role?: string
-          skills?: string[] | null
-          start_date?: string | null
-          supervisor_id?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      whatsapp_logs: {
-        Row: {
-          created_at: string | null
-          error_message: string | null
-          id: string
-          message_content: string
-          message_type: string
-          recipient_phone: string
-          sent_by: string | null
-          status: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          error_message?: string | null
-          id?: string
-          message_content: string
-          message_type: string
-          recipient_phone: string
-          sent_by?: string | null
-          status?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          error_message?: string | null
-          id?: string
-          message_content?: string
-          message_type?: string
-          recipient_phone?: string
-          sent_by?: string | null
-          status?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_dashboard_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          total_members: number
-          new_members_this_month: number
-          upcoming_events: number
-          total_donations: number
-          monthly_donations: number
-          active_ministries: number
-          pending_communications: number
-          prayer_requests: number
-        }[]
-      }
       get_system_resources: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1774,7 +1317,6 @@ export type Database = {
     }
     Enums: {
       donation_type: "tithe" | "offering" | "special" | "project" | "missions"
-      event_status: "scheduled" | "in_progress" | "completed" | "cancelled"
       event_type:
         | "service"
         | "meeting"
@@ -1783,14 +1325,6 @@ export type Database = {
         | "outreach"
         | "other"
       member_status: "active" | "inactive" | "deceased" | "transferred"
-      message_status: "draft" | "sent" | "failed" | "delivered"
-      message_type:
-        | "announcement"
-        | "reminder"
-        | "alert"
-        | "newsletter"
-        | "prayer_update"
-      ministry_role: "leader" | "co_leader" | "member" | "volunteer"
       payment_method:
         | "cash"
         | "check"
@@ -1931,7 +1465,6 @@ export const Constants = {
   public: {
     Enums: {
       donation_type: ["tithe", "offering", "special", "project", "missions"],
-      event_status: ["scheduled", "in_progress", "completed", "cancelled"],
       event_type: [
         "service",
         "meeting",
@@ -1941,15 +1474,6 @@ export const Constants = {
         "other",
       ],
       member_status: ["active", "inactive", "deceased", "transferred"],
-      message_status: ["draft", "sent", "failed", "delivered"],
-      message_type: [
-        "announcement",
-        "reminder",
-        "alert",
-        "newsletter",
-        "prayer_update",
-      ],
-      ministry_role: ["leader", "co_leader", "member", "volunteer"],
       payment_method: [
         "cash",
         "check",

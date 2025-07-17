@@ -7,7 +7,7 @@ import { useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const Settings = () => {
-  const [userRole, setUserRole] = useState("Member");
+  const [userRole, setUserRole] = useState<string>("Member");
   const location = useLocation();
 
   // Simulate checking user role - in real app this would come from auth context

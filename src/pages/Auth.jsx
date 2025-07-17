@@ -1,375 +1,320 @@
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Church, Eye, EyeOff, Shield, Users, DollarSign, FileText, User } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Church, Mail, Lock, User, Phone } from 'lucide-react';
-import { toast } from 'sonner';
+const roleInfo = {
+  system_admin: { label: "System Admin", icon: <span>🛡️</span>, color: "red" },
+  treasurer: { label: "Treasurer", icon: <span>💰</span>, color: "green" },
+  secretary: { label: "Secretary", icon: <span>📝</span>, color: "blue" },
+  clergy: { label: "Clergy", icon: <span>⛪</span>, color: "purple" },
+  member: { label: "Member", icon: <span>👤</span>, color: "gray" },
+};
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { signIn, signUp, resetPassword, isAuthenticated } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [resetEmailSent, setResetEmailSent] = useState(false);
-  const [activeTab, setActiveTab] = useState('signin');
-
-  // Form states
-  const [signInData, setSignInData] = useState({
-    email: '',
-    password: ''
+  const { signIn, signUp, resetPassword, getUserRole, getDashboardRoute } = useAuth();
+  
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: ""
+  });
+  
+  const [registerData, setRegisterData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
   });
 
-  const [signUpData, setSignUpData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    firstName: '',
-    lastName: '',
-    phone: ''
-  });
+  const [resetEmail, setResetEmail] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("login");
 
-  const [resetEmail, setResetEmail] = useState('');
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      const redirectTo = searchParams.get('redirectTo') || '/dashboard';
-      navigate(redirectTo, { replace: true });
-    }
-  }, [isAuthenticated, navigate, searchParams]);
-
-  const handleSignIn = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    setIsLoading(true);
 
+    console.log('Auth: Starting login process...');
+    
     try {
-      const { error } = await signIn(signInData.email, signInData.password);
+      const { error } = await signIn(loginData.email, loginData.password);
       
       if (error) {
-        setError(error.message);
-        toast.error('Sign in failed: ' + error.message);
-      } else {
-        toast.success('Welcome back!');
+        console.error('Auth: Login failed with error:', error);
+        setIsLoading(false);
+        return;
       }
-    } catch (err) {
-      setError('An unexpected error occurred');
-      toast.error('An unexpected error occurred');
+
+      console.log('Auth: Login successful, getting user role...');
+      
+      // Wait a moment for the session to be established
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Get user role and redirect to appropriate dashboard
+      const userRole = await getUserRole();
+      console.log('Auth: User role retrieved:', userRole);
+      
+      if (userRole) {
+        const dashboardRoute = getDashboardRoute(userRole);
+        console.log('Auth: Redirecting to dashboard:', dashboardRoute);
+        navigate(dashboardRoute);
+      } else {
+        console.log('Auth: No role found, redirecting to user dashboard');
+        // If no role assigned, default to member dashboard
+        navigate('/user-dashboard');
+      }
+    } catch (error) {
+      console.error('Auth: Unexpected error during login:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleSignUp = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    if (signUpData.password !== signUpData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
+    
+    if (registerData.password !== registerData.confirmPassword) {
       return;
     }
 
-    if (signUpData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      setLoading(false);
-      return;
-    }
+    setIsLoading(true);
 
-    try {
-      const { error } = await signUp(signUpData.email, signUpData.password, {
-        first_name: signUpData.firstName,
-        last_name: signUpData.lastName,
-        phone: signUpData.phone
-      });
-      
-      if (error) {
-        setError(error.message);
-        toast.error('Sign up failed: ' + error.message);
-      } else {
-        toast.success('Account created successfully! Please check your email to verify your account.');
-        setActiveTab('signin');
-      }
-    } catch (err) {
-      setError('An unexpected error occurred');
-      toast.error('An unexpected error occurred');
-    } finally {
-      setLoading(false);
+    const { error } = await signUp(
+      registerData.email, 
+      registerData.password, 
+      registerData.firstName, 
+      registerData.lastName
+    );
+    
+    if (!error) {
+      setActiveTab("login");
     }
+    
+    setIsLoading(false);
   };
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    setIsLoading(true);
 
-    try {
-      const { error } = await resetPassword(resetEmail);
-      
-      if (error) {
-        setError(error.message);
-        toast.error('Reset failed: ' + error.message);
-      } else {
-        setResetEmailSent(true);
-        toast.success('Password reset email sent!');
-      }
-    } catch (err) {
-      setError('An unexpected error occurred');
-      toast.error('An unexpected error occurred');
-    } finally {
-      setLoading(false);
-    }
+    await resetPassword(resetEmail);
+    
+    setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="w-full max-w-md space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="flex justify-center">
-            <div className="bg-blue-600 p-3 rounded-full">
-              <Church className="h-8 w-8 text-white" />
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-xiracom-blue to-xiracom-darkblue flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="flex justify-center items-center gap-2 mb-4">
+            <Church className="h-8 w-8 text-xiracom-blue" />
+            <CardTitle className="text-2xl text-xiracom-blue">Living Rock Church</CardTitle>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Living Rock CMS</h1>
-          <p className="text-gray-600">Church Management System</p>
-        </div>
-
-        <Card>
+          <p className="text-sm text-gray-600">
+            Church Management System
+          </p>
+        </CardHeader>
+        <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <CardHeader>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
-              </TabsList>
-            </CardHeader>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="login">Sign In</TabsTrigger>
+              <TabsTrigger value="register">Register</TabsTrigger>
+              <TabsTrigger value="reset">Reset</TabsTrigger>
+            </TabsList>
 
-            <CardContent>
-              {error && (
-                <Alert className="mb-4">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <TabsContent value="signin" className="space-y-4">
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="signin-email"
-                        type="email"
-                        placeholder="Enter your email"
-                        className="pl-10"
-                        value={signInData.email}
-                        onChange={(e) => setSignInData(prev => ({ ...prev, email: e.target.value }))}
-                        required
-                      />
+            <TabsContent value="login" className="space-y-4">
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-3">Select your role to access the appropriate dashboard:</p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {Object.entries(roleInfo).map(([role, info]) => (
+                    <div key={role} className={`flex items-center gap-2 p-2 rounded border ${info.color}`}>
+                      {info.icon}
+                      <span>{info.label}</span>
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="signin-password"
-                        type="password"
-                        placeholder="Enter your password"
-                        className="pl-10"
-                        value={signInData.password}
-                        onChange={(e) => setSignInData(prev => ({ ...prev, password: e.target.value }))}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Sign In
-                  </Button>
-                </form>
-
-                <div className="text-center">
-                  <Button 
-                    variant="link" 
-                    onClick={() => setActiveTab('reset')}
-                    className="text-sm"
-                  >
-                    Forgot your password?
-                  </Button>
+                  ))}
                 </div>
-              </TabsContent>
+              </div>
 
-              <TabsContent value="signup" className="space-y-4">
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-firstname">First Name</Label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="signup-firstname"
-                          type="text"
-                          placeholder="First name"
-                          className="pl-10"
-                          value={signUpData.firstName}
-                          onChange={(e) => setSignUpData(prev => ({ ...prev, firstName: e.target.value }))}
-                          required
-                        />
-                      </div>
-                    </div>
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={loginData.email}
+                    onChange={(e) => setLoginData(prev => ({ ...prev, email: e.target.value }))}
+                    required
+                  />
+                </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-lastname">Last Name</Label>
-                      <Input
-                        id="signup-lastname"
-                        type="text"
-                        placeholder="Last name"
-                        value={signUpData.lastName}
-                        onChange={(e) => setSignUpData(prev => ({ ...prev, lastName: e.target.value }))}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="Enter your email"
-                        className="pl-10"
-                        value={signUpData.email}
-                        onChange={(e) => setSignUpData(prev => ({ ...prev, email: e.target.value }))}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-phone">Phone (Optional)</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="signup-phone"
-                        type="tel"
-                        placeholder="+254 700 000 000"
-                        className="pl-10"
-                        value={signUpData.phone}
-                        onChange={(e) => setSignUpData(prev => ({ ...prev, phone: e.target.value }))}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="Create a password"
-                        className="pl-10"
-                        value={signUpData.password}
-                        onChange={(e) => setSignUpData(prev => ({ ...prev, password: e.target.value }))}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-confirm-password">Confirm Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="signup-confirm-password"
-                        type="password"
-                        placeholder="Confirm your password"
-                        className="pl-10"
-                        value={signUpData.confirmPassword}
-                        onChange={(e) => setSignUpData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Create Account
-                  </Button>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="reset" className="space-y-4">
-                {resetEmailSent ? (
-                  <div className="text-center space-y-4">
-                    <div className="bg-green-50 p-4 rounded-lg">
-                      <p className="text-green-800">Password reset email sent! Check your inbox.</p>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        setActiveTab('signin');
-                        setResetEmailSent(false);
-                      }}
-                    >
-                      Back to Sign In
-                    </Button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleResetPassword} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="reset-email">Email</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="reset-email"
-                          type="email"
-                          placeholder="Enter your email"
-                          className="pl-10"
-                          value={resetEmail}
-                          onChange={(e) => setResetEmail(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Reset Password
-                    </Button>
-
-                    <Button 
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={loginData.password}
+                      onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+                      required
+                    />
+                    <Button
                       type="button"
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => setActiveTab('signin')}
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                      onClick={() => setShowPassword(!showPassword)}
                     >
-                      Back to Sign In
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
-                  </form>
-                )}
-              </TabsContent>
-            </CardContent>
-          </Tabs>
-        </Card>
+                  </div>
+                </div>
 
-        <div className="text-center text-sm text-gray-600">
-          <p>Living Rock Church Management System</p>
-          <p>&copy; 2024 All rights reserved</p>
-        </div>
-      </div>
+                <Button
+                  type="submit"
+                  className="w-full bg-xiracom-blue hover:bg-xiracom-darkblue"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Signing in..." : "Sign In"}
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="register" className="space-y-4">
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input
+                      id="firstName"
+                      placeholder="First name"
+                      value={registerData.firstName}
+                      onChange={(e) => setRegisterData(prev => ({ ...prev, firstName: e.target.value }))}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input
+                      id="lastName"
+                      placeholder="Last name"
+                      value={registerData.lastName}
+                      onChange={(e) => setRegisterData(prev => ({ ...prev, lastName: e.target.value }))}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="registerEmail">Email Address</Label>
+                  <Input
+                    id="registerEmail"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={registerData.email}
+                    onChange={(e) => setRegisterData(prev => ({ ...prev, email: e.target.value }))}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="registerPassword">Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="registerPassword"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Create a password"
+                      value={registerData.password}
+                      onChange={(e) => setRegisterData(prev => ({ ...prev, password: e.target.value }))}
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm your password"
+                      value={registerData.confirmPassword}
+                      onChange={(e) => setRegisterData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-xiracom-blue hover:bg-xiracom-darkblue"
+                  disabled={isLoading || registerData.password !== registerData.confirmPassword}
+                >
+                  {isLoading ? "Creating Account..." : "Create Account"}
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="reset" className="space-y-4">
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="resetEmail">Email Address</Label>
+                  <Input
+                    id="resetEmail"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-xiracom-blue hover:bg-xiracom-darkblue"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Sending..." : "Send Reset Email"}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
+
+          <div className="text-center mt-4">
+            <Link to="/welcome" className="text-sm text-xiracom-blue hover:underline">
+              Back to Welcome
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

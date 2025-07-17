@@ -1,76 +1,42 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import DashboardStats from '@/components/dashboard/DashboardStats';
-import QuickActions from '@/components/dashboard/QuickActions';
-import UpcomingEvents from '@/components/dashboard/UpcomingEvents';
-import RecentDonations from '@/components/dashboard/RecentDonations';
+import { useUserRole } from '@/hooks/useUserRole';
+import { Navigate } from 'react-router-dom';
 import WelcomeDashboard from '@/components/dashboard/WelcomeDashboard';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Dashboard = () => {
-  const { user, profile, role, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { role, loading: roleLoading } = useUserRole();
 
-  const getRoleDisplayName = (userRole) => {
-    const roleNames = {
-      'system_admin': 'System Administrator',
-      'clergy': 'Clergy Member',
-      'treasurer': 'Treasurer',
-      'secretary': 'Secretary',
-      'member': 'Member'
-    };
-    return roleNames[userRole] || 'Member';
-  };
-
-  if (loading) {
+  if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
-        </div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-xiracom-blue"></div>
       </div>
     );
   }
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Alert className="max-w-md">
-          <AlertDescription>
-            Please log in to access your dashboard.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
+    return <Navigate to="/auth" replace />;
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Welcome Section */}
-      <WelcomeDashboard
-        userName={profile?.first_name ? `${profile.first_name} ${profile.last_name}` : user?.email}
-        userRole={getRoleDisplayName(role)}
-      />
+  // Redirect to role-specific dashboard
+  const dashboardRoutes = {
+    system_admin: '/admin-dashboard',
+    clergy: '/clergy-dashboard',
+    treasurer: '/treasurer-dashboard',
+    secretary: '/secretary-dashboard',
+    member: '/user-dashboard'
+  };
 
-      {/* Dashboard Statistics */}
-      <DashboardStats />
+  const targetRoute = dashboardRoutes[role || 'member'];
+  
+  if (targetRoute && window.location.pathname === '/') {
+    return <Navigate to={targetRoute} replace />;
+  }
 
-      {/* Quick Actions */}
-      <QuickActions role={role} />
-
-      {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Upcoming Events */}
-        <UpcomingEvents />
-
-        {/* Recent Donations (for treasurers and admins) */}
-        {(role === 'treasurer' || role === 'system_admin') && (
-          <RecentDonations />
-        )}
-      </div>
-    </div>
-  );
+  return <WelcomeDashboard />;
 };
 
 export default Dashboard;

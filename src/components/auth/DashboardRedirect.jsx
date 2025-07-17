@@ -1,45 +1,40 @@
-
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const DashboardRedirect = () => {
   const navigate = useNavigate();
-  const { user, loading, role } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { role, loading: roleLoading } = useUserRole();
 
   useEffect(() => {
-    console.log('DashboardRedirect: Auth state check', { 
-      user: !!user, 
-      loading, 
-      role,
-      userEmail: user?.email 
-    });
-    
-    if (loading) {
-      console.log('DashboardRedirect: Still loading auth state...');
-      return;
-    }
+    if (authLoading || roleLoading) return;
 
     if (!user) {
-      console.log('DashboardRedirect: No user found, redirecting to auth');
-      navigate('/auth', { replace: true });
+      navigate('/auth');
       return;
     }
 
-    // User is authenticated, redirect to dashboard
-    console.log('DashboardRedirect: User authenticated, redirecting to dashboard');
-    navigate('/dashboard', { replace: true });
-  }, [user, loading, role, navigate]);
+    // Redirect to appropriate dashboard based on role
+    const dashboardRoutes = {
+      system_admin: '/admin-dashboard',
+      clergy: '/clergy-dashboard',
+      treasurer: '/treasurer-dashboard',
+      secretary: '/secretary-dashboard',
+      member: '/user-dashboard'
+    };
+
+    const targetRoute = dashboardRoutes[role || 'member'] || '/user-dashboard';
+    navigate(targetRoute);
+  }, [user, role, authLoading, roleLoading, navigate]);
 
   // Show loading while determining redirect
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center space-y-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="text-gray-600">Loading...</p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-xiracom-blue"></div>
     </div>
   );
 };
 
-export default DashboardRedirect;
+export default DashboardRedirect; 
