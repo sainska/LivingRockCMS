@@ -1,89 +1,52 @@
 
 import { useState } from 'react';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
 export const usePDFExport = () => {
   const [isExporting, setIsExporting] = useState(false);
 
   const exportFinancialReport = async (data) => {
+    setIsExporting(true);
     try {
-      setIsExporting(true);
       const doc = new jsPDF();
       
       // Header
       doc.setFontSize(20);
       doc.text('Living Rock Church - Financial Report', 20, 20);
+      
+      // Date
       doc.setFontSize(12);
-      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 30);
+      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 35);
       
-      // Summary section
-      let yPos = 50;
-      doc.setFontSize(16);
-      doc.text('Financial Summary', 20, yPos);
-      yPos += 10;
+      // Summary
+      doc.setFontSize(14);
+      doc.text('Financial Summary', 20, 55);
       
-      doc.setFontSize(12);
-      doc.text(`Total Donations: KSH ${data.totalDonations?.toLocaleString() || '0'}`, 20, yPos);
-      yPos += 8;
-      doc.text(`Monthly Donations: KSH ${data.monthlyDonations?.toLocaleString() || '0'}`, 20, yPos);
-      yPos += 8;
-      doc.text(`Total Expenses: KSH ${data.totalExpenses?.toLocaleString() || '0'}`, 20, yPos);
-      yPos += 8;
-      doc.text(`Monthly Expenses: KSH ${data.monthlyExpenses?.toLocaleString() || '0'}`, 20, yPos);
-      yPos += 15;
+      doc.setFontSize(10);
+      doc.text(`Total Donations: KES ${data.totalDonations.toLocaleString()}`, 20, 70);
+      doc.text(`Monthly Donations: KES ${data.monthlyDonations.toLocaleString()}`, 20, 80);
+      doc.text(`Total Expenses: KES ${data.totalExpenses.toLocaleString()}`, 20, 90);
+      doc.text(`Monthly Expenses: KES ${data.monthlyExpenses.toLocaleString()}`, 20, 100);
+      doc.text(`Net Income: KES ${(data.totalDonations - data.totalExpenses).toLocaleString()}`, 20, 110);
       
-      // Donations table
-      if (data.donationTrends && data.donationTrends.length > 0) {
+      // Budget table
+      if (data.budgetCategories && data.budgetCategories.length > 0) {
         doc.autoTable({
-          startY: yPos,
-          head: [['Date', 'Type', 'Amount (KSH)']],
-          body: data.donationTrends.slice(0, 10).map(donation => [
-            new Date(donation.donation_date).toLocaleDateString(),
-            donation.donation_type,
-            `KSH ${Number(donation.amount).toLocaleString()}`
+          head: [['Category', 'Allocated', 'Spent', 'Remaining']],
+          body: data.budgetCategories.map(cat => [
+            cat.name,
+            `KES ${Number(cat.allocated_amount).toLocaleString()}`,
+            `KES ${Number(cat.spent_amount).toLocaleString()}`,
+            `KES ${(Number(cat.allocated_amount) - Number(cat.spent_amount)).toLocaleString()}`
           ]),
-          title: 'Recent Donations'
+          startY: 130,
         });
       }
       
       doc.save('financial-report.pdf');
     } catch (error) {
-      console.error('Error exporting PDF:', error);
-      throw error;
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  const exportSecurityReport = async (logs) => {
-    try {
-      setIsExporting(true);
-      const doc = new jsPDF();
-      
-      doc.setFontSize(20);
-      doc.text('Living Rock Church - Security Report', 20, 20);
-      doc.setFontSize(12);
-      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 30);
-      
-      if (logs && logs.length > 0) {
-        doc.autoTable({
-          startY: 50,
-          head: [['Timestamp', 'Event', 'User', 'Severity', 'Result']],
-          body: logs.slice(0, 20).map(log => [
-            new Date(log.timestamp).toLocaleString(),
-            log.event,
-            log.user || 'System',
-            log.severity,
-            log.result
-          ]),
-          title: 'Security Events Log'
-        });
-      }
-      
-      doc.save('security-report.pdf');
-    } catch (error) {
-      console.error('Error exporting security PDF:', error);
+      console.error('Error generating PDF:', error);
       throw error;
     } finally {
       setIsExporting(false);
@@ -91,42 +54,37 @@ export const usePDFExport = () => {
   };
 
   const exportMembershipReport = async (members) => {
+    setIsExporting(true);
     try {
-      setIsExporting(true);
       const doc = new jsPDF();
       
       doc.setFontSize(20);
       doc.text('Living Rock Church - Membership Report', 20, 20);
-      doc.setFontSize(12);
-      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 30);
       
-      if (members && members.length > 0) {
-        doc.autoTable({
-          startY: 50,
-          head: [['Name', 'Email', 'Phone', 'Join Date']],
-          body: members.map(member => [
-            `${member.first_name} ${member.last_name}`,
-            member.email,
-            member.phone || 'N/A',
-            member.created_at ? new Date(member.created_at).toLocaleDateString() : 'N/A'
-          ]),
-          title: 'Church Members'
-        });
-      }
+      doc.setFontSize(12);
+      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 35);
+      doc.text(`Total Members: ${members.length}`, 20, 45);
+      
+      doc.autoTable({
+        head: [['Name', 'Email', 'Phone', 'City', 'Role']],
+        body: members.slice(0, 50).map(member => [
+          `${member.first_name} ${member.last_name}`,
+          member.email,
+          member.phone || 'N/A',
+          member.city || 'N/A',
+          member.user_roles?.[0]?.role || 'member'
+        ]),
+        startY: 60,
+      });
       
       doc.save('membership-report.pdf');
     } catch (error) {
-      console.error('Error exporting membership PDF:', error);
+      console.error('Error generating PDF:', error);
       throw error;
     } finally {
       setIsExporting(false);
     }
   };
 
-  return {
-    isExporting,
-    exportFinancialReport,
-    exportSecurityReport,
-    exportMembershipReport
-  };
+  return { exportFinancialReport, exportMembershipReport, isExporting };
 };

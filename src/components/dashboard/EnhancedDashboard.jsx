@@ -11,7 +11,6 @@ import {
   TrendingUp, 
   Heart,
   MessageSquare,
-  Home,
   UserCheck,
   Target
 } from 'lucide-react';
@@ -20,14 +19,18 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useDonations } from '@/hooks/useDonations';
 import { useEvents } from '@/hooks/useEvents';
 import { usePrayerRequests } from '@/hooks/usePrayerRequests';
+import { useUserRole } from '@/hooks/useUserRole';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 const EnhancedDashboard = () => {
   const { stats, loading: statsLoading } = useChurchData();
   const { notifications, unreadCount } = useNotifications();
-  const { donations } = useDonations();
-  const { events } = useEvents();
-  const { prayerRequests } = usePrayerRequests();
+  const { donations, loading: donationsLoading } = useDonations();
+  const { events, loading: eventsLoading } = useEvents();
+  const { prayerRequests, loading: prayerLoading } = usePrayerRequests();
+  const { role } = useUserRole();
+  const navigate = useNavigate();
 
   const recentDonations = donations.slice(0, 5);
   const upcomingEvents = events
@@ -38,7 +41,7 @@ const EnhancedDashboard = () => {
     .filter(request => request.status === 'active')
     .slice(0, 3);
 
-  if (statsLoading) {
+  if (statsLoading || donationsLoading || eventsLoading || prayerLoading) {
     return (
       <div className="p-6 space-y-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -65,7 +68,7 @@ const EnhancedDashboard = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.total_members || 0}</div>
+            <div className="text-2xl font-bold">{stats?.total_members || stats?.totalMembers || 0}</div>
             <p className="text-xs text-muted-foreground">
               +{stats?.new_members_this_month || 0} this month
             </p>
@@ -79,10 +82,10 @@ const EnhancedDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              KES {stats?.monthly_donations?.toLocaleString() || '0'}
+              KES {Number(stats?.monthly_donations || stats?.monthlyDonations || 0).toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
-              Total: KES {stats?.total_donations?.toLocaleString() || '0'}
+              Total: KES {Number(stats?.total_donations || 0).toLocaleString()}
             </p>
           </CardContent>
         </Card>
@@ -93,7 +96,7 @@ const EnhancedDashboard = () => {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.upcoming_events || 0}</div>
+            <div className="text-2xl font-bold">{upcomingEvents.length}</div>
             <p className="text-xs text-muted-foreground">Next 30 days</p>
           </CardContent>
         </Card>
@@ -135,7 +138,7 @@ const EnhancedDashboard = () => {
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-green-600">
-                      KES {donation.amount.toLocaleString()}
+                      KES {Number(donation.amount).toLocaleString()}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {format(new Date(donation.donation_date), 'MMM dd')}
@@ -256,26 +259,48 @@ const EnhancedDashboard = () => {
         </Card>
       )}
 
-      {/* Quick Actions */}
+      {/* Quick Actions - Role Based */}
       <Card>
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Button variant="outline" className="h-20 flex-col gap-2">
-              <Users className="h-6 w-6" />
-              Add Member
-            </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2">
-              <Calendar className="h-6 w-6" />
-              Create Event
-            </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2">
-              <DollarSign className="h-6 w-6" />
-              Record Donation
-            </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2">
+            {(role === 'system_admin' || role === 'secretary') && (
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2"
+                onClick={() => navigate('/members')}
+              >
+                <Users className="h-6 w-6" />
+                Add Member
+              </Button>
+            )}
+            {(role === 'system_admin' || role === 'clergy' || role === 'secretary') && (
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2"
+                onClick={() => navigate('/events')}
+              >
+                <Calendar className="h-6 w-6" />
+                Create Event
+              </Button>
+            )}
+            {(role === 'system_admin' || role === 'treasurer') && (
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2"
+                onClick={() => navigate('/finances')}
+              >
+                <DollarSign className="h-6 w-6" />
+                Record Donation
+              </Button>
+            )}
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col gap-2"
+              onClick={() => navigate('/attendance')}
+            >
               <UserCheck className="h-6 w-6" />
               Take Attendance
             </Button>

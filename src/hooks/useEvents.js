@@ -1,33 +1,30 @@
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useEvents = () => {
-  const { user } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user) return;
-
     const fetchEvents = async () => {
       try {
-        console.log('Fetching events...');
         const { data, error } = await supabase
           .from('events')
-          .select('*')
+          .select(`
+            *,
+            profiles!events_created_by_fkey (
+              first_name,
+              last_name
+            )
+          `)
           .order('start_date', { ascending: true });
 
-        if (error) {
-          console.error('Error fetching events:', error);
-          setError(error.message);
-        } else {
-          setEvents(data || []);
-        }
+        if (error) throw error;
+        setEvents(data || []);
       } catch (err) {
-        console.error('Error in fetchEvents:', err);
+        console.error('Error fetching events:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -35,33 +32,18 @@ export const useEvents = () => {
     };
 
     fetchEvents();
-  }, [user]);
 
-  const addEvent = async (eventData) => {
-    try {
-      const { data, error } = await supabase
-        .from('events')
-        .insert([{
-          ...eventData,
-          created_by: user.id
-        }])
-        .select()
-        .single();
+    // Real-time subscription
+    const subscription = supabase
+      .channel('events-realtime')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'events' },
+        () => fetchEvents()
+      )
+      .subscribe();
 
-      if (error) throw error;
+    return () => supabase.removeChannel(subscription);
+  }, []);
 
-      setEvents(prev => [...prev, data]);
-      return { data, error: null };
-    } catch (error) {
-      console.error('Error adding event:', error);
-      return { data: null, error };
-    }
-  };
-
-  return {
-    events,
-    loading,
-    error,
-    addEvent
-  };
+  return { events, loading, error };
 };
