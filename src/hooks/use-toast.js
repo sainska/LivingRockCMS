@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react"
+import React from "react"
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
@@ -130,9 +130,9 @@ function toast({ ...props }) {
 }
 
 function useToast() {
-  const [state, setState] = useState(memoryState)
+  const [state, setState] = React.useState(memoryState)
 
-  useEffect(() => {
+  React.useEffect(() => {
     listeners.push(setState)
     return () => {
       const index = listeners.indexOf(setState)
