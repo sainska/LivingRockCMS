@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { QrCode, Shield, Users, Clock, AlertTriangle, CheckCircle } from "lucide-react";
+import QRCode from 'qrcode.react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const CheckInSecurity = () => {
   const [checkInSettings, setCheckInSettings] = useState({
@@ -16,6 +18,16 @@ const CheckInSecurity = () => {
     backgroundCheckRequired: true,
     visitorScreening: true
   });
+
+  const [qrOpen, setQrOpen] = useState(false);
+  const [qrValue, setQrValue] = useState("");
+
+  const handleGenerateQr = () => {
+    // Generate a random code for now (could be based on settings)
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    setQrValue(code);
+    setQrOpen(true);
+  };
 
   const checkInSessions = [
     {
@@ -127,11 +139,22 @@ const CheckInSecurity = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Secure Check-in System</h3>
-        <Button>
+        <Button onClick={handleGenerateQr}>
           <QrCode className="h-4 w-4 mr-2" />
           Generate Check-in Code
         </Button>
       </div>
+      <Dialog open={qrOpen} onOpenChange={setQrOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Check-in QR Code</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
+            <QRCode value={qrValue} size={180} />
+            <div className="text-lg font-mono">{qrValue}</div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Security Settings */}
       <Card>
