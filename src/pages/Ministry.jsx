@@ -3,6 +3,9 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUserRole } from '@/hooks/useUserRole';
 import MinistryDashboard from '@/components/ministry/MinistryDashboard';
+import MinistryList from '@/components/ministry/MinistryList';
+import MinistryMembers from '@/components/ministry/MinistryMembers';
+import MinistryReports from '@/components/ministry/MinistryReports';
 
 const Ministry = () => {
   const { role } = useUserRole();
@@ -22,24 +25,15 @@ const Ministry = () => {
         </TabsContent>
         
         <TabsContent value="ministries">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Ministry Management</h2>
-            <p className="text-muted-foreground">Ministry management features coming soon...</p>
-          </div>
+          <MinistryList />
         </TabsContent>
         
         <TabsContent value="members">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Ministry Members</h2>
-            <p className="text-muted-foreground">Member management features coming soon...</p>
-          </div>
+          <MinistryMembers />
         </TabsContent>
         
         <TabsContent value="reports">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Ministry Reports</h2>
-            <p className="text-muted-foreground">Ministry reporting features coming soon...</p>
-          </div>
+          <MinistryReports />
         </TabsContent>
       </Tabs>
     </div>

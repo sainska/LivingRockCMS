@@ -36,7 +36,7 @@ export const useChurchData = () => {
           console.error('Dashboard stats error:', dashboardError);
         }
 
-        // Fetch recent donations
+        // Fetch recent donations with profile data
         const { data: donationsData, error: donationsError } = await supabase
           .from('donations')
           .select(`
@@ -70,7 +70,7 @@ export const useChurchData = () => {
           console.error('Events fetch error:', eventsError);
         }
 
-        // Fetch members count
+        // Fetch members count from profiles table
         const { count: membersCount, error: membersError } = await supabase
           .from('profiles')
           .select('*', { count: 'exact', head: true });
@@ -79,9 +79,6 @@ export const useChurchData = () => {
           console.error('Members count error:', membersError);
         }
 
-        // Fetch weekly attendance (mock data for now as we need actual attendance records)
-        const weeklyAttendance = 350;
-
         const statsData = dashboardData?.[0] || {};
         
         setStats({
@@ -89,9 +86,16 @@ export const useChurchData = () => {
           totalMembers: membersCount || 0,
           totalEvents: eventsData?.length || 0,
           monthlyDonations: statsData.monthly_donations || 0,
-          weeklyAttendance,
+          weeklyAttendance: 350, // This would come from attendance records
           recentDonations: donationsData || [],
           upcomingEvents: eventsData || []
+        });
+
+        console.log('Dashboard stats loaded:', {
+          ...statsData,
+          totalMembers: membersCount,
+          recentDonations: donationsData?.length,
+          upcomingEvents: eventsData?.length
         });
 
       } catch (err) {
@@ -104,12 +108,15 @@ export const useChurchData = () => {
 
     fetchDashboardStats();
 
-    // Set up real-time subscriptions
+    // Set up real-time subscriptions for data changes
     const donationsSubscription = supabase
       .channel('donations-changes')
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'donations' },
-        () => fetchDashboardStats()
+        () => {
+          console.log('Donations changed, refreshing stats...');
+          fetchDashboardStats();
+        }
       )
       .subscribe();
 
@@ -117,13 +124,28 @@ export const useChurchData = () => {
       .channel('events-changes')
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'events' },
-        () => fetchDashboardStats()
+        () => {
+          console.log('Events changed, refreshing stats...');
+          fetchDashboardStats();
+        }
+      )
+      .subscribe();
+
+    const profilesSubscription = supabase
+      .channel('profiles-changes')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'profiles' },
+        () => {
+          console.log('Profiles changed, refreshing stats...');
+          fetchDashboardStats();
+        }
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(donationsSubscription);
       supabase.removeChannel(eventsSubscription);
+      supabase.removeChannel(profilesSubscription);
     };
   }, []);
 

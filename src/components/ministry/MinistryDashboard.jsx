@@ -11,7 +11,9 @@ import {
   TrendingUp,
   UserPlus,
   Activity,
-  Target
+  Target,
+  MapPin,
+  Clock
 } from 'lucide-react';
 import { useMinistries } from '@/hooks/useMinistries';
 import { usePDFExport } from '@/hooks/usePDFExport';
@@ -24,13 +26,14 @@ const MinistryDashboard = () => {
   const handleExportPDF = async () => {
     try {
       const membersData = ministries.flatMap(ministry => 
-        ministry.ministry_members?.map(member => ({
+        ministry.ministry_members?.filter(member => member.is_active).map(member => ({
           first_name: member.profiles?.first_name || '',
           last_name: member.profiles?.last_name || '',
           email: member.profiles?.email || '',
           phone: member.profiles?.phone || '',
           created_at: member.joined_date,
-          ministry: ministry.name
+          ministry: ministry.name,
+          role: member.role || 'member'
         })) || []
       );
       
@@ -150,7 +153,8 @@ const MinistryDashboard = () => {
         <CardContent>
           <div className="space-y-4">
             {activeMinistries.map((ministry) => {
-              const memberCount = ministry.ministry_members?.filter(m => m.is_active).length || 0;
+              const activeMembers = ministry.ministry_members?.filter(m => m.is_active) || [];
+              const memberCount = activeMembers.length;
               const leaderName = ministry.leader ? 
                 `${ministry.leader.first_name} ${ministry.leader.last_name}` : 
                 'No leader assigned';
@@ -169,25 +173,53 @@ const MinistryDashboard = () => {
                     </Badge>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">Leader:</span> {leaderName}
                     </div>
-                    <div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">Meeting:</span> 
                       {ministry.meeting_day && ministry.meeting_time ? 
                         ` ${ministry.meeting_day} at ${ministry.meeting_time}` : 
                         ' Not scheduled'
                       }
                     </div>
-                    <div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">Location:</span> 
                       {ministry.meeting_location || 'Not specified'}
                     </div>
                   </div>
+
+                  {/* Ministry Members List */}
+                  {activeMembers.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="font-medium text-sm mb-2">Members:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {activeMembers.slice(0, 5).map((member) => (
+                          <Badge key={member.id} variant="secondary" className="text-xs">
+                            {member.profiles ? 
+                              `${member.profiles.first_name} ${member.profiles.last_name}` : 
+                              'Unknown Member'
+                            }
+                            {member.role && member.role !== 'member' && (
+                              <span className="ml-1 text-muted-foreground">({member.role})</span>
+                            )}
+                          </Badge>
+                        ))}
+                        {activeMembers.length > 5 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{activeMembers.length - 5} more
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Member Progress Bar */}
-                  <div className="mt-4">
+                  <div className="mb-4">
                     <div className="flex justify-between text-sm mb-1">
                       <span>Membership Growth</span>
                       <span>{memberCount}/50 target</span>
@@ -195,7 +227,7 @@ const MinistryDashboard = () => {
                     <Progress value={(memberCount / 50) * 100} className="h-2" />
                   </div>
                   
-                  <div className="flex gap-2 mt-4">
+                  <div className="flex gap-2">
                     <Button size="sm" variant="outline">
                       <UserPlus className="h-4 w-4 mr-1" />
                       Add Member
@@ -214,6 +246,10 @@ const MinistryDashboard = () => {
                 <Heart className="h-16 w-16 mx-auto mb-4 opacity-50" />
                 <h3 className="text-lg font-medium mb-2">No Active Ministries</h3>
                 <p>Start by creating your first ministry to engage your congregation.</p>
+                <Button className="mt-4" variant="outline">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Create Ministry
+                </Button>
               </div>
             )}
           </div>

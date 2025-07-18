@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, UserPlus, Download, Filter, Edit, Trash, Phone, Mail, MapPin } from "lucide-react";
 import { useMembers } from "@/hooks/useMembers";
 import { useToast } from "@/components/ui/use-toast";
@@ -34,26 +33,32 @@ const Members = () => {
 
   const filteredMembers = members.filter(member => {
     const searchLower = searchTerm.toLowerCase();
-    const profileName = member.profiles ? 
-      `${member.profiles.first_name || ''} ${member.profiles.last_name || ''}`.toLowerCase() : '';
+    const memberName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
     const memberEmail = member.email?.toLowerCase() || '';
     const memberPhone = member.phone || '';
     
-    return profileName.includes(searchLower) || 
+    return memberName.includes(searchLower) || 
            memberEmail.includes(searchLower) || 
            memberPhone.includes(searchTerm);
   });
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "active":
-        return <Badge className="bg-green-500">Active</Badge>;
-      case "inactive":
-        return <Badge variant="outline" className="text-gray-500">Inactive</Badge>;
-      case "visitor":
-        return <Badge variant="secondary" className="bg-xiracom-blue">Visitor</Badge>;
+  const getStatusBadge = (userRoles) => {
+    if (!userRoles || userRoles.length === 0) {
+      return <Badge variant="outline">Member</Badge>;
+    }
+    
+    const role = userRoles[0]?.role || 'member';
+    switch (role) {
+      case "system_admin":
+        return <Badge className="bg-red-500">Admin</Badge>;
+      case "clergy":
+        return <Badge className="bg-purple-500">Clergy</Badge>;
+      case "secretary":
+        return <Badge className="bg-blue-500">Secretary</Badge>;
+      case "treasurer":
+        return <Badge className="bg-green-500">Treasurer</Badge>;
       default:
-        return <Badge variant="outline">Unknown</Badge>;
+        return <Badge variant="outline">Member</Badge>;
     }
   };
 
@@ -152,8 +157,8 @@ const Members = () => {
   const openEditDialog = (member) => {
     setSelectedMember(member);
     setNewMember({
-      first_name: member.profiles?.first_name || "",
-      last_name: member.profiles?.last_name || "",
+      first_name: member.first_name || "",
+      last_name: member.last_name || "",
       email: member.email || "",
       phone: member.phone || "",
       address: member.address || "",
@@ -328,8 +333,8 @@ const Members = () => {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Contact</TableHead>
-                  <TableHead className="hidden md:table-cell">Membership #</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead className="hidden md:table-cell">Household</TableHead>
                   <TableHead className="hidden md:table-cell">Join Date</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -341,10 +346,7 @@ const Members = () => {
                       <TableCell className="font-medium">
                         <div>
                           <p className="font-semibold">
-                            {member.profiles ? 
-                              `${member.profiles.first_name || ''} ${member.profiles.last_name || ''}`.trim() || 'No Name' 
-                              : 'No Name'
-                            }
+                            {`${member.first_name || ''} ${member.last_name || ''}`.trim() || 'No Name'}
                           </p>
                           {member.address && (
                             <p className="text-sm text-muted-foreground flex items-center">
@@ -370,12 +372,12 @@ const Members = () => {
                           )}
                         </div>
                       </TableCell>
+                      <TableCell>{getStatusBadge(member.user_roles)}</TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {member.membership_number || 'N/A'}
+                        {member.households?.name || 'Not assigned'}
                       </TableCell>
-                      <TableCell>{getStatusBadge(member.status)}</TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {member.join_date ? new Date(member.join_date).toLocaleDateString() : 'N/A'}
+                        {member.created_at ? new Date(member.created_at).toLocaleDateString() : 'N/A'}
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-1">

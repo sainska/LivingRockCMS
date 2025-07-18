@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { BasicInfoFields, PersonalDetailsFields, RoleSpecificFields } from "@/components/forms/UserFormFields";
 import { PasswordFields } from "@/components/forms/PasswordFields";
+import { toast } from 'sonner';
 
 const roleConfig = {
   member: {
@@ -82,6 +83,17 @@ const RoleBasedRegister = () => {
 
     // Validation
     if (formData.password !== formData.confirmPassword) {
+      toast.error('Password Mismatch', {
+        description: 'Passwords do not match. Please try again.',
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+      toast.error('Missing Required Fields', {
+        description: 'Please fill in all required fields.',
+      });
       setIsLoading(false);
       return;
     }
@@ -91,14 +103,33 @@ const RoleBasedRegister = () => {
         formData.email,
         formData.password,
         formData.firstName,
-        formData.lastName
+        formData.lastName,
+        {
+          phone: formData.phone,
+          gender: formData.gender,
+          date_of_birth: formData.dateOfBirth,
+          address: formData.address,
+          city: formData.city,
+          role: selectedRole
+        }
       );
 
-      if (!error) {
+      if (error) {
+        console.error('Registration error:', error);
+        toast.error('Registration Failed', {
+          description: error.message || 'Something went wrong. Please try again.',
+        });
+      } else {
+        toast.success('Registration Successful', {
+          description: 'Welcome to Living Rock Church! Please check your email to verify your account.',
+        });
         navigate('/auth');
       }
     } catch (error) {
       console.error('Registration error:', error);
+      toast.error('Registration Failed', {
+        description: 'Something went wrong. Please try again.',
+      });
     } finally {
       setIsLoading(false);
     }
