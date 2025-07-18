@@ -43,6 +43,7 @@ import Communication from "./pages/Communication";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Security from "./pages/Security";
+import Ministry from "./pages/Ministry";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -103,8 +104,11 @@ const App = () => {
               <Route path="/role-based-register" element={<RoleBasedRegister />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               
-              {/* Main Dashboard Route - Redirects based on role */}
-              <Route path="/" element={<DashboardRedirect />} />
+              {/* Main Welcome Route */}
+              <Route path="/" element={<Welcome />} />
+              
+              {/* Dashboard Route - Redirects based on role */}
+              <Route path="/dashboard" element={<DashboardRedirect />} />
               
               {/* Role-based Dashboard Routes */}
               <Route path="/admin-dashboard" element={
@@ -240,6 +244,11 @@ const App = () => {
               <Route path="/security" element={
                 <RoleBasedRoute allowedRoles={['system_admin']}>
                   <Layout><Security /></Layout>
+                </RoleBasedRoute>
+              } />
+              <Route path="/ministry" element={
+                <RoleBasedRoute allowedRoles={['member', 'clergy', 'treasurer', 'secretary', 'system_admin']}>
+                  <Layout><Ministry /></Layout>
                 </RoleBasedRoute>
               } />
               
