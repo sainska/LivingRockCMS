@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import { supabase } from "./integrations/supabase/client";
@@ -43,6 +43,7 @@ import Communication from "./pages/Communication";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Security from "./pages/Security";
+import Ministry from "./pages/Ministry";
 import NotFound from "./pages/NotFound";
 import PrayerRequests from "./pages/PrayerRequests";
 
@@ -104,8 +105,11 @@ const App = () => {
               <Route path="/role-based-register" element={<RoleBasedRegister />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               
-              {/* Main Dashboard Route - Redirects based on role */}
-              <Route path="/" element={<DashboardRedirect />} />
+              {/* Main Welcome Route */}
+              <Route path="/" element={<Welcome />} />
+              
+              {/* Dashboard Route - Redirects based on role */}
+              <Route path="/dashboard" element={<DashboardRedirect />} />
               
               {/* Role-based Dashboard Routes */}
               <Route path="/admin-dashboard" element={
@@ -243,7 +247,15 @@ const App = () => {
                   <Layout><Security /></Layout>
                 </RoleBasedRoute>
               } />
+<<<<<<< HEAD
               <Route path="/prayers" element={<PrayerRequests />} />
+=======
+              <Route path="/ministry" element={
+                <RoleBasedRoute allowedRoles={['member', 'clergy', 'treasurer', 'secretary', 'system_admin']}>
+                  <Layout><Ministry /></Layout>
+                </RoleBasedRoute>
+              } />
+>>>>>>> dd30a64f7057b0f5cfce22764c876b5eeb5b2b2d
               
               <Route path="*" element={<NotFound />} />
             </Routes>

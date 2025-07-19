@@ -3,6 +3,10 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUserRole } from '@/hooks/useUserRole';
 import FinancialAnalytics from '@/components/financial/FinancialAnalytics';
+import DonationsManagement from '@/components/financial/DonationsManagement';
+import ExpensesManagement from '@/components/financial/ExpensesManagement';
+import BudgetManagement from '@/components/financial/BudgetManagement';
+import FinancialReports from '@/components/financial/FinancialReports';
 
 const Finances = () => {
   const { role } = useUserRole();
@@ -35,31 +39,19 @@ const Finances = () => {
         </TabsContent>
         
         <TabsContent value="donations">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Donations Management</h2>
-            <p className="text-muted-foreground">Donation management features coming soon...</p>
-          </div>
+          <DonationsManagement />
         </TabsContent>
         
         <TabsContent value="expenses">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Expenses Management</h2>
-            <p className="text-muted-foreground">Expense management features coming soon...</p>
-          </div>
+          <ExpensesManagement />
         </TabsContent>
         
         <TabsContent value="budget">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Budget Management</h2>
-            <p className="text-muted-foreground">Budget management features coming soon...</p>
-          </div>
+          <BudgetManagement />
         </TabsContent>
         
         <TabsContent value="reports">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Financial Reports</h2>
-            <p className="text-muted-foreground">Financial reporting features coming soon...</p>
-          </div>
+          <FinancialReports />
         </TabsContent>
       </Tabs>
     </div>

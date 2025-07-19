@@ -12,7 +12,7 @@ const DashboardRedirect = () => {
     if (authLoading || roleLoading) return;
 
     if (!user) {
-      navigate('/auth');
+      navigate('/welcome');
       return;
     }
 
