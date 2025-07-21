@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, DollarSign, TrendingUp, Wallet } from "lucide-react";
+import { DollarSign, TrendingUp, Wallet } from "lucide-react";
+import ReportDownload from "./ReportDownload";
 
 const FinancialReport = ({ period }) => {
   const financialSummary = [
@@ -30,15 +30,23 @@ const FinancialReport = ({ period }) => {
     { month: "June", income: 850000, expenses: 775000, net: 75000 }
   ];
 
+  // Prepare data for ReportDownload
+  const reportData = {
+    summary: {
+      "Total Income": "KSh 850,000",
+      "Total Expenses": "KSh 775,000",
+      "Net Income": "KSh 75,000"
+    },
+    table: {
+      title: "Income Breakdown",
+      columns: ["Category", "Amount (KSh)", "Percentage", "Change"],
+      rows: financialSummary.map(item => [item.category, item.amount.toLocaleString(), item.percentage + "%", item.change])
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Financial Report - {period}</h3>
-        <Button variant="outline" size="sm">
-          <Download className="h-4 w-4 mr-2" />
-          Export
-        </Button>
-      </div>
+      <ReportDownload data={reportData} title="Financial Report" period={period} />
 
       {/* Financial Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -54,7 +62,6 @@ const FinancialReport = ({ period }) => {
             </div>
           </CardContent>
         </Card>
-        
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -67,7 +74,6 @@ const FinancialReport = ({ period }) => {
             </div>
           </CardContent>
         </Card>
-        
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">

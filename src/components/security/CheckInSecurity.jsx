@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { QrCode, Shield, Users, Clock, AlertTriangle, CheckCircle } from "lucide-react";
-import QRCode from 'qrcode.react';
+import QRCode from 'react-qr-code';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const CheckInSecurity = () => {

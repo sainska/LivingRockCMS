@@ -29,7 +29,16 @@ import {
   PieChart,
   CreditCard,
   Mail,
-  Bell
+  Bell,
+  Plus,
+  Inbox,
+  Send,
+  Repeat,
+  Target,
+  Download,
+  Edit,
+  Clock,
+  Gift
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -204,6 +213,231 @@ const Sidebar = () => {
     }
   };
 
+  const getRoleBasedDashboardSections = (role) => {
+    switch (role) {
+      case 'member':
+      default:
+        return [
+          {
+            title: 'Profile',
+            items: [
+              { href: '/dashboard/member/profile', icon: <User size={20} />, title: 'Profile' },
+            ],
+          },
+          {
+            title: 'Ministries & Groups',
+            items: [
+              { href: '/dashboard/member/ministries', icon: <Users size={20} />, title: 'My Groups' },
+              { href: '/dashboard/member/ministries#join', icon: <Plus size={20} />, title: 'Join Requests' },
+            ],
+          },
+          {
+            title: 'Events & Attendance',
+            items: [
+              { href: '/dashboard/member/attendance', icon: <Calendar size={20} />, title: 'Events & Attendance' },
+            ],
+          },
+          {
+            title: 'Giving',
+            items: [
+              { href: '/dashboard/member/giving', icon: <DollarSign size={20} />, title: 'Giving' },
+            ],
+          },
+          {
+            title: 'Pastoral Care',
+            items: [
+              { href: '/dashboard/member/pastoral', icon: <Heart size={20} />, title: 'Pastoral Care' },
+            ],
+          },
+          {
+            title: 'Messages & Announcements',
+            items: [
+              { href: '/dashboard/member/messages', icon: <Mail size={20} />, title: 'Messages' },
+            ],
+          },
+          {
+            title: 'Settings',
+            items: [
+              { href: '/dashboard/member/settings', icon: <Settings size={20} />, title: 'Settings' },
+            ],
+          },
+        ];
+      case 'secretary':
+        return [
+          {
+            title: 'Members',
+            items: [
+              { href: '/dashboard/secretary/members', icon: <Users size={20} />, title: 'Directory' },
+              { href: '/dashboard/secretary/members/add', icon: <Plus size={20} />, title: 'Add Member' },
+              { href: '/dashboard/secretary/members/status', icon: <UserCheck size={20} />, title: 'Status Updates' },
+              { href: '/dashboard/secretary/members/sacraments', icon: <BookOpen size={20} />, title: 'Sacraments' },
+            ],
+          },
+          {
+            title: 'Events & Scheduling',
+            items: [
+              { href: '/dashboard/secretary/events', icon: <Calendar size={20} />, title: 'Event Calendar' },
+              { href: '/dashboard/secretary/events/manage', icon: <Settings size={20} />, title: 'Manage Events' },
+              { href: '/dashboard/secretary/events/attendance', icon: <UserCheck size={20} />, title: 'Attendance Records' },
+              { href: '/dashboard/secretary/events/recurring', icon: <Repeat size={20} />, title: 'Recurring Events' },
+            ],
+          },
+          {
+            title: 'Ministries',
+            items: [
+              { href: '/dashboard/secretary/ministries', icon: <Users size={20} />, title: 'Groups Overview' },
+              { href: '/dashboard/secretary/ministries/assign', icon: <UserCheck size={20} />, title: 'Assign Members' },
+              { href: '/dashboard/secretary/ministries/counts', icon: <BarChart size={20} />, title: 'Membership Counts' },
+            ],
+          },
+          {
+            title: 'Communication',
+            items: [
+              { href: '/dashboard/secretary/communication', icon: <Mail size={20} />, title: 'Announcements' },
+              { href: '/dashboard/secretary/communication/inbox', icon: <Inbox size={20} />, title: 'Inbox' },
+              { href: '/dashboard/secretary/communication/outbox', icon: <Send size={20} />, title: 'Outbox' },
+              { href: '/dashboard/secretary/communication/bulk', icon: <Users size={20} />, title: 'Bulk Send' },
+            ],
+          },
+          {
+            title: 'Pastoral Care',
+            items: [
+              { href: '/dashboard/secretary/pastoral', icon: <Heart size={20} />, title: 'Visits Tracker' },
+              { href: '/dashboard/secretary/pastoral/counseling', icon: <User size={20} />, title: 'Counseling Sessions' },
+              { href: '/dashboard/secretary/pastoral/followups', icon: <Repeat size={20} />, title: 'Follow-Ups' },
+            ],
+          },
+          {
+            title: 'Reports',
+            items: [
+              { href: '/dashboard/secretary/reports/membership', icon: <BarChart size={20} />, title: 'Membership Reports' },
+              { href: '/dashboard/secretary/reports/events', icon: <Calendar size={20} />, title: 'Event Attendance Reports' },
+              { href: '/dashboard/secretary/reports/groups', icon: <Users size={20} />, title: 'Group Activity Reports' },
+              { href: '/dashboard/secretary/reports/finances', icon: <DollarSign size={20} />, title: 'Financial Overview' },
+            ],
+          },
+          {
+            title: 'Tools',
+            items: [
+              { href: '/dashboard/secretary/tools/templates', icon: <FileText size={20} />, title: 'Document Templates' },
+              { href: '/dashboard/secretary/tools/settings', icon: <Settings size={20} />, title: 'Settings' },
+              { href: '/dashboard/secretary/tools/roles', icon: <UserCog size={20} />, title: 'Profile/Role Management' },
+            ],
+          },
+        ];
+      case 'treasurer':
+        return [
+          {
+            title: 'Accounts',
+            items: [
+              { href: '/dashboard/treasurer/accounts', icon: <CreditCard size={20} />, title: 'Overview' },
+              { href: '/dashboard/treasurer/accounts/create', icon: <Plus size={20} />, title: 'Create/Edit Account' },
+              { href: '/dashboard/treasurer/accounts/status', icon: <UserCheck size={20} />, title: 'Account Status' },
+            ],
+          },
+          {
+            title: 'Transactions',
+            items: [
+              { href: '/dashboard/treasurer/transactions', icon: <DollarSign size={20} />, title: 'Record Transaction' },
+              { href: '/dashboard/treasurer/transactions/view', icon: <Eye size={20} />, title: 'View Transactions' },
+              { href: '/dashboard/treasurer/transactions/edit', icon: <Edit size={20} />, title: 'Edit/Reverse' },
+              { href: '/dashboard/treasurer/transactions/receipts', icon: <FileText size={20} />, title: 'Attach Receipts' },
+            ],
+          },
+          {
+            title: 'Donations & Tithes',
+            items: [
+              { href: '/dashboard/treasurer/donations', icon: <DollarSign size={20} />, title: 'Tithes Summary' },
+              { href: '/dashboard/treasurer/donations/offerings', icon: <Gift size={20} />, title: 'Offerings' },
+              { href: '/dashboard/treasurer/donations/donors', icon: <Users size={20} />, title: 'Donor Records' },
+              { href: '/dashboard/treasurer/donations/receipts', icon: <FileText size={20} />, title: 'Receipts' },
+            ],
+          },
+          {
+            title: 'Expenses',
+            items: [
+              { href: '/dashboard/treasurer/expenses', icon: <CreditCard size={20} />, title: 'Expense Categories' },
+              { href: '/dashboard/treasurer/expenses/recurring', icon: <Repeat size={20} />, title: 'Recurring Expenses' },
+              { href: '/dashboard/treasurer/expenses/approvals', icon: <UserCheck size={20} />, title: 'Approvals' },
+            ],
+          },
+          {
+            title: 'Reports',
+            items: [
+              { href: '/dashboard/treasurer/reports/income', icon: <BarChart size={20} />, title: 'Income vs Expense' },
+              { href: '/dashboard/treasurer/reports/balances', icon: <PieChart size={20} />, title: 'Balances' },
+              { href: '/dashboard/treasurer/reports/budget', icon: <Target size={20} />, title: 'Budget Tracking' },
+              { href: '/dashboard/treasurer/reports/export', icon: <Download size={20} />, title: 'Export' },
+            ],
+          },
+          {
+            title: 'Audit & Security',
+            items: [
+              { href: '/dashboard/treasurer/audit/logs', icon: <FileText size={20} />, title: 'Transaction Logs' },
+              { href: '/dashboard/treasurer/audit/users', icon: <User size={20} />, title: 'User Access' },
+              { href: '/dashboard/treasurer/audit/backup', icon: <Database size={20} />, title: 'Backup/Restore' },
+            ],
+          },
+        ];
+      case 'clergy':
+        return [
+          {
+            title: 'Members',
+            items: [
+              { href: '/dashboard/clergy/members', icon: <Users size={20} />, title: 'Directory' },
+              { href: '/dashboard/clergy/members/sacraments', icon: <BookOpen size={20} />, title: 'Sacraments Records' },
+              { href: '/dashboard/clergy/members/groups', icon: <Users size={20} />, title: 'Group Assignments' },
+              { href: '/dashboard/clergy/members/notes', icon: <FileText size={20} />, title: 'Spiritual Notes' },
+            ],
+          },
+          {
+            title: 'Pastoral Care',
+            items: [
+              { href: '/dashboard/clergy/pastoral', icon: <Heart size={20} />, title: 'Visit Planner' },
+              { href: '/dashboard/clergy/pastoral/history', icon: <Clock size={20} />, title: 'Care History' },
+              { href: '/dashboard/clergy/pastoral/counseling', icon: <User size={20} />, title: 'Counseling Sessions' },
+              { href: '/dashboard/clergy/pastoral/followups', icon: <Repeat size={20} />, title: 'Follow-Ups' },
+            ],
+          },
+          {
+            title: 'Ministries',
+            items: [
+              { href: '/dashboard/clergy/ministries', icon: <Users size={20} />, title: 'Groups Overview' },
+              { href: '/dashboard/clergy/ministries/leaders', icon: <UserCheck size={20} />, title: 'Assign Leaders' },
+              { href: '/dashboard/clergy/ministries/growth', icon: <BarChart size={20} />, title: 'Track Growth' },
+              { href: '/dashboard/clergy/ministries/activities', icon: <Activity size={20} />, title: 'Group Activities' },
+            ],
+          },
+          {
+            title: 'Events & Services',
+            items: [
+              { href: '/dashboard/clergy/events', icon: <Calendar size={20} />, title: 'Event Calendar' },
+              { href: '/dashboard/clergy/events/services', icon: <BookOpen size={20} />, title: 'Service Details' },
+              { href: '/dashboard/clergy/events/attendance', icon: <UserCheck size={20} />, title: 'Attendance Monitoring' },
+              { href: '/dashboard/clergy/events/reports', icon: <BarChart size={20} />, title: 'Event Reports' },
+            ],
+          },
+          {
+            title: 'Communication',
+            items: [
+              { href: '/dashboard/clergy/communication', icon: <Mail size={20} />, title: 'Announcements' },
+              { href: '/dashboard/clergy/communication/messages', icon: <MessageSquare size={20} />, title: 'Messages' },
+              { href: '/dashboard/clergy/communication/alerts', icon: <Bell size={20} />, title: 'Urgent Alerts' },
+            ],
+          },
+          {
+            title: 'Reports & Insights',
+            items: [
+              { href: '/dashboard/clergy/reports/growth', icon: <BarChart size={20} />, title: 'Member Growth Reports' },
+              { href: '/dashboard/clergy/reports/attendance', icon: <PieChart size={20} />, title: 'Attendance Trends' },
+              { href: '/dashboard/clergy/reports/pastoral', icon: <Heart size={20} />, title: 'Pastoral Care Stats' },
+              { href: '/dashboard/clergy/reports/engagement', icon: <Users size={20} />, title: 'Ministry Engagement' },
+            ],
+          },
+        ];
+    }
+  };
+
   if (loading) {
     return (
       <aside className="flex flex-col bg-sidebar h-screen border-r shadow-sm w-64">
@@ -222,6 +456,8 @@ const Sidebar = () => {
   const financialItems = getFinancialItems();
   const systemItems = getSystemItems();
   const securityItems = getSecurityItems();
+
+  const sidebarSections = getRoleBasedDashboardSections(currentRole);
 
   return (
     <aside
@@ -249,50 +485,14 @@ const Sidebar = () => {
 
       <div className="flex-1 overflow-y-auto py-4 px-2">
         <div className="flex flex-col gap-2">
-          {/* Dashboard Section */}
-          {dashboardItems.length > 0 && (
+          {sidebarSections.map((section, idx) => (
             <SidebarSection
-              title="Dashboard"
-              items={dashboardItems}
+              key={idx}
+              title={section.title}
+              items={section.items}
               isCollapsed={collapsed}
             />
-          )}
-
-          {/* Church Management Section */}
-          {churchManagementItems.length > 0 && (
-            <SidebarSection
-              title="Church Management"
-              items={churchManagementItems}
-              isCollapsed={collapsed}
-            />
-          )}
-
-          {/* Financial Management Section */}
-          {financialItems.length > 0 && (
-            <SidebarSection
-              title="Financial Management"
-              items={financialItems}
-              isCollapsed={collapsed}
-            />
-          )}
-
-          {/* System Administration Section */}
-          {systemItems.length > 0 && (
-            <SidebarSection
-              title="System Administration"
-              items={systemItems}
-              isCollapsed={collapsed}
-            />
-          )}
-
-          {/* Security Section */}
-          {securityItems.length > 0 && (
-            <SidebarSection
-              title="Security"
-              items={securityItems}
-              isCollapsed={collapsed}
-            />
-          )}
+          ))}
         </div>
       </div>
 

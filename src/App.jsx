@@ -46,6 +46,65 @@ import Security from "./pages/Security";
 import Ministry from "./pages/Ministry";
 import NotFound from "./pages/NotFound";
 import PrayerRequests from "./pages/PrayerRequests";
+import MemberDashboard from "./components/admin/MemberDashboard";
+import MemberMinistries from "./components/member/MemberMinistries";
+import MemberAttendance from "./components/member/MemberAttendance";
+import MemberGiving from "./components/member/MemberGiving";
+import MemberPastoralCare from "./components/member/MemberPastoralCare";
+import MemberMessages from "./components/member/MemberMessages";
+import MemberSettings from "./components/member/MemberSettings";
+import SecretaryMembers from "./components/secretary/SecretaryMembers";
+import SecretaryEvents from "./components/secretary/SecretaryEvents";
+import SecretaryMinistries from "./components/secretary/SecretaryMinistries";
+import SecretaryCommunication from "./components/secretary/SecretaryCommunication";
+import SecretaryPastoralCare from "./components/secretary/SecretaryPastoralCare";
+import SecretaryReports from "./components/secretary/SecretaryReports";
+import SecretaryTools from "./components/secretary/SecretaryTools";
+import TreasurerAccounts from "./components/treasurer/TreasurerAccounts";
+import TreasurerTransactions from "./components/treasurer/TreasurerTransactions";
+import TreasurerDonations from "./components/treasurer/TreasurerDonations";
+import TreasurerExpenses from "./components/treasurer/TreasurerExpenses";
+import TreasurerReports from "./components/treasurer/TreasurerReports";
+import TreasurerAudit from "./components/treasurer/TreasurerAudit";
+import ClergyMembers from "./components/clergy/ClergyMembers";
+import ClergyEvents from "./components/clergy/ClergyEvents";
+import ClergyMinistries from "./components/clergy/ClergyMinistries";
+import ClergyPastoralCare from "./components/clergy/ClergyPastoralCare";
+import ClergyCommunication from "./components/clergy/ClergyCommunication";
+import ClergyReports from "./components/clergy/ClergyReports";
+import ClergySacraments from "./components/clergy/ClergySacraments";
+import ClergyGroupAssignments from "./components/clergy/ClergyGroupAssignments";
+import ClergySpiritualNotes from "./components/clergy/ClergySpiritualNotes";
+import SecretaryAddMember from "./components/secretary/SecretaryAddMember";
+import SecretaryStatusUpdates from "./components/secretary/SecretaryStatusUpdates";
+import SecretarySacraments from "./components/secretary/SecretarySacraments";
+import SecretaryAttendanceRecords from "./components/secretary/SecretaryAttendanceRecords";
+import SecretaryManageEvents from "./components/secretary/SecretaryManageEvents";
+import SecretaryRecurringEvents from "./components/secretary/SecretaryRecurringEvents";
+import SecretaryAssignMembers from "./components/secretary/SecretaryAssignMembers";
+import SecretaryMembershipCounts from "./components/secretary/SecretaryMembershipCounts";
+import SecretaryInbox from "./components/secretary/SecretaryInbox";
+import SecretaryOutbox from "./components/secretary/SecretaryOutbox";
+import SecretaryBulkSend from "./components/secretary/SecretaryBulkSend";
+import SecretaryCounselingSessions from "./components/secretary/SecretaryCounselingSessions";
+import SecretaryFollowUps from "./components/secretary/SecretaryFollowUps";
+import SecretaryMembershipReports from "./components/secretary/SecretaryMembershipReports";
+import SecretaryEventAttendanceReports from "./components/secretary/SecretaryEventAttendanceReports";
+import SecretaryGroupActivityReports from "./components/secretary/SecretaryGroupActivityReports";
+import SecretaryFinancialOverview from "./components/secretary/SecretaryFinancialOverview";
+import SecretaryDocumentTemplates from "./components/secretary/SecretaryDocumentTemplates";
+import SecretarySettings from "./components/secretary/SecretarySettings";
+import SecretaryProfileRoleManagement from "./components/secretary/SecretaryProfileRoleManagement";
+import CreateEditAccount from "./components/treasurer/CreateEditAccount";
+import AccountStatus from "./components/treasurer/AccountStatus";
+import ViewTransactions from "./components/treasurer/ViewTransactions";
+import EditReverse from "./components/treasurer/EditReverse";
+import AttachReceipts from "./components/treasurer/AttachReceipts";
+import Offerings from "./components/treasurer/Offerings";
+import DonorRecords from "./components/treasurer/DonorRecords";
+import Receipts from "./components/treasurer/Receipts";
+import RecurringExpenses from "./components/treasurer/RecurringExpenses";
+import Approvals from "./components/treasurer/Approvals";
 
 const queryClient = new QueryClient();
 
@@ -111,6 +170,21 @@ const App = () => {
               {/* Dashboard Route - Redirects based on role */}
               <Route path="/dashboard" element={<DashboardRedirect />} />
               
+              {/* Member Dashboard Route */}
+              <Route path="/dashboard/member" element={
+                <RoleBasedRoute allowedRoles={['member', 'system_admin']}>
+                  <Layout><MemberDashboard /></Layout>
+                </RoleBasedRoute>
+              }>
+                <Route path="profile" element={<UserProfile />} />
+                <Route path="ministries" element={<MemberMinistries />} />
+                <Route path="attendance" element={<MemberAttendance />} />
+                <Route path="giving" element={<MemberGiving />} />
+                <Route path="pastoral" element={<MemberPastoralCare />} />
+                <Route path="messages" element={<MemberMessages />} />
+                <Route path="settings" element={<MemberSettings />} />
+              </Route>
+              
               {/* Role-based Dashboard Routes */}
               <Route path="/admin-dashboard" element={
                 <RoleBasedRoute allowedRoles={['system_admin']}>
@@ -127,16 +201,123 @@ const App = () => {
                   <Layout><TreasurerDashboard /></Layout>
                 </RoleBasedRoute>
               } />
+              <Route path="/dashboard/treasurer" element={
+                <RoleBasedRoute allowedRoles={['treasurer', 'system_admin']}>
+                  <Layout><TreasurerDashboard /></Layout>
+                </RoleBasedRoute>
+              }>
+                <Route path="accounts" element={<TreasurerAccounts />} />
+                <Route path="accounts/create" element={<CreateEditAccount />} />
+                <Route path="accounts/status" element={<AccountStatus />} />
+
+                <Route path="transactions" element={<TreasurerTransactions />} />
+                <Route path="transactions/view" element={<ViewTransactions />} />
+                <Route path="transactions/edit" element={<EditReverse />} />
+                <Route path="transactions/receipts" element={<AttachReceipts />} />
+
+                <Route path="donations" element={<TreasurerDonations />} />
+                <Route path="donations/offerings" element={<Offerings />} />
+                <Route path="donations/donors" element={<DonorRecords />} />
+                <Route path="donations/receipts" element={<Receipts />} />
+
+                <Route path="expenses" element={<TreasurerExpenses />} />
+                <Route path="expenses/recurring" element={<RecurringExpenses />} />
+                <Route path="expenses/approvals" element={<Approvals />} />
+
+                <Route path="reports" element={<TreasurerReports />} />
+                <Route path="reports/income" element={<div>Income vs Expense (TODO)</div>} />
+                <Route path="reports/balances" element={<div>Balances (TODO)</div>} />
+                <Route path="reports/budget" element={<div>Budget Tracking (TODO)</div>} />
+                <Route path="reports/export" element={<div>Export (TODO)</div>} />
+
+                <Route path="audit" element={<TreasurerAudit />} />
+                <Route path="audit/logs" element={<div>Transaction Logs (TODO)</div>} />
+                <Route path="audit/users" element={<div>User Access (TODO)</div>} />
+                <Route path="audit/backup" element={<div>Backup/Restore (TODO)</div>} />
+              </Route>
               <Route path="/secretary-dashboard" element={
                 <RoleBasedRoute allowedRoles={['secretary', 'system_admin']}>
                   <Layout><SecretaryDashboard /></Layout>
                 </RoleBasedRoute>
               } />
+              <Route path="/dashboard/secretary" element={
+                <RoleBasedRoute allowedRoles={['secretary', 'system_admin']}>
+                  <Layout><SecretaryDashboard /></Layout>
+                </RoleBasedRoute>
+              }>
+                {/* Members */}
+                <Route path="members" element={<SecretaryMembers />} />
+                <Route path="members/add" element={<SecretaryAddMember />} />
+                <Route path="members/status" element={<SecretaryStatusUpdates />} />
+                <Route path="members/sacraments" element={<SecretarySacraments />} />
+                {/* Events & Scheduling */}
+                <Route path="events" element={<SecretaryEvents />} />
+                <Route path="events/manage" element={<SecretaryManageEvents />} />
+                <Route path="events/attendance" element={<SecretaryAttendanceRecords />} />
+                <Route path="events/recurring" element={<SecretaryRecurringEvents />} />
+                {/* Ministries */}
+                <Route path="ministries" element={<SecretaryMinistries />} />
+                <Route path="ministries/assign" element={<SecretaryAssignMembers />} />
+                <Route path="ministries/counts" element={<SecretaryMembershipCounts />} />
+                {/* Communication */}
+                <Route path="communication" element={<SecretaryCommunication />} />
+                <Route path="communication/inbox" element={<SecretaryInbox />} />
+                <Route path="communication/outbox" element={<SecretaryOutbox />} />
+                <Route path="communication/bulk" element={<SecretaryBulkSend />} />
+                {/* Pastoral Care */}
+                <Route path="pastoral" element={<SecretaryPastoralCare />} />
+                <Route path="pastoral/counseling" element={<SecretaryCounselingSessions />} />
+                <Route path="pastoral/followups" element={<SecretaryFollowUps />} />
+                {/* Reports */}
+                <Route path="reports/membership" element={<SecretaryMembershipReports />} />
+                <Route path="reports/events" element={<SecretaryEventAttendanceReports />} />
+                <Route path="reports/groups" element={<SecretaryGroupActivityReports />} />
+                <Route path="reports/finances" element={<SecretaryFinancialOverview />} />
+                {/* Tools */}
+                <Route path="tools/templates" element={<SecretaryDocumentTemplates />} />
+                <Route path="tools/settings" element={<SecretarySettings />} />
+                <Route path="tools/roles" element={<SecretaryProfileRoleManagement />} />
+              </Route>
               <Route path="/clergy-dashboard" element={
                 <RoleBasedRoute allowedRoles={['clergy', 'system_admin']}>
                   <Layout><ClergyDashboard /></Layout>
                 </RoleBasedRoute>
               } />
+              <Route path="/dashboard/clergy" element={
+                <RoleBasedRoute allowedRoles={['clergy', 'system_admin']}>
+                  <Layout><ClergyDashboard /></Layout>
+                </RoleBasedRoute>
+              }>
+                {/* Members */}
+                <Route path="members" element={<ClergyMembers />} />
+                <Route path="members/sacraments" element={<ClergySacraments />} />
+                <Route path="members/groups" element={<ClergyGroupAssignments />} />
+                <Route path="members/notes" element={<ClergySpiritualNotes />} />
+                {/* Pastoral Care */}
+                <Route path="pastoral" element={<ClergyPastoralCare />} />
+                <Route path="pastoral/history" element={<div>Care History (TODO)</div>} />
+                <Route path="pastoral/counseling" element={<div>Counseling Sessions (TODO)</div>} />
+                <Route path="pastoral/followups" element={<div>Follow-Ups (TODO)</div>} />
+                {/* Ministries */}
+                <Route path="ministries" element={<ClergyMinistries />} />
+                <Route path="ministries/leaders" element={<div>Assign Leaders (TODO)</div>} />
+                <Route path="ministries/growth" element={<div>Track Growth (TODO)</div>} />
+                <Route path="ministries/activities" element={<div>Group Activities (TODO)</div>} />
+                {/* Events & Services */}
+                <Route path="events" element={<ClergyEvents />} />
+                <Route path="events/services" element={<div>Service Details (TODO)</div>} />
+                <Route path="events/attendance" element={<div>Attendance Monitoring (TODO)</div>} />
+                <Route path="events/reports" element={<div>Event Reports (TODO)</div>} />
+                {/* Communication */}
+                <Route path="communication" element={<ClergyCommunication />} />
+                <Route path="communication/messages" element={<div>Messages (TODO)</div>} />
+                <Route path="communication/alerts" element={<div>Urgent Alerts (TODO)</div>} />
+                {/* Reports & Insights */}
+                <Route path="reports/growth" element={<div>Member Growth Reports (TODO)</div>} />
+                <Route path="reports/attendance" element={<div>Attendance Trends (TODO)</div>} />
+                <Route path="reports/pastoral" element={<div>Pastoral Care Stats (TODO)</div>} />
+                <Route path="reports/engagement" element={<div>Ministry Engagement (TODO)</div>} />
+              </Route>
               <Route path="/user-dashboard" element={
                 <RoleBasedRoute allowedRoles={['member', 'clergy', 'treasurer', 'secretary', 'system_admin']}>
                   <Layout><UserDashboard /></Layout>
@@ -247,15 +428,15 @@ const App = () => {
                   <Layout><Security /></Layout>
                 </RoleBasedRoute>
               } />
-<<<<<<< HEAD
+
               <Route path="/prayers" element={<PrayerRequests />} />
-=======
+
               <Route path="/ministry" element={
                 <RoleBasedRoute allowedRoles={['member', 'clergy', 'treasurer', 'secretary', 'system_admin']}>
                   <Layout><Ministry /></Layout>
                 </RoleBasedRoute>
               } />
->>>>>>> dd30a64f7057b0f5cfce22764c876b5eeb5b2b2d
+
               
               <Route path="*" element={<NotFound />} />
             </Routes>

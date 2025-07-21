@@ -7,8 +7,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Settings, Play, Download } from "lucide-react";
+import ReportDownload from "./ReportDownload";
 
-const CustomReportBuilder = () => {
+const CustomReportBuilder = ({ period }) => {
+  // Example data for demonstration
+  const reportData = {
+    summary: {
+      "Custom Metric 1": 123,
+      "Custom Metric 2": 456,
+      "Custom Metric 3": 789
+    },
+    table: {
+      title: "Custom Data Table",
+      columns: ["Field 1", "Field 2", "Field 3"],
+      rows: [
+        ["A", "B", "C"],
+        ["D", "E", "F"],
+        ["G", "H", "I"]
+      ]
+    }
+  };
+
   const [reportType, setReportType] = useState("");
   const [dateRange, setDateRange] = useState("");
   const [selectedFields, setSelectedFields] = useState([]);
@@ -64,16 +83,13 @@ const CustomReportBuilder = () => {
 
   return (
     <div className="space-y-6">
+      <ReportDownload data={reportData} title="Custom Report" period={period} />
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Custom Report Builder</h3>
         <div className="flex gap-2">
           <Button variant="outline" onClick={generateReport}>
             <Play className="h-4 w-4 mr-2" />
             Generate Report
-          </Button>
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export
           </Button>
         </div>
       </div>

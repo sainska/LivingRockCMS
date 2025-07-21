@@ -153,7 +153,7 @@ const Welcome = () => {
       {/* Footer */}
       <footer className="px-6 py-8 border-t border-white/20">
         <div className="max-w-6xl mx-auto text-center text-white/80">
-          <p>© 2024 Living Rock Church Management System. Built with love for the church community.</p>
+          <p>© 2025 Living Rock Church Management System. Built with love for the church community.</p>
         </div>
       </footer>
     </div>

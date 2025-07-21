@@ -84,3 +84,16 @@ AS $function$
     (SELECT COUNT(*) FROM public.communications WHERE status = 'draft') as pending_communications,
     (SELECT COUNT(*) FROM public.prayer_requests WHERE status = 'active') as prayer_requests;
 $function$;
+
+-- Add status_updates table for secretary dashboard status updates
+create table if not exists public.status_updates (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  category text,
+  created_by uuid references profiles(id),
+  created_at timestamptz not null default now()
+);
+
+-- Optional: Index for faster queries by created_at
+create index if not exists idx_status_updates_created_at on public.status_updates(created_at desc);
