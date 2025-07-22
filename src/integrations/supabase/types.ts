@@ -69,7 +69,22 @@ export type Database = {
           recorded_by?: string
           status?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "attendance_records_event_id_fkey",
+            columns: ["event_id"],
+            isOneToOne: false,
+            referencedRelation: "events",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_member_id_fkey",
+            columns: ["member_id"],
+            isOneToOne: false,
+            referencedRelation: "profiles",
+            referencedColumns: ["id"]
+          }
+        ]
       }
       audit_logs: {
         Row: {

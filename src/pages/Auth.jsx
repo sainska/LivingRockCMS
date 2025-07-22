@@ -5,26 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Church, Eye, EyeOff, Shield, Users, DollarSign, FileText, User } from "lucide-react";
+import { Church, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-
-const roleInfo = {
-  system_admin: { label: "System Admin", icon: <span>🛡️</span>, color: "red" },
-  treasurer: { label: "Treasurer", icon: <span>💰</span>, color: "green" },
-  secretary: { label: "Secretary", icon: <span>📝</span>, color: "blue" },
-  clergy: { label: "Clergy", icon: <span>⛪</span>, color: "purple" },
-  member: { label: "Member", icon: <span>👤</span>, color: "gray" },
-};
 
 const Auth = () => {
   const navigate = useNavigate();
   const { signIn, signUp, resetPassword, getUserRole, getDashboardRoute } = useAuth();
-  
-  const [loginData, setLoginData] = useState({
-    email: "",
-    password: ""
-  });
-  
+
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [registerData, setRegisterData] = useState({
     firstName: "",
     lastName: "",
@@ -32,7 +20,6 @@ const Auth = () => {
     password: "",
     confirmPassword: ""
   });
-
   const [resetEmail, setResetEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -42,38 +29,22 @@ const Auth = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
-    console.log('Auth: Starting login process...');
-    
     try {
       const { error } = await signIn(loginData.email, loginData.password);
-      
       if (error) {
-        console.error('Auth: Login failed with error:', error);
         setIsLoading(false);
         return;
       }
-
-      console.log('Auth: Login successful, getting user role...');
-      
-      // Wait a moment for the session to be established
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Get user role and redirect to appropriate dashboard
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const userRole = await getUserRole();
-      console.log('Auth: User role retrieved:', userRole);
-      
       if (userRole) {
         const dashboardRoute = getDashboardRoute(userRole);
-        console.log('Auth: Redirecting to dashboard:', dashboardRoute);
         navigate(dashboardRoute);
       } else {
-        console.log('Auth: No role found, redirecting to user dashboard');
-        // If no role assigned, default to member dashboard
-        navigate('/user-dashboard');
+        navigate("/user-dashboard");
       }
     } catch (error) {
-      console.error('Auth: Unexpected error during login:', error);
+      console.error("Auth: Unexpected error during login:", error);
     } finally {
       setIsLoading(false);
     }
@@ -81,33 +52,22 @@ const Auth = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    
-    if (registerData.password !== registerData.confirmPassword) {
-      return;
-    }
-
+    if (registerData.password !== registerData.confirmPassword) return;
     setIsLoading(true);
-
     const { error } = await signUp(
-      registerData.email, 
-      registerData.password, 
-      registerData.firstName, 
+      registerData.email,
+      registerData.password,
+      registerData.firstName,
       registerData.lastName
     );
-    
-    if (!error) {
-      setActiveTab("login");
-    }
-    
+    if (!error) setActiveTab("login");
     setIsLoading(false);
   };
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
     await resetPassword(resetEmail);
-    
     setIsLoading(false);
   };
 
@@ -117,11 +77,11 @@ const Auth = () => {
         <CardHeader className="text-center">
           <div className="flex justify-center items-center gap-2 mb-4">
             <Church className="h-8 w-8 text-xiracom-blue" />
-            <CardTitle className="text-2xl text-xiracom-blue">Living Rock Church</CardTitle>
+            <CardTitle className="text-2xl text-xiracom-blue">
+              Living Rock Church
+            </CardTitle>
           </div>
-          <p className="text-sm text-gray-600">
-            Church Management System
-          </p>
+          <p className="text-sm text-gray-600">Church Management System</p>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -132,18 +92,6 @@ const Auth = () => {
             </TabsList>
 
             <TabsContent value="login" className="space-y-4">
-              <div className="mb-4">
-                <p className="text-sm text-gray-600 mb-3">Select your role to access the appropriate dashboard:</p>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  {Object.entries(roleInfo).map(([role, info]) => (
-                    <div key={role} className={`flex items-center gap-2 p-2 rounded border ${info.color}`}>
-                      {info.icon}
-                      <span>{info.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
@@ -152,7 +100,9 @@ const Auth = () => {
                     type="email"
                     placeholder="Enter your email"
                     value={loginData.email}
-                    onChange={(e) => setLoginData(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) =>
+                      setLoginData((prev) => ({ ...prev, email: e.target.value }))
+                    }
                     required
                   />
                 </div>
@@ -165,7 +115,9 @@ const Auth = () => {
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
                       value={loginData.password}
-                      onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+                      onChange={(e) =>
+                        setLoginData((prev) => ({ ...prev, password: e.target.value }))
+                      }
                       required
                     />
                     <Button
@@ -175,7 +127,11 @@ const Auth = () => {
                       className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -199,7 +155,9 @@ const Auth = () => {
                       id="firstName"
                       placeholder="First name"
                       value={registerData.firstName}
-                      onChange={(e) => setRegisterData(prev => ({ ...prev, firstName: e.target.value }))}
+                      onChange={(e) =>
+                        setRegisterData((prev) => ({ ...prev, firstName: e.target.value }))
+                      }
                       required
                     />
                   </div>
@@ -209,7 +167,9 @@ const Auth = () => {
                       id="lastName"
                       placeholder="Last name"
                       value={registerData.lastName}
-                      onChange={(e) => setRegisterData(prev => ({ ...prev, lastName: e.target.value }))}
+                      onChange={(e) =>
+                        setRegisterData((prev) => ({ ...prev, lastName: e.target.value }))
+                      }
                       required
                     />
                   </div>
@@ -222,7 +182,9 @@ const Auth = () => {
                     type="email"
                     placeholder="Enter your email"
                     value={registerData.email}
-                    onChange={(e) => setRegisterData(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) =>
+                      setRegisterData((prev) => ({ ...prev, email: e.target.value }))
+                    }
                     required
                   />
                 </div>
@@ -235,7 +197,9 @@ const Auth = () => {
                       type={showPassword ? "text" : "password"}
                       placeholder="Create a password"
                       value={registerData.password}
-                      onChange={(e) => setRegisterData(prev => ({ ...prev, password: e.target.value }))}
+                      onChange={(e) =>
+                        setRegisterData((prev) => ({ ...prev, password: e.target.value }))
+                      }
                       required
                     />
                     <Button
@@ -245,7 +209,11 @@ const Auth = () => {
                       className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -258,7 +226,12 @@ const Auth = () => {
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="Confirm your password"
                       value={registerData.confirmPassword}
-                      onChange={(e) => setRegisterData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      onChange={(e) =>
+                        setRegisterData((prev) => ({
+                          ...prev,
+                          confirmPassword: e.target.value,
+                        }))
+                      }
                       required
                     />
                     <Button
@@ -268,7 +241,11 @@ const Auth = () => {
                       className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -276,7 +253,9 @@ const Auth = () => {
                 <Button
                   type="submit"
                   className="w-full bg-xiracom-blue hover:bg-xiracom-darkblue"
-                  disabled={isLoading || registerData.password !== registerData.confirmPassword}
+                  disabled={
+                    isLoading || registerData.password !== registerData.confirmPassword
+                  }
                 >
                   {isLoading ? "Creating Account..." : "Create Account"}
                 </Button>
