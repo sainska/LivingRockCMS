@@ -84,11 +84,9 @@ CREATE TABLE IF NOT EXISTS public.donations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     donor_id UUID REFERENCES public.profiles(id),
     amount NUMERIC(12,2) NOT NULL,
-    donation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     donation_type TEXT,
-    purpose TEXT,
-    is_anonymous BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    donation_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    notes TEXT
 );
 
 -- 8. Pledges
@@ -182,8 +180,6 @@ CREATE TABLE IF NOT EXISTS public.messages (
     recipient_id UUID REFERENCES public.profiles(id),
     subject TEXT,
     content TEXT,
-    message_type TEXT,
-    is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

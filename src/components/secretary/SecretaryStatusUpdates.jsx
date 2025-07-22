@@ -31,8 +31,6 @@ const SecretaryStatusUpdates = () => {
           <div>Loading...</div>
         ) : error ? (
           <div className="text-red-500">{error}</div>
-        ) : updates.length === 0 ? (
-          <div>No status updates found.</div>
         ) : (
           <Table>
             <TableHeader>
@@ -44,14 +42,20 @@ const SecretaryStatusUpdates = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {updates.map((u) => (
-                <TableRow key={u.id}>
-                  <TableCell>{u.title}</TableCell>
-                  <TableCell>{u.description}</TableCell>
-                  <TableCell>{u.category || '-'}</TableCell>
-                  <TableCell>{u.created_at ? new Date(u.created_at).toLocaleString() : ''}</TableCell>
+              {updates.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">No status updates found.</TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                updates.map((u) => (
+                  <TableRow key={u.id}>
+                    <TableCell>{u.title}</TableCell>
+                    <TableCell>{u.description}</TableCell>
+                    <TableCell>{u.category || '-'}</TableCell>
+                    <TableCell>{u.created_at ? new Date(u.created_at).toLocaleString() : ''}</TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         )}

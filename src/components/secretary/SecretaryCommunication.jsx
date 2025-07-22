@@ -20,6 +20,8 @@ const fetchMessages = async () => {
   return data;
 };
 
+// Secretary Dashboard - Announcements Module
+
 const SecretaryCommunication = () => {
   const queryClient = useQueryClient();
   const [announcements, setAnnouncements] = useState([]);
@@ -44,13 +46,23 @@ const SecretaryCommunication = () => {
     fetchData();
   }, []);
 
-  const addAnnouncementMutation = useMutation(async (newAnnouncement) => {
-    const { data, error } = await supabase.from('announcements').insert([newAnnouncement]);
-    if (error) throw error;
-    return data;
-  }, {
-    onSuccess: () => { setShowAdd(false); queryClient.invalidateQueries(['announcements']); }
-  });
+  const addAnnouncementMutation = useMutation(
+    async (newAnnouncement) => {
+      const { data, error } = await supabase.from('announcements').insert([newAnnouncement]);
+      if (error) throw error;
+      return data;
+    }
+  );
+
+  useEffect(() => {
+    if (addAnnouncementMutation.isSuccess) {
+      setShowAdd(false);
+      supabase
+        .from('announcements')
+        .select('*')
+        .then(({ data }) => setAnnouncements(data || []));
+    }
+  }, [addAnnouncementMutation.isSuccess]);
 
   if (loading) {
     return (
@@ -70,7 +82,7 @@ const SecretaryCommunication = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Communication Center</h2>
+        <h2 className="text-2xl font-bold">Announcements</h2>
         <Dialog open={showAdd} onOpenChange={setShowAdd}>
           <DialogTrigger asChild>
             <Button>Post Announcement</Button>

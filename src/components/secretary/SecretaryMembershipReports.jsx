@@ -10,7 +10,7 @@ const SecretaryMembershipReports = () => {
   useEffect(() => {
     setLoading(true);
     async function fetchData() {
-      const { data } = await supabase.from('members').select('*');
+      const { data } = await supabase.from('members').select('*, profiles:user_id(first_name, last_name)');
       setMembers(data || []);
       setLoading(false);
     }
@@ -34,8 +34,8 @@ const SecretaryMembershipReports = () => {
           <TableBody>
             {members.map(m => (
               <TableRow key={m.id}>
-                <TableCell>{m.first_name} {m.last_name}</TableCell>
-                <TableCell>{m.membership_status || 'Active'}</TableCell>
+                <TableCell>{(m.profiles?.first_name || '-') + ' ' + (m.profiles?.last_name || '-')}</TableCell>
+                <TableCell>{m.membership_status || m.status || 'Active'}</TableCell>
                 <TableCell>{m.created_at}</TableCell>
               </TableRow>
             ))}

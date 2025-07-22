@@ -18,7 +18,7 @@ const SecretaryMembers = () => {
     async function fetchData() {
       const { data, error } = await supabase
         .from('members')
-        .select('*');
+        .select('*, profiles:user_id(first_name, last_name, email, phone)');
       setMembers(data || []);
       setLoading(false);
     }
@@ -92,10 +92,10 @@ const SecretaryMembers = () => {
             <TableBody>
               {members?.map(member => (
                   <TableRow key={member.id}>
-                    <TableCell>{member.first_name} {member.last_name}</TableCell>
-                    <TableCell>{member.email}</TableCell>
-                    <TableCell>{member.phone}</TableCell>
-                    <TableCell>{member.membership_status || 'Active'}</TableCell>
+                    <TableCell>{(member.profiles?.first_name || '-') + ' ' + (member.profiles?.last_name || '-')}</TableCell>
+                    <TableCell>{member.profiles?.email || '-'}</TableCell>
+                    <TableCell>{member.profiles?.phone || '-'}</TableCell>
+                    <TableCell>{member.status || member.membership_status || 'Active'}</TableCell>
                     <TableCell><Button size="sm" variant="outline">Edit</Button></TableCell>
                   </TableRow>
                 ))}

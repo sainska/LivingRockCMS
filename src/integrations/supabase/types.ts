@@ -2080,6 +2080,80 @@ export type Database = {
         }
         Relationships: []
       }
+      ministry_group_members: {
+        Row: {
+          id: string
+          ministry_group_id: string
+          user_id: string
+          role: string | null
+          joined_at: string | null
+        }
+        Insert: {
+          id?: string
+          ministry_group_id: string
+          user_id: string
+          role?: string | null
+          joined_at?: string | null
+        }
+        Update: {
+          id?: string
+          ministry_group_id?: string
+          user_id?: string
+          role?: string | null
+          joined_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ministry_group_members_ministry_group_id_fkey",
+            columns: ["ministry_group_id"],
+            isOneToOne: false,
+            referencedRelation: "ministry_groups",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ministry_group_members_user_id_fkey",
+            columns: ["user_id"],
+            isOneToOne: false,
+            referencedRelation: "profiles",
+            referencedColumns: ["id"]
+          }
+        ]
+      },
+      ministry_groups: {
+        Row: {
+          id: string
+          name: string
+          meeting_time: string | null
+          location: string | null
+          leader_id: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          meeting_time?: string | null
+          location?: string | null
+          leader_id?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          meeting_time?: string | null
+          location?: string | null
+          leader_id?: string | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ministry_groups_leader_id_fkey",
+            columns: ["leader_id"],
+            isOneToOne: false,
+            referencedRelation: "profiles",
+            referencedColumns: ["id"]
+          }
+        ]
+      },
     }
     Views: {
       [_ in never]: never
