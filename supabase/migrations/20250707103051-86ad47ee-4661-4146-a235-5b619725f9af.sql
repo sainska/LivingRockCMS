@@ -22,7 +22,7 @@ CREATE TABLE public.communications (
   type TEXT NOT NULL DEFAULT 'announcement',
   target_audience TEXT[] DEFAULT ARRAY['all'],
   sent_by UUID NOT NULL,
-  sent_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   is_urgent BOOLEAN NOT NULL DEFAULT false,
   status TEXT NOT NULL DEFAULT 'draft'
 );

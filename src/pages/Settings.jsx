@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUserRole } from '@/hooks/useUserRole';
 import ProfileSettings from '@/components/settings/ProfileSettings';
+import ChurchSettings from '@/components/settings/ChurchSettings';
 
 const Settings = () => {
   const { role } = useUserRole();
@@ -22,10 +23,7 @@ const Settings = () => {
         </TabsContent>
         
         <TabsContent value="church">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Church Settings</h2>
-            <p className="text-muted-foreground">Church configuration settings coming soon...</p>
-          </div>
+          <ChurchSettings />
         </TabsContent>
         
         <TabsContent value="system">

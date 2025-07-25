@@ -6,7 +6,8 @@ const Footer = () => {
     <footer className="bg-[#0071BC] text-white py-2 px-4 mt-auto">
       <div className="flex flex-col items-center justify-center text-center">
         <div className="text-sm font-medium">
-          Living Rock Church Management System © 2025 | Powered by Xiracom
+          Living Rock Church Management System © 2025 | Powered by{' '}
+          <a href="https://xiracom.co.ke/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-200">Xiracom</a>
         </div>
       </div>
     </footer>

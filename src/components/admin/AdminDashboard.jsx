@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,8 @@ import {
   HardDrive,
   Globe
 } from "lucide-react";
+import { supabase } from '@/integrations/supabase/client';
+import MemberMessages from '../member/MemberMessages';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -98,6 +100,38 @@ const AdminDashboard = () => {
       time: "1 day ago"
     }
   ];
+
+  const [announcements, setAnnouncements] = useState([]);
+  const [announcementsError, setAnnouncementsError] = useState(null);
+  const [announcementsLoading, setAnnouncementsLoading] = useState(true);
+  const [urgentAlerts, setUrgentAlerts] = useState([]);
+
+  useEffect(() => {
+    setAnnouncementsLoading(true);
+    setAnnouncementsError(null);
+    supabase
+      .from('announcements')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(5)
+      .then(({ data, error }) => {
+        if (error) {
+          setAnnouncementsError(error.message);
+          setAnnouncements([]);
+        } else {
+          setAnnouncements(data || []);
+        }
+        setAnnouncementsLoading(false);
+      });
+    // Fetch urgent alerts
+    supabase
+      .from('system_notifications')
+      .select('*')
+      .eq('notification_type', 'urgent')
+      .order('created_at', { ascending: false })
+      .limit(5)
+      .then(({ data }) => setUrgentAlerts(data || []));
+  }, []);
 
   const handleQuickAction = (action) => {
     switch (action) {
@@ -361,6 +395,49 @@ const AdminDashboard = () => {
                 View All Alerts
               </Button>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Announcements</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {announcementsLoading ? <div className="text-gray-400">Loading...</div> :
+              announcementsError ? <div className="text-red-500">{announcementsError}</div> :
+              announcements.length === 0 ? <div className="text-gray-400">No announcements.</div> :
+                announcements.map(a => (
+                  <div key={a.id} className="mb-3 p-2 rounded bg-blue-50">
+                    <div className="font-semibold">{a.title}</div>
+                    <div className="text-xs text-gray-500">{a.created_at ? new Date(a.created_at).toLocaleString() : ''}</div>
+                    <div className="text-sm">{a.content}</div>
+                  </div>
+                ))}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Messages</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MemberMessages role="admin" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Urgent Alerts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {urgentAlerts.length === 0 ? <div className="text-gray-400">No urgent alerts.</div> :
+              urgentAlerts.map(alert => (
+                <div key={alert.id} className="mb-3 p-2 rounded bg-gradient-to-r from-red-100 to-red-200">
+                  <div className="font-semibold text-red-700">{alert.title || 'Urgent Alert'}</div>
+                  <div className="text-xs text-gray-500">{alert.created_at ? new Date(alert.created_at).toLocaleString() : ''}</div>
+                  <div className="text-sm">{alert.message}</div>
+                </div>
+              ))}
           </CardContent>
         </Card>
       </div>

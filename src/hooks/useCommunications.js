@@ -18,7 +18,7 @@ export const useCommunications = () => {
         const { data, error } = await supabase
           .from('communications')
           .select('*')
-          .order('sent_at', { ascending: false });
+          .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error fetching communications:', error);

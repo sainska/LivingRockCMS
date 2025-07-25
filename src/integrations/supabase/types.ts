@@ -440,7 +440,7 @@ export type Database = {
           content: string
           id: string
           is_urgent: boolean
-          sent_at: string
+          created_at: string
           sent_by: string
           status: string
           target_audience: string[] | null
@@ -451,7 +451,7 @@ export type Database = {
           content: string
           id?: string
           is_urgent?: boolean
-          sent_at?: string
+          created_at?: string
           sent_by: string
           status?: string
           target_audience?: string[] | null
@@ -462,7 +462,7 @@ export type Database = {
           content?: string
           id?: string
           is_urgent?: boolean
-          sent_at?: string
+          created_at?: string
           sent_by?: string
           status?: string
           target_audience?: string[] | null

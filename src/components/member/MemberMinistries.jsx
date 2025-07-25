@@ -14,12 +14,16 @@ const MemberMinistries = () => {
     if (!user) return;
     setLoading(true);
     supabase
-      .from('ministry_group_members')
-      .select('id, ministry_groups(name, description, leader_id)')
-      .eq('user_id', user.id)
+      .from('ministry_members')
+      .select('id, role, ministries(name, description, meeting_day, meeting_time, meeting_location)')
+      .eq('member_id', user.id)
       .then(({ data, error }) => {
         if (error) setError(error.message);
         setMinistries(data || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError('Network error: Failed to fetch. Please check your connection or CORS settings.');
         setLoading(false);
       });
   }, [user]);
@@ -42,13 +46,21 @@ const MemberMinistries = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
+                <TableHead>Meeting Day</TableHead>
+                <TableHead>Meeting Time</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Role</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {ministries.map((m) => (
                 <TableRow key={m.id}>
-                  <TableCell>{m.ministry_groups?.name || 'N/A'}</TableCell>
-                  <TableCell>{m.ministry_groups?.description || '-'}</TableCell>
+                  <TableCell>{m.ministries?.name || 'N/A'}</TableCell>
+                  <TableCell>{m.ministries?.description || '-'}</TableCell>
+                  <TableCell>{m.ministries?.meeting_day || '-'}</TableCell>
+                  <TableCell>{m.ministries?.meeting_time || '-'}</TableCell>
+                  <TableCell>{m.ministries?.meeting_location || '-'}</TableCell>
+                  <TableCell>{m.role || '-'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

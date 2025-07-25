@@ -15,8 +15,8 @@ const MemberAttendance = () => {
     setLoading(true);
     supabase
       .from('attendance_records')
-      .select('id, event_id, attendance_status, notes, events(title, start_date)')
-      .eq('user_id', user.id)
+      .select('id, event_id, status, notes, events(title, start_date)')
+      .eq('member_id', user.id)
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
         if (error) setError(error.message);
@@ -52,7 +52,7 @@ const MemberAttendance = () => {
                 <TableRow key={rec.id}>
                   <TableCell>{rec.events?.title || 'N/A'}</TableCell>
                   <TableCell>{rec.events?.start_date ? new Date(rec.events.start_date).toLocaleDateString() : 'N/A'}</TableCell>
-                  <TableCell>{rec.attendance_status}</TableCell>
+                  <TableCell>{rec.status}</TableCell>
                   <TableCell>{rec.notes || '-'}</TableCell>
                 </TableRow>
               ))}

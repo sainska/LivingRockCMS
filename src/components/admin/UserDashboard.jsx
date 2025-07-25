@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,8 @@ import {
   Church,
   User,
   Clock,
-  MapPin
+  MapPin,
+  Settings
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -23,6 +24,8 @@ import { usePrayerRequests } from '@/hooks/usePrayerRequests';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
+import MemberMessages from '../member/MemberMessages';
 
 const UserDashboard = () => {
   const { user } = useAuth();
@@ -31,6 +34,27 @@ const UserDashboard = () => {
   const { prayerRequests, loading: prayerLoading } = usePrayerRequests();
   const { notifications, unreadCount } = useNotifications();
   const navigate = useNavigate();
+
+  const [announcements, setAnnouncements] = useState([]);
+  const [urgentAlerts, setUrgentAlerts] = useState([]);
+
+  useEffect(() => {
+    // Fetch announcements
+    supabase
+      .from('announcements')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(5)
+      .then(({ data }) => setAnnouncements(data || []));
+    // Fetch urgent alerts
+    supabase
+      .from('system_notifications')
+      .select('*')
+      .eq('notification_type', 'urgent')
+      .order('created_at', { ascending: false })
+      .limit(5)
+      .then(({ data }) => setUrgentAlerts(data || []));
+  }, []);
 
   const upcomingEvents = events
     .filter(event => new Date(event.start_date) > new Date())
@@ -109,6 +133,10 @@ const UserDashboard = () => {
           <Button variant="outline" onClick={() => navigate('/profile')}>
             <User className="h-4 w-4 mr-2" />
             My Profile
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/') }>
+            <Settings className="h-4 w-4 mr-2" />
+            Settings
           </Button>
         </div>
       </div>
@@ -300,6 +328,58 @@ const UserDashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Messages */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Messages</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <MemberMessages role="user" />
+        </CardContent>
+      </Card>
+
+      {/* Communication Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Announcements</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {announcements.length === 0 ? <div className="text-gray-400">No announcements.</div> :
+              announcements.map(a => (
+                <div key={a.id} className="mb-3 p-2 rounded bg-blue-50">
+                  <div className="font-semibold">{a.title}</div>
+                  <div className="text-xs text-gray-500">{a.created_at ? new Date(a.created_at).toLocaleString() : ''}</div>
+                  <div className="text-sm">{a.content}</div>
+                </div>
+              ))}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Messages</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MemberMessages role="user" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Urgent Alerts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {urgentAlerts.length === 0 ? <div className="text-gray-400">No urgent alerts.</div> :
+              urgentAlerts.map(alert => (
+                <div key={alert.id} className="mb-3 p-2 rounded bg-gradient-to-r from-red-100 to-red-200">
+                  <div className="font-semibold text-red-700">{alert.title || 'Urgent Alert'}</div>
+                  <div className="text-xs text-gray-500">{alert.created_at ? new Date(alert.created_at).toLocaleString() : ''}</div>
+                  <div className="text-sm">{alert.message}</div>
+                </div>
+              ))}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

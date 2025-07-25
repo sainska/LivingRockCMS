@@ -129,6 +129,26 @@ const MemberDashboard = () => {
 
       {/* Main Content Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* Ministries & Groups Quick Link */}
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Ministries & Groups
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <button
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded w-full"
+              onClick={() => navigate('/member/groups')}
+            >
+              View My Groups & Join Requests
+            </button>
+            <p className="text-xs text-muted-foreground">
+              See your group memberships and pending join requests.
+            </p>
+          </CardContent>
+        </Card>
         {/* My Ministries */}
         <Card className="col-span-1">
           <CardHeader>

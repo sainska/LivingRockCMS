@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -105,6 +104,15 @@ import DonorRecords from "./components/treasurer/DonorRecords";
 import Receipts from "./components/treasurer/Receipts";
 import RecurringExpenses from "./components/treasurer/RecurringExpenses";
 import Approvals from "./components/treasurer/Approvals";
+import IncomeVsExpenseReport from './components/treasurer/IncomeVsExpenseReport';
+import BalancesReport from './components/treasurer/BalancesReport';
+import BudgetTrackingReport from './components/treasurer/BudgetTrackingReport';
+import ExportReport from './components/treasurer/ExportReport';
+import TransactionLogsReport from './components/treasurer/TransactionLogsReport';
+import UserAccessReport from './components/treasurer/UserAccessReport';
+import BackupRestoreReport from './components/treasurer/BackupRestoreReport';
+import SettingsDashboard from './pages/SettingsDashboard';
+import MemberGroups from "./components/member/MemberGroups";
 
 const queryClient = new QueryClient();
 
@@ -185,6 +193,13 @@ const App = () => {
                 <Route path="settings" element={<MemberSettings />} />
               </Route>
               
+              {/* Member Groups Route */}
+              <Route path="/member/groups" element={
+                <RoleBasedRoute allowedRoles={['member', 'system_admin']}>
+                  <Layout><MemberGroups /></Layout>
+                </RoleBasedRoute>
+              } />
+              
               {/* Role-based Dashboard Routes */}
               <Route path="/admin-dashboard" element={
                 <RoleBasedRoute allowedRoles={['system_admin']}>
@@ -225,15 +240,16 @@ const App = () => {
                 <Route path="expenses/approvals" element={<Approvals />} />
 
                 <Route path="reports" element={<TreasurerReports />} />
-                <Route path="reports/income" element={<div>Income vs Expense (TODO)</div>} />
-                <Route path="reports/balances" element={<div>Balances (TODO)</div>} />
-                <Route path="reports/budget" element={<div>Budget Tracking (TODO)</div>} />
-                <Route path="reports/export" element={<div>Export (TODO)</div>} />
+                <Route path="reports/income-expense" element={<IncomeVsExpenseReport />} />
+                <Route path="reports/income" element={<IncomeVsExpenseReport />} />
+                <Route path="reports/balances" element={<BalancesReport />} />
+                <Route path="reports/budget" element={<BudgetTrackingReport />} />
+                <Route path="reports/export" element={<ExportReport />} />
 
                 <Route path="audit" element={<TreasurerAudit />} />
-                <Route path="audit/logs" element={<div>Transaction Logs (TODO)</div>} />
-                <Route path="audit/users" element={<div>User Access (TODO)</div>} />
-                <Route path="audit/backup" element={<div>Backup/Restore (TODO)</div>} />
+                <Route path="audit/logs" element={<TransactionLogsReport />} />
+                <Route path="audit/users" element={<UserAccessReport />} />
+                <Route path="audit/backup" element={<BackupRestoreReport />} />
               </Route>
               <Route path="/secretary-dashboard" element={
                 <RoleBasedRoute allowedRoles={['secretary', 'system_admin']}>
@@ -426,6 +442,11 @@ const App = () => {
               <Route path="/security" element={
                 <RoleBasedRoute allowedRoles={['system_admin']}>
                   <Layout><Security /></Layout>
+                </RoleBasedRoute>
+              } />
+              <Route path="/settings-dashboard" element={
+                <RoleBasedRoute allowedRoles={['member', 'clergy', 'treasurer', 'secretary', 'system_admin']}>
+                  <Layout><SettingsDashboard /></Layout>
                 </RoleBasedRoute>
               } />
 

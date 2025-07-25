@@ -2,25 +2,38 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import GroupList from './GroupList';
+import GroupJoinRequests from './GroupJoinRequests';
 
 const MemberGroups = () => {
   const { user } = useAuth();
   const [groups, setGroups] = useState([]);
+  const [joinRequests, setJoinRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    supabase
-      .from('ministry_group_members')
-      .select('id, role, joined_at, ministry_groups(name, meeting_time, location, leader_id)')
-      .eq('user_id', user.id)
-      .order('joined_at', { ascending: false })
-      .then(({ data, error }) => {
-        if (error) setError(error.message);
-        setGroups(data || []);
+    Promise.all([
+      supabase
+        .from('ministry_group_members')
+        .select('id, role, joined_at, ministry_groups(name, meeting_time, location, leader_id)')
+        .eq('user_id', user.id),
+      supabase
+        .from('ministry_group_join_requests')
+        .select('id, status, requested_at, ministry_groups(name, meeting_time, location, leader_id)')
+        .eq('user_id', user.id)
+    ])
+      .then(([groupsRes, joinReqsRes]) => {
+        if (groupsRes.error) setError(groupsRes.error.message);
+        else if (joinReqsRes.error) setError(joinReqsRes.error.message);
+        setGroups(groupsRes.data || []);
+        setJoinRequests(joinReqsRes.data || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError('Network error: Failed to fetch. Please check your connection or CORS settings.');
         setLoading(false);
       });
   }, [user]);
@@ -28,36 +41,18 @@ const MemberGroups = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>My Groups</CardTitle>
+        <CardTitle>Ministries & Groups</CardTitle>
       </CardHeader>
       <CardContent>
         {loading ? (
           <div>Loading...</div>
         ) : error ? (
           <div className="text-red-500">{error}</div>
-        ) : groups.length === 0 ? (
-          <div>No groups found.</div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Group Name</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Meeting Time</TableHead>
-                <TableHead>Location</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {groups.map((g) => (
-                <TableRow key={g.id}>
-                  <TableCell>{g.ministry_groups?.name || 'N/A'}</TableCell>
-                  <TableCell>{g.role}</TableCell>
-                  <TableCell>{g.ministry_groups?.meeting_time || '-'}</TableCell>
-                  <TableCell>{g.ministry_groups?.location || '-'}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <>
+            <GroupList groups={groups} />
+            <GroupJoinRequests joinRequests={joinRequests} />
+          </>
         )}
       </CardContent>
     </Card>

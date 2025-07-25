@@ -59,9 +59,9 @@ const SecretaryAttendanceRecords = () => {
   }, []);
 
   return (
-    <Card>
-      <CardHeader><CardTitle>Attendance Records</CardTitle></CardHeader>
-      <CardContent>
+  <Card>
+    <CardHeader><CardTitle>Attendance Records</CardTitle></CardHeader>
+    <CardContent>
         {loading ? (
           <div>Loading...</div>
         ) : error ? (
@@ -96,9 +96,9 @@ const SecretaryAttendanceRecords = () => {
             </TableBody>
           </Table>
         )}
-      </CardContent>
-    </Card>
-  );
+    </CardContent>
+  </Card>
+);
 };
 
 export default SecretaryAttendanceRecords; 

@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useEvents } from '@/hooks/useEvents';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -44,6 +45,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { format, addDays, isBefore } from 'date-fns';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useEffect } from 'react';
+import { useUserEventInterests } from '@/hooks/useUserEventInterests';
+import { useEventReminders } from '@/hooks/useEventReminders';
+import { saveAs } from 'file-saver';
+import { createEvent } from 'ics';
+import { useEventFeedback } from '@/hooks/useEventFeedback';
+import { useEventComments } from '@/hooks/useEventComments';
+import { useEventMedia } from '@/hooks/useEventMedia';
 
 // Form schema for event creation
 const eventFormSchema = z.object({
@@ -65,80 +76,6 @@ const eventFormSchema = z.object({
     message: "Organizer name must be at least 3 characters.",
   }),
 });
-
-// Sample event data for demonstration
-const sampleEvents = [
-  {
-    id: "evt-001",
-    title: "Sunday Service",
-    date: new Date(),
-    startTime: "09:00 AM",
-    endTime: "11:30 AM",
-    location: "Main Sanctuary",
-    description: "Weekly Sunday worship service with praise and sermon.",
-    isRecurring: true,
-    requiresRegistration: false,
-    organizer: "Pastor John",
-    attendees: 120,
-    status: "upcoming"
-  },
-  {
-    id: "evt-002",
-    title: "Bible Study Group",
-    date: addDays(new Date(), 2),
-    startTime: "06:30 PM",
-    endTime: "08:00 PM",
-    location: "Fellowship Hall",
-    description: "Weekly Bible study focusing on the book of Romans.",
-    isRecurring: true,
-    requiresRegistration: false,
-    organizer: "Deacon Sarah",
-    attendees: 25,
-    status: "upcoming"
-  },
-  {
-    id: "evt-003",
-    title: "Youth Camp",
-    date: addDays(new Date(), 14),
-    startTime: "08:00 AM",
-    endTime: "05:00 PM",
-    location: "Camp Wilderness",
-    description: "Annual youth camp with activities, worship, and fellowship.",
-    isRecurring: false,
-    requiresRegistration: true,
-    organizer: "Youth Pastor Mike",
-    attendees: 45,
-    status: "upcoming"
-  },
-  {
-    id: "evt-004",
-    title: "Easter Service",
-    date: new Date("2025-04-20"),
-    startTime: "10:00 AM",
-    endTime: "12:00 PM",
-    location: "Main Sanctuary",
-    description: "Special Easter celebration service.",
-    isRecurring: false,
-    requiresRegistration: false,
-    organizer: "Pastor John",
-    attendees: 300,
-    status: "upcoming"
-  },
-  {
-    id: "evt-005",
-    title: "Women's Conference",
-    date: addDays(new Date(), -7),
-    startTime: "09:00 AM",
-    endTime: "04:00 PM",
-    location: "Community Center",
-    description: "Annual women's conference with guest speakers and workshops.",
-    isRecurring: false,
-    requiresRegistration: true,
-    organizer: "Sister Mary",
-    attendees: 85,
-    status: "completed"
-  }
-];
 
 const EventCard = ({ event, onViewDetails }) => {
   const isPast = isBefore(new Date(event.date), new Date()) && event.status === "completed";
@@ -204,70 +141,108 @@ const EventCard = ({ event, onViewDetails }) => {
   );
 };
 
+function EventRegistrationButton({ eventId }) {
+  const { user } = useAuth();
+  const [registered, setRegistered] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    let isMounted = true;
+    supabase
+      .from('event_registrations')
+      .select('*')
+      .eq('event_id', eventId)
+      .eq('user_id', user.id)
+      .then(({ data }) => {
+        if (isMounted) setRegistered(data && data.length > 0);
+      });
+    return () => { isMounted = false; };
+  }, [user, eventId]);
+
+  const handleRegister = async () => {
+    setLoading(true);
+    if (registered) {
+      await supabase
+        .from('event_registrations')
+        .delete()
+        .eq('event_id', eventId)
+        .eq('user_id', user.id);
+      setRegistered(false);
+    } else {
+      await supabase
+        .from('event_registrations')
+        .insert([{ event_id: eventId, user_id: user.id }]);
+      setRegistered(true);
+    }
+    setLoading(false);
+  };
+
+  if (!user) return null;
+
+  return (
+    <button
+      className={`btn ${registered ? 'btn-secondary' : 'btn-primary'} mt-2`}
+      onClick={handleRegister}
+      disabled={loading}
+    >
+      {registered ? 'Unregister' : 'Register'}
+    </button>
+  );
+}
+
 const Events = () => {
-  const [events, setEvents] = useState(sampleEvents);
+  const { events, loading, error } = useEvents();
   const [activeTab, setActiveTab] = useState("upcoming");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [isAddEventOpen, setIsAddEventOpen] = useState(false);
+  const { interests: userInterests } = useUserEventInterests();
+  const [filterType, setFilterType] = useState('');
+  const [filterDate, setFilterDate] = useState('');
+  const [filterLocation, setFilterLocation] = useState('');
+  const [filterOrganizer, setFilterOrganizer] = useState('');
+  const [sortBy, setSortBy] = useState('date');
+  const [attendeeCount, setAttendeeCount] = useState(0);
+  const [attendees, setAttendees] = useState([]);
+  const { user } = useAuth();
+  const [attendanceHistory, setAttendanceHistory] = useState([]);
 
-  const form = useForm({
-    resolver: zodResolver(eventFormSchema),
-    defaultValues: {
-      title: "",
-      date: format(new Date(), 'yyyy-MM-dd'),
-      startTime: "09:00",
-      endTime: "10:00",
-      location: "",
-      description: "",
-      isRecurring: false,
-      requiresRegistration: false,
-      organizer: "",
-    },
+  useEffect(() => {
+    if (!selectedEvent?.id) return;
+    supabase
+      .from('event_registrations')
+      .select('user_id')
+      .eq('event_id', selectedEvent.id)
+      .then(({ data }) => {
+        setAttendeeCount(data ? data.length : 0);
+        setAttendees(data ? data.map(r => r.user_id) : []);
+      });
+  }, [selectedEvent?.id]);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('event_registrations')
+      .select('event_id, events(title, date)')
+      .eq('user_id', user.id)
+      .then(({ data }) => {
+        setAttendanceHistory(data || []);
   });
+  }, [user]);
 
-  const filteredEvents = events.filter(event => {
-    const matchesStatus = activeTab === "all" || (
-      activeTab === "upcoming" && !isBefore(new Date(event.date), new Date()) ||
-      activeTab === "completed" && isBefore(new Date(event.date), new Date()) && event.status === "completed"
-    );
-    
-    const matchesSearch = searchTerm === "" || 
-      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.organizer.toLowerCase().includes(searchTerm.toLowerCase());
-      
-    return matchesStatus && matchesSearch;
-  });
+  const filteredEvents = events
+    .filter(e => !filterType || e.event_type === filterType)
+    .filter(e => !filterDate || e.date === filterDate)
+    .filter(e => !filterLocation || e.location === filterLocation)
+    .filter(e => !filterOrganizer || e.organizer === filterOrganizer)
+    .sort((a, b) => sortBy === 'date' ? new Date(a.date) - new Date(b.date) : a.title.localeCompare(b.title));
 
-  const handleAddEvent = (data) => {
-    const newEvent = {
-      id: `evt-${(events.length + 1).toString().padStart(3, '0')}`,
-      title: data.title,
-      date: new Date(data.date),
-      startTime: formatTime(data.startTime),
-      endTime: formatTime(data.endTime),
-      location: data.location,
-      description: data.description || "",
-      isRecurring: data.isRecurring,
-      requiresRegistration: data.requiresRegistration,
-      organizer: data.organizer,
-      attendees: 0,
-      status: "upcoming"
-    };
-    
-    setEvents([...events, newEvent]);
-    setIsAddEventOpen(false);
-    form.reset();
-  };
-
-  const formatTime = (time24h) => {
-    const [hours, minutes] = time24h.split(':');
-    const hour = parseInt(hours, 10);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const hour12 = hour % 12 || 12;
-    return `${hour12}:${minutes} ${ampm}`;
-  };
+  const recommendedEvents = events.filter(event =>
+    userInterests.some(interest =>
+      event.title?.toLowerCase().includes(interest.toLowerCase()) ||
+      event.event_type?.toLowerCase() === interest.toLowerCase()
+    )
+  );
 
   const handleViewDetails = (event) => {
     setSelectedEvent(event);
@@ -296,173 +271,7 @@ const Events = () => {
               </button>
             )}
           </div>
-          <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-xiracom-blue hover:bg-xiracom-darkblue">
-                <Plus className="mr-2 h-4 w-4" /> Add Event
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[550px]">
-              <DialogHeader>
-                <DialogTitle>Create New Event</DialogTitle>
-                <DialogDescription>
-                  Fill in the details for the new church event.
-                </DialogDescription>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleAddEvent)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Event Title</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter event title" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="date"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Date</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="grid grid-cols-2 gap-2">
-                      <FormField
-                        control={form.control}
-                        name="startTime"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Start Time</FormLabel>
-                            <FormControl>
-                              <Input type="time" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="endTime"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>End Time</FormLabel>
-                            <FormControl>
-                              <Input type="time" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                  
-                  <FormField
-                    control={form.control}
-                    name="location"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Location</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter event location" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter event description" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="organizer"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Organizer</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter organizer name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="flex flex-col md:flex-row gap-4 pt-2">
-                    <FormField
-                      control={form.control}
-                      name="isRecurring"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center gap-2 space-y-0">
-                          <FormControl>
-                            <Checkbox 
-                              checked={field.value} 
-                              onCheckedChange={field.onChange} 
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal cursor-pointer">
-                            Recurring Event
-                          </FormLabel>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="requiresRegistration"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center gap-2 space-y-0">
-                          <FormControl>
-                            <Checkbox 
-                              checked={field.value} 
-                              onCheckedChange={field.onChange} 
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal cursor-pointer">
-                            Requires Registration
-                          </FormLabel>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
-                  <DialogFooter className="pt-4">
-                    <Button type="button" variant="outline" onClick={() => setIsAddEventOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" className="bg-xiracom-blue hover:bg-xiracom-darkblue">
-                      Create Event
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
+          {/* Add Event button and dialog removed for member portal. */}
         </div>
       </div>
       
@@ -485,6 +294,39 @@ const Events = () => {
         </div>
         
         <TabsContent value="upcoming" className="mt-0">
+          {loading ? (
+            <div className="text-center py-10">Loading events...</div>
+          ) : error ? (
+            <div className="text-center text-red-500 py-10">Error loading events: {error}</div>
+          ) : (
+            <>
+              {userInterests.length > 0 && recommendedEvents.length > 0 && (
+                <div className="mb-6">
+                  <h2 className="text-xl font-bold mb-2">Recommended for You</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {recommendedEvents.map(event => (
+                      <EventCard key={event.id} event={event} onViewDetails={handleViewDetails} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2 mb-4">
+                <select value={filterType} onChange={e => setFilterType(e.target.value)}>
+                  <option value="">All Types</option>
+                  {/* Map event types dynamically if available */}
+                  <option value="worship">Worship</option>
+                  <option value="study">Study</option>
+                  <option value="youth">Youth</option>
+                  <option value="conference">Conference</option>
+                </select>
+                <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} />
+                <input type="text" placeholder="Location" value={filterLocation} onChange={e => setFilterLocation(e.target.value)} />
+                <input type="text" placeholder="Organizer" value={filterOrganizer} onChange={e => setFilterOrganizer(e.target.value)} />
+                <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                  <option value="date">Sort by Date</option>
+                  <option value="title">Sort by Title</option>
+                </select>
+              </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredEvents.length > 0 ? (
               filteredEvents.map((event) => (
@@ -497,9 +339,16 @@ const Events = () => {
               </div>
             )}
           </div>
+            </>
+          )}
         </TabsContent>
         
         <TabsContent value="completed" className="mt-0">
+          {loading ? (
+            <div className="text-center py-10">Loading events...</div>
+          ) : error ? (
+            <div className="text-center text-red-500 py-10">Error loading events: {error}</div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredEvents.length > 0 ? (
               filteredEvents.map((event) => (
@@ -512,9 +361,15 @@ const Events = () => {
               </div>
             )}
           </div>
+          )}
         </TabsContent>
         
         <TabsContent value="all" className="mt-0">
+          {loading ? (
+            <div className="text-center py-10">Loading events...</div>
+          ) : error ? (
+            <div className="text-center text-red-500 py-10">Error loading events: {error}</div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredEvents.length > 0 ? (
               filteredEvents.map((event) => (
@@ -527,8 +382,20 @@ const Events = () => {
               </div>
             )}
           </div>
+          )}
         </TabsContent>
       </Tabs>
+      
+      {attendanceHistory.length > 0 && (
+        <div className="my-8">
+          <h2 className="text-xl font-bold mb-2">My Attendance History</h2>
+          <ul className="text-xs">
+            {attendanceHistory.map(a => (
+              <li key={a.event_id}>{a.events?.title} ({a.events?.date && new Date(a.events.date).toLocaleDateString()})</li>
+            ))}
+          </ul>
+        </div>
+      )}
       
       {/* Event Details Drawer */}
       <Drawer open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
@@ -584,6 +451,24 @@ const Events = () => {
                 </div>
               )}
               
+              {selectedEvent?.capacity && (
+                <div className="mt-4">
+                  <span className="font-semibold">Capacity:</span> {selectedEvent.capacity}
+                  <span className="ml-4 font-semibold">Registered:</span> {attendeeCount}
+                  <span className="ml-4 font-semibold">Spots Left:</span> {selectedEvent.capacity - attendeeCount}
+                </div>
+              )}
+              {attendees.length > 0 && (
+                <div className="mt-2">
+                  <span className="font-semibold">Attendees:</span>
+                  <ul className="text-xs mt-1">
+                    {attendees.map(uid => (
+                      <li key={uid}>{uid}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
               <div className="flex justify-between pt-4">
                 <div className="space-x-2">
                   <Button variant="outline" size="sm">
@@ -600,6 +485,62 @@ const Events = () => {
                     {selectedEvent.requiresRegistration ? 'Register Now' : 'Add to Calendar'}
                   </Button>
                 )}
+              </div>
+              <EventRegistrationButton eventId={selectedEvent.id} />
+              <div className="mt-4">
+                <label>Set Reminder:</label>
+                <button onClick={() => addReminder(new Date(new Date(selectedEvent.date).getTime() - 24*60*60*1000).toISOString())} className="btn btn-sm ml-2">1 Day Before</button>
+                <button onClick={() => addReminder(new Date(new Date(selectedEvent.date).getTime() - 60*60*1000).toISOString())} className="btn btn-sm ml-2">1 Hour Before</button>
+                {reminders && reminders.length > 0 && (
+                  <ul className="mt-2">
+                    {reminders.map(r => (
+                      <li key={r.id} className="flex items-center gap-2 text-xs">
+                        {new Date(r.reminder_time).toLocaleString()} <button onClick={() => removeReminder(r.id)} className="text-red-500">Remove</button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="mt-4 flex gap-2">
+                <a href={getGoogleCalendarUrl(selectedEvent)} target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-sm">Add to Google Calendar</a>
+                <button onClick={() => exportEventToICS(selectedEvent)} className="btn btn-outline btn-sm">Export .ics</button>
+              </div>
+              <div className="mt-4 flex gap-2">
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(selectedEvent?.title + ' - ' + window.location.href)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline btn-sm"
+                  aria-label="Share on WhatsApp"
+                >
+                  WhatsApp
+                </a>
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline btn-sm"
+                  aria-label="Share on Facebook"
+                >
+                  Facebook
+                </a>
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(selectedEvent?.title)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline btn-sm"
+                  aria-label="Share on Twitter"
+                >
+                  Twitter
+                </a>
+                <button
+                  className="btn btn-outline btn-sm"
+                  aria-label="Copy event link"
+                  onClick={() => navigator.clipboard.writeText(window.location.href)}
+                  type="button"
+                >
+                  Copy Link
+                </button>
               </div>
             </div>
           )}

@@ -43,6 +43,16 @@
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 200 94% 33%;
     --sidebar-ring: 34 93% 54%;
+
+    /* Kenya & Church themed colors */
+    --kenya-green: 134 61% 41%;
+    --kenya-red: 0 89% 49%;
+    --kenya-gold: 45 93% 47%;
+    --church-gold: 41 100% 58%;
+    --church-purple: 252 83% 57%;
+    --church-emerald: 158 84% 48%;
+    --mount-kenya: 210 40% 20%;
+    --savanna-gold: 38 92% 50%;
   }
 
   .dark {

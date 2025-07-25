@@ -33,13 +33,16 @@ const TreasurerAccounts = () => {
     fetchData();
   }, []);
 
-  const addAccountMutation = useMutation(async (newAccount) => {
-    const { data, error } = await supabase.from('financial_accounts').insert([newAccount]);
-    if (error) throw error;
-    return data;
-  }, {
-    onSuccess: () => { setShowAdd(false); queryClient.invalidateQueries(['accounts']); }
+  const mutation = useMutation(async (mutationData) => {
+    // ...mutation logic...
   });
+
+  useEffect(() => {
+    if (mutation.isSuccess) {
+      setShowAdd(false);
+      queryClient.invalidateQueries(['accounts']);
+    }
+  }, [mutation.isSuccess, queryClient]);
 
   if (loading) {
     return (
@@ -66,7 +69,7 @@ const TreasurerAccounts = () => {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Add Account</DialogTitle></DialogHeader>
-            <form onSubmit={e => { e.preventDefault(); addAccountMutation.mutate(form); }} className="space-y-4">
+            <form onSubmit={e => { e.preventDefault(); mutation.mutate(form); }} className="space-y-4">
               <div><Label>Name</Label><Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required /></div>
               <div><Label>Description</Label><Input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} /></div>
               <div><Label>Status</Label><Input value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))} /></div>

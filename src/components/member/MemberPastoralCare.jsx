@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 
 const MemberPastoralCare = () => {
   const { user } = useAuth();
@@ -30,69 +31,59 @@ const MemberPastoralCare = () => {
   const [showRequestDialog, setShowRequestDialog] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Mock data - replace with actual API calls
+  // Fetch real data from Supabase
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Pastoral Visits
+      const { data: visitsData } = await supabase
+        .from('pastoral_visits')
+        .select('id, visit_date, status, notes, visitor_id, profiles:visitor_id(first_name, last_name)')
+        .eq('member_id', user.id)
+        .order('visit_date', { ascending: false });
+      setPastoralVisits((visitsData || []).map(v => ({
+        ...v,
+        pastor_name: v.profiles ? `${v.profiles.first_name} ${v.profiles.last_name}` : 'Pastor'
+      })));
+
+      // Counseling Sessions
+      const { data: counselingData } = await supabase
+        .from('counseling_sessions')
+        .select('id, session_date, status, notes, counselor_id, profiles:counselor_id(first_name, last_name)')
+        .eq('member_id', user.id)
+        .order('session_date', { ascending: false });
+      setCounselingSessions((counselingData || []).map(s => ({
+        ...s,
+        counselor_name: s.profiles ? `${s.profiles.first_name} ${s.profiles.last_name}` : 'Counselor'
+      })));
+
+      // Support Requests
+      const { data: requestsData } = await supabase
+        .from('support_requests')
+        .select('id, request_type, details, status, requested_at')
+        .eq('user_id', user.id)
+        .order('requested_at', { ascending: false });
+      setSupportRequests(requestsData || []);
+    } catch (err) {
+      // Optionally handle error
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    setTimeout(() => {
-      setPastoralVisits([
-        {
-          id: 1,
-          visit_date: '2024-01-25T14:00:00',
-          pastor_name: 'Rev. John Smith',
-          status: 'scheduled',
-          notes: 'Home visit to discuss family matters'
-        },
-        {
-          id: 2,
-          visit_date: '2024-01-15T10:00:00',
-          pastor_name: 'Rev. Mary Johnson',
-          status: 'completed',
-          notes: 'Hospital visit - prayer and encouragement'
-        }
-      ]);
+    if (user?.id) fetchData();
+  }, [user]);
 
-      setCounselingSessions([
-        {
-          id: 1,
-          session_date: '2024-01-30T16:00:00',
-          counselor_name: 'Dr. Sarah Wilson',
-          status: 'scheduled',
-          notes: 'Marriage counseling session'
-        },
-        {
-          id: 2,
-          session_date: '2024-01-20T15:00:00',
-          counselor_name: 'Rev. David Brown',
-          status: 'completed',
-          notes: 'Spiritual guidance session'
-        }
-      ]);
-
-      setSupportRequests([
-        {
-          id: 1,
-          request_type: 'prayer',
-          details: 'Prayer for healing and strength',
-          status: 'pending',
-          requested_at: '2024-01-18'
-        },
-        {
-          id: 2,
-          request_type: 'counseling',
-          details: 'Need guidance on family issues',
-          status: 'approved',
-          requested_at: '2024-01-10'
-        }
-      ]);
-
-      setLoading(false);
-    }, 1000);
-  }, []);
-
-  const handleSupportRequest = (requestData) => {
-    // Mock API call
-    console.log('Submitting support request:', requestData);
+  const handleSupportRequest = async (requestData) => {
+    if (!user?.id) return;
     setShowRequestDialog(false);
-    // In real app, this would make an API call
+    await supabase.from('support_requests').insert({
+      user_id: user.id,
+      ...requestData,
+      status: 'pending',
+      requested_at: new Date().toISOString()
+    });
+    fetchData();
   };
 
   const getStatusIcon = (status) => {

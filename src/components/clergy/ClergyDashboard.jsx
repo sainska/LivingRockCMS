@@ -17,17 +17,64 @@ import {
   Phone,
   Mail,
   Home,
-  TrendingUp
+  TrendingUp,
+  Megaphone,
+  AlertTriangle
 } from 'lucide-react';
 import { useClergyDashboard } from '@/hooks/useClergyDashboard';
 import { useUserRole } from '@/hooks/useUserRole';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import MemberMessages from '../member/MemberMessages';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const ClergyDashboard = () => {
   const { role } = useUserRole();
   const { clergyData, loading, error } = useClergyDashboard(role?.userId);
   const navigate = useNavigate();
+  const [announcements, setAnnouncements] = useState([]);
+  const [announcementsError, setAnnouncementsError] = useState(null);
+  const [announcementsLoading, setAnnouncementsLoading] = useState(true);
+  const [urgentAlerts, setUrgentAlerts] = useState([]);
+  const [urgentAlertsError, setUrgentAlertsError] = useState(null);
+  const [urgentAlertsLoading, setUrgentAlertsLoading] = useState(true);
+
+  useEffect(() => {
+    setAnnouncementsLoading(true);
+    setAnnouncementsError(null);
+    supabase
+      .from('announcements')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(5)
+      .then(({ data, error }) => {
+        if (error) {
+          setAnnouncementsError(error.message);
+          setAnnouncements([]);
+        } else {
+          setAnnouncements(data || []);
+        }
+        setAnnouncementsLoading(false);
+      });
+    setUrgentAlertsLoading(true);
+    setUrgentAlertsError(null);
+    supabase
+      .from('system_notifications')
+      .select('*')
+      .eq('notification_type', 'urgent')
+      .order('created_at', { ascending: false })
+      .limit(5)
+      .then(({ data, error }) => {
+        if (error) {
+          setUrgentAlertsError(error.message);
+          setUrgentAlerts([]);
+        } else {
+          setUrgentAlerts(data || []);
+        }
+        setUrgentAlertsLoading(false);
+      });
+  }, []);
 
   if (loading) {
     return (
@@ -67,7 +114,7 @@ const ClergyDashboard = () => {
     attendanceStats, 
     memberActivity, 
     upcomingEvents, 
-    announcements 
+    announcements: dashboardAnnouncements // Renamed to avoid conflict
   } = clergyData;
 
   return (
@@ -446,6 +493,76 @@ const ClergyDashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Messages */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Messages</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <MemberMessages role="clergy" />
+        </CardContent>
+      </Card>
+
+      {/* Communication Section */}
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <Mail className="h-6 w-6 text-blue-500" /> Communication
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Announcements Card */}
+          <Card className="border-blue-200 shadow-md">
+            <CardHeader className="flex items-center gap-2 bg-blue-50 rounded-t">
+              <Megaphone className="h-5 w-5 text-blue-600" />
+              <CardTitle className="text-blue-700">Announcements</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {announcementsLoading ? <div className="text-gray-400">Loading...</div> :
+               announcementsError ? <div className="text-red-500">{announcementsError}</div> :
+               announcements.length === 0 ? <div className="text-gray-400">No announcements.</div> :
+                 announcements.map(a => (
+                   <div key={a.id} className="mb-3 p-2 rounded bg-blue-100">
+                     <div className="font-semibold text-blue-800">{a.title}</div>
+                     <div className="text-xs text-gray-500">{a.created_at ? new Date(a.created_at).toLocaleString() : ''}</div>
+                     <div className="text-sm">{a.content}</div>
+                   </div>
+                 ))}
+              <Button className="mt-2 w-full" variant="outline" onClick={() => navigate('/clergy/announcements')}>View All Announcements</Button>
+            </CardContent>
+          </Card>
+          {/* Messages Card */}
+          <Card className="border-green-200 shadow-md">
+            <CardHeader className="flex items-center gap-2 bg-green-50 rounded-t">
+              <Mail className="h-5 w-5 text-green-600" />
+              <CardTitle className="text-green-700">Messages</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MemberMessages role="clergy" />
+              <Button className="mt-2 w-full" variant="outline" onClick={() => navigate('/clergy/messages')}>Open Full Messages</Button>
+            </CardContent>
+          </Card>
+          {/* Urgent Alerts Card */}
+          <Card className="border-red-200 shadow-md">
+            <CardHeader className="flex items-center gap-2 bg-red-50 rounded-t">
+              <AlertTriangle className="h-5 w-5 text-red-600" />
+              <CardTitle className="text-red-700">Urgent Alerts</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {urgentAlertsLoading ? <div className="text-gray-400">Loading...</div> :
+               urgentAlertsError ? <div className="text-red-500">{urgentAlertsError}</div> :
+               urgentAlerts.length === 0 ? <div className="text-gray-400">No urgent alerts.</div> :
+                 urgentAlerts.map(alert => (
+                   <div key={alert.id} className="mb-3 p-2 rounded bg-gradient-to-r from-red-100 to-red-200">
+                     <div className="font-semibold text-red-700">{alert.title || 'Urgent Alert'}</div>
+                     <div className="text-xs text-gray-500">{alert.created_at ? new Date(alert.created_at).toLocaleString() : ''}</div>
+                     <div className="text-sm">{alert.message}</div>
+                   </div>
+                 ))}
+              <Button className="mt-2 w-full" variant="outline" onClick={() => navigate('/clergy/alerts')}>View All Alerts</Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
