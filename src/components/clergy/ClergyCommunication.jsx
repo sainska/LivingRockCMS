@@ -8,22 +8,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useNavigate } from 'react-router-dom';
 
 const fetchAnnouncements = async () => {
   const { data, error } = await supabase.from('announcements').select('*').order('created_at', { ascending: false });
   if (error) throw error;
   return data;
 };
-const fetchMessages = async () => {
-  const { data, error } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
-  if (error) throw error;
-  return data;
-};
 
 const ClergyCommunication = () => {
   const queryClient = useQueryClient();
-  const { data: announcements, isLoading: loadingAnnouncements } = useQuery(['clergy_announcements'], fetchAnnouncements);
-  const { data: messages, isLoading: loadingMessages } = useQuery(['clergy_messages'], fetchMessages);
+  const navigate = useNavigate();
+  const { data: announcements, isLoading: loadingAnnouncements, error: announcementsError } = useQuery(['clergy_announcements'], fetchAnnouncements);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ title: '', content: '', priority: 'normal' });
 
@@ -38,7 +34,10 @@ const ClergyCommunication = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Communication</h2>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => navigate('/dashboard/clergy')}>Back to Dashboard</Button>
+          <h2 className="text-2xl font-bold">Announcements</h2>
+        </div>
         <Dialog open={showAdd} onOpenChange={setShowAdd}>
           <DialogTrigger asChild>
             <Button>Send Announcement</Button>
@@ -68,38 +67,14 @@ const ClergyCommunication = () => {
             </TableHeader>
             <TableBody>
               {loadingAnnouncements ? <TableRow><TableCell colSpan={4}>Loading...</TableCell></TableRow> :
+                announcementsError ? <TableRow><TableCell colSpan={4} className="text-red-500">{announcementsError.message || announcementsError}</TableCell></TableRow> :
+                announcements?.length === 0 ? <TableRow><TableCell colSpan={4}>No announcements found.</TableCell></TableRow> :
                 announcements?.map(a => (
                   <TableRow key={a.id}>
                     <TableCell>{a.title}</TableCell>
                     <TableCell>{a.content}</TableCell>
                     <TableCell>{a.priority}</TableCell>
-                    <TableCell>{a.created_at}</TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader><CardTitle>Messages</CardTitle></CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>From</TableHead>
-                <TableHead>To</TableHead>
-                <TableHead>Subject</TableHead>
-                <TableHead>Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loadingMessages ? <TableRow><TableCell colSpan={4}>Loading...</TableCell></TableRow> :
-                messages?.map(m => (
-                  <TableRow key={m.id}>
-                    <TableCell>{m.sender_id}</TableCell>
-                    <TableCell>{m.recipient_id}</TableCell>
-                    <TableCell>{m.subject}</TableCell>
-                    <TableCell>{m.created_at}</TableCell>
+                    <TableCell>{a.created_at ? new Date(a.created_at).toLocaleString() : ''}</TableCell>
                   </TableRow>
                 ))}
             </TableBody>
