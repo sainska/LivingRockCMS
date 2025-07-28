@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>You're Invited - Living Rock Church Management System</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    /* Email wrapper */
+    .email-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+    }
+    
+    /* Header with gradient */
+    .email-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 40px 30px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Floating background elements */
+    .header-bg-element {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .bg-element-1 {
+      width: 80px;
+      height: 80px;
+      background: #fbbf24;
+      top: 20px;
+      left: 20px;
+      animation-delay: 0s;
+    }
+    
+    .bg-element-2 {
+      width: 60px;
+      height: 60px;
+      background: #10b981;
+      top: 40px;
+      right: 30px;
+      animation-delay: 2s;
+    }
+    
+    .bg-element-3 {
+      width: 40px;
+      height: 40px;
+      background: #f59e0b;
+      bottom: 30px;
+      left: 50px;
+      animation-delay: 4s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    /* Church logo and branding */
+    .church-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+    }
+    
+    .church-name {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .church-location {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    
+    /* Main content */
+    .email-content {
+      padding: 40px 30px;
+      background: white;
+    }
+    
+    .invitation-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    h1 {
+      color: #1f2937;
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      color: #6b7280;
+      font-size: 18px;
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+    
+    /* Content paragraphs */
+    .content-text {
+      color: #4b5563;
+      font-size: 16px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .highlight {
+      color: #f59e0b;
+      font-weight: 600;
+    }
+    
+    .inviter-info {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 1px solid #f59e0b;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .inviter-name {
+      color: #92400e;
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    
+    .inviter-role {
+      color: #a16207;
+      font-size: 14px;
+      font-style: italic;
+    }
+    
+    /* CTA Button */
+    .cta-section {
+      text-align: center;
+      margin: 40px 0;
+    }
+    
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      text-decoration: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px rgba(16, 185, 129, 0.4);
+    }
+    
+    /* Role information */
+    .role-section {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 1px solid #0ea5e9;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .role-title {
+      color: #0c4a6e;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .role-description {
+      color: #0369a1;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    /* Features section */
+    .features-section {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      padding: 30px;
+      margin: 30px 0;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .features-title {
+      color: #1f2937;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .feature-icon {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .feature-text {
+      color: #4b5563;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    /* Trust indicators */
+    .trust-section {
+      text-align: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border-radius: 12px;
+      border: 1px solid #a7f3d0;
+    }
+    
+    .trust-title {
+      color: #065f46;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    
+    .trust-items {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #047857;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .trust-icon {
+      width: 16px;
+      height: 16px;
+      background: #10b981;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 8px;
+    }
+    
+    /* Footer */
+    .email-footer {
+      background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+      padding: 30px;
+      text-align: center;
+      color: white;
+    }
+    
+    .footer-content {
+      margin-bottom: 20px;
+    }
+    
+    .footer-text {
+      color: #d1d5db;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .footer-link {
+      color: #fbbf24;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+    
+    .footer-copyright {
+      color: #9ca3af;
+      font-size: 12px;
+      border-top: 1px solid #374151;
+      padding-top: 20px;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 600px) {
+      .email-wrapper {
+        margin: 0;
+        border-radius: 0;
+      }
+      
+      .email-header,
+      .email-content,
+      .email-footer {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .trust-items {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <!-- Header Section -->
+    <div class="email-header">
+      <!-- Floating background elements -->
+      <div class="header-bg-element bg-element-1"></div>
+      <div class="header-bg-element bg-element-2"></div>
+      <div class="header-bg-element bg-element-3"></div>
+      
+      <!-- Church branding -->
+      <div class="church-logo">
+        <div class="logo-icon">⛪</div>
+        <div>
+          <div class="church-name">Living Rock Church</div>
+          <div class="church-location">📍 Nairobi, Kenya</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="email-content">
+      <!-- Invitation badge -->
+      <div class="invitation-badge">🎉 You've Been Invited!</div>
+      
+      <!-- Main heading -->
+      <h1>
+        Welcome to <span class="gradient-text">Living Rock CMS</span>
+      </h1>
+      
+      <!-- Subtitle -->
+      <p class="subtitle">
+        You've been invited to join the <strong>Living Rock Church Management System</strong> platform at <a href="{{ .SiteURL }}" style="color: #f59e0b; text-decoration: none;">{{ .SiteURL }}</a>.
+      </p>
+      
+      <!-- Inviter information -->
+      <div class="inviter-info">
+        <div class="inviter-name">Invited by: {{ .InviterName }}</div>
+        <div class="inviter-role">{{ .InviterRole }} at Living Rock Church</div>
+      </div>
+      
+      <!-- Main content -->
+      <p class="content-text">
+        Hello,
+      </p>
+      
+      <p class="content-text">
+        You've been invited to join <span class="highlight">Living Rock Church Management System</span> — a comprehensive platform designed to streamline church operations and enhance community engagement across Kenya.
+      </p>
+      
+      <!-- Role information -->
+      <div class="role-section">
+        <div class="role-title">Your Assigned Role: {{ .UserRole }}</div>
+        <div class="role-description">
+          {{ if eq .UserRole "member" }}
+            As a member, you'll have access to view church events, manage your profile, and participate in church activities.
+          {{ else if eq .UserRole "secretary" }}
+            As a secretary, you'll help manage member records, coordinate events, and assist with church administration.
+          {{ else if eq .UserRole "treasurer" }}
+            As a treasurer, you'll manage church finances, track donations, and maintain financial records.
+          {{ else if eq .UserRole "clergy" }}
+            As clergy, you'll have access to pastoral care tools, member management, and spiritual guidance features.
+          {{ else }}
+            You'll have access to church management features based on your assigned role.
+          {{ end }}
+        </div>
+      </div>
+      
+      <p class="content-text">
+        To get started, click the button below to accept your invitation and create your account:
+      </p>
+      
+      <!-- CTA Section -->
+      <div class="cta-section">
+        <a href="{{ .ConfirmationURL }}" class="cta-button">
+          ✅ Accept the Invitation
+        </a>
+      </div>
+      
+      <!-- Features Section -->
+      <div class="features-section">
+        <h3 class="features-title">What You'll Get Access To:</h3>
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon">👥</div>
+            <div class="feature-text">Member Management</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📅</div>
+            <div class="feature-text">Event Planning</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">💰</div>
+            <div class="feature-text">Financial Tracking</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🛡️</div>
+            <div class="feature-text">Security & Access</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Trust Indicators -->
+      <div class="trust-section">
+        <h4 class="trust-title">Trusted by Churches Across Kenya</h4>
+        <div class="trust-items">
+          <div class="trust-item">
+            <div class="trust-icon">✓</div>
+            <span>500+ Churches Trust Us</span>
+          </div>
+          <div class="trust-item">
+            <div class="trust-icon">✓</div>
+            <span>Available in Swahili & English</span>
+          </div>
+          <div class="trust-item">
+            <div class="trust-icon">✓</div>
+            <span>4.9/5 User Rating</span>
+          </div>
+        </div>
+      </div>
+      
+      <p class="content-text">
+        This platform supports comprehensive church management, member engagement, and community building across Kenya.
+      </p>
+      
+      <p class="content-text">
+        If you weren't expecting this invitation, feel free to ignore this email.
+      </p>
+      
+      <p class="content-text">
+        <strong>— The Living Rock Church Team</strong><br>
+        <em>Empowering churches from Mount Kenya to the Indian Ocean</em>
+      </p>
+    </div>
+    
+    <!-- Footer -->
+    <div class="email-footer">
+      <div class="footer-content">
+        <p class="footer-text">
+          Questions about your invitation? Need help getting started?
+        </p>
+        <div class="footer-links">
+          <a href="mailto:support@livingrockchurch.com" class="footer-link">Contact Support</a>
+          <a href="https://livingrockchurch.com/help" class="footer-link">Help Center</a>
+          <a href="https://livingrockchurch.com/demo" class="footer-link">Watch Demo</a>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        © 2025 Living Rock Church Management System. All rights reserved.<br>
+        Built with ❤️ in Kenya by Xiracom Technologies
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

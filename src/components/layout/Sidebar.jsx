@@ -215,6 +215,26 @@ const Sidebar = () => {
 
   const getRoleBasedDashboardSections = (role) => {
     switch (role) {
+      case 'system_admin':
+        return [
+          {
+            title: 'System Admin',
+            items: [
+              { href: '/admin-dashboard', icon: <LayoutDashboard size={20} />, title: 'Admin Dashboard' },
+              { href: '/system-dashboard', icon: <Activity size={20} />, title: 'System Dashboard' },
+              { href: '/users', icon: <UserCheck size={20} />, title: 'User Management' },
+              { href: '/backup', icon: <Database size={20} />, title: 'Backup & Data' },
+              { href: '/integrations', icon: <BarChart size={20} />, title: 'Integrations' },
+              { href: '/security-overview', icon: <Shield size={20} />, title: 'Security Overview' },
+              { href: '/access-control', icon: <UserCog size={20} />, title: 'Access Control' },
+              { href: '/data-protection', icon: <ShieldCheck size={20} />, title: 'Data Protection' },
+              { href: '/security-logs', icon: <Eye size={20} />, title: 'Security Logs' },
+              { href: '/checkin-security', icon: <Lock size={20} />, title: 'Check-in Security' },
+              { href: '/finances', icon: <CreditCard size={20} />, title: 'Finances' },
+              { href: '/reports', icon: <PieChart size={20} />, title: 'Reports' },
+            ],
+          },
+        ];
       case 'member':
       default:
         return [

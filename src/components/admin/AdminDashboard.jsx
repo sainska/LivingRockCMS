@@ -15,10 +15,13 @@ import {
   CheckCircle,
   Clock,
   HardDrive,
-  Globe
+  Globe,
+  UserCheck
 } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import MemberMessages from '../member/MemberMessages';
+import UserManagement from '@/components/settings/UserManagement';
+import AccountActivation from './AccountActivation';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -135,8 +138,11 @@ const AdminDashboard = () => {
 
   const handleQuickAction = (action) => {
     switch (action) {
+      case 'account-activation':
+        navigate('/admin/account-activation');
+        break;
       case 'user-management':
-        navigate('/users');
+        navigate('/admin/user-management');
         break;
       case 'church-info':
         navigate('/church-info');
@@ -238,6 +244,17 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-3">
+              <Button 
+                className="justify-start h-12"
+                onClick={() => handleQuickAction('account-activation')}
+              >
+                <UserCheck className="h-4 w-4 mr-3" />
+                <div className="text-left">
+                  <div className="font-medium">Account Activation</div>
+                  <div className="text-xs text-muted-foreground">Approve new user accounts</div>
+                </div>
+              </Button>
+              
               <Button 
                 className="justify-start h-12"
                 onClick={() => handleQuickAction('user-management')}
@@ -440,6 +457,9 @@ const AdminDashboard = () => {
               ))}
           </CardContent>
         </Card>
+      </div>
+      <div className="mt-8">
+        <UserManagement />
       </div>
     </div>
   );

@@ -319,17 +319,41 @@ const Welcome = () => {
               </div>
             </div>
             
-            <div className="animate-fade-in-up" style={{animationDelay: '0.4s'}}>
-              <h5 className="text-lg font-semibold text-white mb-4">Languages</h5>
-              <div className="flex flex-wrap gap-2">
-                <Badge className="bg-kenya-green text-white">English</Badge>
-                <Badge className="bg-kenya-red text-white">Kiswahili</Badge>
-                <Badge className="bg-savanna-gold text-mount-kenya">Kikuyu</Badge>
-                <Badge className="bg-kenya-red text-white">Kalenjin</Badge>
-              </div>
-            </div>
+            <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+  <h5 className="text-lg font-semibold text-white mb-4">Languages</h5>
+  <div className="flex flex-wrap gap-2">
+    <Badge className="bg-green-700 text-white">English</Badge>
+    <Badge className="bg-red-700 text-white">Kiswahili</Badge>
+    <Badge className="bg-yellow-500 text-black">Kikuyu</Badge>
+    <Badge className="bg-blue-700 text-white">Luo</Badge>
+    <Badge className="bg-emerald-600 text-white">Luhya</Badge>
+    <Badge className="bg-pink-600 text-white">Kamba</Badge>
+    <Badge className="bg-purple-700 text-white">Kalenjin</Badge>
+    <Badge className="bg-orange-600 text-white">Maasai</Badge>
+    <Badge className="bg-teal-700 text-white">Meru</Badge>
+    <Badge className="bg-lime-600 text-black">Embu</Badge>
+    <Badge className="bg-indigo-700 text-white">Taita</Badge>
+    <Badge className="bg-rose-600 text-white">Pokomo</Badge>
+    <Badge className="bg-cyan-700 text-white">Samburu</Badge>
+    <Badge className="bg-amber-500 text-black">Turkana</Badge>
+    <Badge className="bg-sky-700 text-white">Somali</Badge>
+    <Badge className="bg-fuchsia-700 text-white">Borana</Badge>
+    <Badge className="bg-violet-700 text-white">Rendille</Badge>
+    <Badge className="bg-stone-600 text-white">Giriama</Badge>
+    <Badge className="bg-yellow-700 text-black">Digo</Badge>
+    <Badge className="bg-red-800 text-white">Teso</Badge>
+    <Badge className="bg-green-800 text-white">Kuria</Badge>
+    <Badge className="bg-orange-700 text-white">Suba</Badge>
+    <Badge className="bg-pink-700 text-white">Mijikenda</Badge>
+    <Badge className="bg-indigo-800 text-white">Ogiek</Badge>
+    <Badge className="bg-amber-600 text-black">Nubi</Badge>
+    <Badge className="bg-emerald-700 text-white">Sabaot</Badge>
+    <Badge className="bg-lime-700 text-black">Ilchamus</Badge>
+    <Badge className="bg-cyan-800 text-white">Dasenach</Badge>
+    <Badge className="bg-rose-700 text-white">Gabra</Badge>
+  </div>
+</div>
           </div>
-          
           <div className="mt-8 pt-8 border-t border-white/20 text-center text-white/60 animate-fade-in-up" style={{animationDelay: '0.6s'}}>
             <p>© 2025 Living Rock Church Management System. Made with Love in Kenya for churches worldwide.</p>
           </div>

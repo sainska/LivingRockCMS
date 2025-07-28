@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { BasicInfoFields, PersonalDetailsFields } from "@/components/forms/UserFormFields";
 import { PasswordFields } from "@/components/forms/PasswordFields";
@@ -10,6 +11,7 @@ import { PasswordFields } from "@/components/forms/PasswordFields";
 const Register = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signUp } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -39,19 +41,54 @@ const Register = () => {
       return;
     }
 
-    try {
-      // TODO: Replace with actual registration logic
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
       toast({
-        title: "Registration Successful",
-        description: "Welcome to Living Rock Church! Redirecting to your dashboard...",
+        title: "Missing Required Fields",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
       });
+      setIsLoading(false);
+      return;
+    }
 
-      // Redirect to member dashboard
-      navigate('/');
+    try {
+      // Prepare additional data for profile
+      const additionalData = {
+        phone: formData.phone,
+        gender: formData.gender,
+        date_of_birth: formData.dateOfBirth,
+        address: formData.address,
+        city: formData.city,
+        role: 'member' // Default role for registration
+      };
+
+      // Call the signUp function from AuthContext
+      const { error } = await signUp(
+        formData.email,
+        formData.password,
+        formData.firstName,
+        formData.lastName,
+        additionalData
+      );
+
+      if (error) {
+        console.error('Registration error:', error);
+        toast({
+          title: "Registration Failed",
+          description: error.message || "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Registration Successful",
+          description: "Welcome to Living Rock Church! Please check your email to verify your account.",
+        });
+        
+        // Redirect to login page after successful registration
+        navigate('/auth');
+      }
     } catch (error) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
         description: "Something went wrong. Please try again.",

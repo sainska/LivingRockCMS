@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { 
+import {
   Activity,
   Database,
   Server,
@@ -13,41 +13,38 @@ import {
   Zap,
   CheckCircle,
   AlertTriangle,
-  Clock
+  Clock,
+  Users,
+  DollarSign
 } from "lucide-react";
+import { useRealTimeData } from '@/hooks/useRealTimeData';
+
+const metricIconMap = {
+  'Server Status': Server,
+  'Database Connection': Database,
+  'Database Status': Database,
+  'API Response': Zap,
+  'Network Status': Globe,
+  'Total Tables': HardDrive,
+  'RLS Enabled Tables': Globe,
+  'Active Users': Users,
+  'Recent Transactions': DollarSign,
+};
 
 const SystemDashboard = () => {
-  const systemMetrics = [
-    {
-      title: "Server Status",
-      value: "Online",
-      status: "success",
-      icon: Server,
-      details: "Uptime: 99.9%"
-    },
-    {
-      title: "Database Status",
-      value: "Healthy",
-      status: "success", 
-      icon: Database,
-      details: "Connections: 45/100"
-    },
-    {
-      title: "API Response",
-      value: "120ms",
-      status: "success",
-      icon: Zap,
-      details: "Average response time"
-    },
-    {
-      title: "Network Status",
-      value: "Stable",
-      status: "success",
-      icon: Globe,
-      details: "Bandwidth: 85%"
-    }
-  ];
+  const { data, loading, error } = useRealTimeData();
+  const systemHealth = Array.isArray(data?.systemHealth) ? data.systemHealth : [];
 
+  // Map systemHealth to dashboard metrics
+  const systemMetrics = systemHealth.map((metric) => ({
+    title: metric.metric_name,
+    value: metric.metric_value,
+    status: metric.status === 'OK' ? 'success' : (metric.status === 'WARNING' ? 'warning' : 'error'),
+    icon: metricIconMap[metric.metric_name] || Activity,
+    details: '', // Optionally add more details if available
+  }));
+
+  // Placeholder for resource usage (extend backend to provide real data)
   const resourceUsage = [
     { name: "CPU Usage", value: 34, unit: "%", color: "bg-blue-500" },
     { name: "Memory Usage", value: 67, unit: "%", color: "bg-green-500" },
@@ -55,6 +52,7 @@ const SystemDashboard = () => {
     { name: "Network I/O", value: 23, unit: "%", color: "bg-purple-500" }
   ];
 
+  // Placeholder for system events (extend backend to provide real data)
   const systemEvents = [
     {
       time: "2 minutes ago",
@@ -63,14 +61,14 @@ const SystemDashboard = () => {
       icon: CheckCircle
     },
     {
-      time: "15 minutes ago", 
+      time: "15 minutes ago",
       type: "warning",
       message: "High memory usage detected",
       icon: AlertTriangle
     },
     {
       time: "1 hour ago",
-      type: "info", 
+      type: "info",
       message: "Database optimization completed",
       icon: Database
     },
@@ -82,6 +80,7 @@ const SystemDashboard = () => {
     }
   ];
 
+  // Placeholder for services (extend backend to provide real data)
   const services = [
     { name: "Web Server", status: "Running", uptime: "99.9%" },
     { name: "Database", status: "Running", uptime: "99.8%" },
@@ -94,7 +93,7 @@ const SystemDashboard = () => {
   const getStatusBadge = (status) => {
     const colors = {
       success: "bg-green-100 text-green-800",
-      warning: "bg-yellow-100 text-yellow-800", 
+      warning: "bg-yellow-100 text-yellow-800",
       error: "bg-red-100 text-red-800"
     };
     return colors[status] || "bg-gray-100 text-gray-800";
@@ -107,6 +106,31 @@ const SystemDashboard = () => {
       default: return <CheckCircle className="h-4 w-4 text-green-600" />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardContent className="p-6">
+                <div className="h-8 bg-muted rounded mb-2"></div>
+                <div className="h-4 bg-muted rounded w-1/2"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-100 text-red-800 p-4 rounded">Error loading system data: {error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -153,6 +177,7 @@ const SystemDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* TODO: Replace with real resource usage data from backend */}
             {resourceUsage.map((resource, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex justify-between text-sm">
@@ -181,6 +206,7 @@ const SystemDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
+              {/* TODO: Replace with real system events from backend */}
               {systemEvents.map((event, index) => (
                 <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50">
                   {getEventIcon(event.type)}
@@ -205,6 +231,7 @@ const SystemDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* TODO: Replace with real service status/uptime from backend */}
             {services.map((service, index) => (
               <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                 <div>

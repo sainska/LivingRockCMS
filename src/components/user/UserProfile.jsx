@@ -26,10 +26,14 @@ import {
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useToast } from '@/hooks/use-toast';
+import PasswordStrengthIndicator from '@/components/ui/PasswordStrengthIndicator';
+import { validatePasswordComplete } from '@/utils/passwordValidation';
 
 const UserProfile = () => {
-  const { user } = useAuth();
+  const { user, changePassword } = useAuth();
   const { role } = useUserRole();
+  const { toast } = useToast();
 
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -95,13 +99,41 @@ const UserProfile = () => {
     // In a real app, this would save to the database
   };
 
-  const handleChangePassword = () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      console.error('Passwords do not match');
+  const handleChangePassword = async () => {
+    // Validate password
+    const validation = validatePasswordComplete(
+      passwordData.newPassword, 
+      passwordData.confirmPassword, 
+      {
+        email: user?.email,
+        firstName: profileData.firstName,
+        lastName: profileData.lastName
+      }
+    );
+
+    if (!validation.isValid) {
+      toast({
+        title: "Password Validation Failed",
+        description: validation.errors.join(", "),
+        variant: "destructive",
+      });
       return;
     }
-    console.log('Changing password...');
-    // In a real app, this would call the auth service
+
+    try {
+      const { error } = await changePassword(passwordData.currentPassword, passwordData.newPassword);
+      
+      if (!error) {
+        // Clear password fields after successful change
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: ""
+        });
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+    }
   };
 
   const getRoleDisplayName = (role) => {
@@ -371,7 +403,24 @@ const UserProfile = () => {
                   onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                 />
               </div>
-              <Button onClick={handleChangePassword}>
+              
+              {/* Password Strength Indicator */}
+              {passwordData.newPassword && (
+                <PasswordStrengthIndicator
+                  password={passwordData.newPassword}
+                  confirmPassword={passwordData.confirmPassword}
+                  userInfo={{
+                    email: user?.email,
+                    firstName: profileData.firstName,
+                    lastName: profileData.lastName
+                  }}
+                />
+              )}
+              
+              <Button 
+                onClick={handleChangePassword}
+                disabled={!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+              >
                 Change Password
               </Button>
             </CardContent>

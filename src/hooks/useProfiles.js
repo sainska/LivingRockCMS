@@ -16,7 +16,7 @@ export const useProfiles = () => {
         .from('profiles')
         .select(`
           *,
-          user_roles (
+          user_roles:user_roles!user_roles_user_id_fkey (
             role,
             is_active
           )

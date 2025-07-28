@@ -7,10 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Church, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import SocialLogin from "@/components/auth/SocialLogin";
+import MagicLink from "@/components/auth/MagicLink";
 
 const Auth = () => {
   const navigate = useNavigate();
   const { signIn, signUp, resetPassword, getUserRole, getDashboardRoute } = useAuth();
+  const { toast } = useToast();
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [registerData, setRegisterData] = useState({
@@ -66,9 +70,32 @@ const Auth = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
+    
+    if (!resetEmail || !resetEmail.trim()) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
-    await resetPassword(resetEmail);
+    
+    try {
+      const { error } = await resetPassword(resetEmail);
+      
+      if (!error) {
+        // Clear the email field on success
+        setResetEmail("");
+        // Switch back to login tab after successful reset request
+        setActiveTab("login");
+      }
+    } catch (error) {
+      console.error('Reset password error:', error);
+    } finally {
     setIsLoading(false);
+    }
   };
 
   return (
@@ -85,9 +112,10 @@ const Auth = () => {
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="login">Sign In</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
+              <TabsTrigger value="magic">Magic Link</TabsTrigger>
               <TabsTrigger value="reset">Reset</TabsTrigger>
             </TabsList>
 
@@ -144,6 +172,35 @@ const Auth = () => {
                   {isLoading ? "Signing in..." : "Sign In"}
                 </Button>
               </form>
+
+              <SocialLogin 
+                onSuccess={async () => {
+                  await new Promise((resolve) => setTimeout(resolve, 1000));
+                  const userRole = await getUserRole();
+                  if (userRole) {
+                    const dashboardRoute = getDashboardRoute(userRole);
+                    navigate(dashboardRoute);
+                  } else {
+                    navigate("/user-dashboard");
+                  }
+                }}
+              />
+            </TabsContent>
+
+            <TabsContent value="magic" className="space-y-4">
+              <MagicLink 
+                allowSignUp={true}
+                onSuccess={async () => {
+                  await new Promise((resolve) => setTimeout(resolve, 1000));
+                  const userRole = await getUserRole();
+                  if (userRole) {
+                    const dashboardRoute = getDashboardRoute(userRole);
+                    navigate(dashboardRoute);
+                  } else {
+                    navigate("/user-dashboard");
+                  }
+                }}
+              />
             </TabsContent>
 
             <TabsContent value="register" className="space-y-4">

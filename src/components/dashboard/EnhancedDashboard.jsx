@@ -304,6 +304,36 @@ const EnhancedDashboard = () => {
               <UserCheck className="h-6 w-6" />
               Take Attendance
             </Button>
+            <Card>
+              <CardHeader>
+                <CardTitle>Volunteer Opportunities</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => navigate('/volunteer')}>
+                  View & Sign Up
+                </Button>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>In-App Chat</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => navigate('/chat')}>
+                  Open Chat
+                </Button>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Event Tickets</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => navigate('/event-tickets')}>
+                  My Tickets
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </CardContent>
       </Card>

@@ -27,9 +27,13 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import PasswordStrengthIndicator from '@/components/ui/PasswordStrengthIndicator';
+import { validatePasswordComplete } from '@/utils/passwordValidation';
 
 const MemberSettings = () => {
-  const { user } = useAuth();
+  const { user, changePassword } = useAuth();
+  const { toast } = useToast();
   const [privacySettings, setPrivacySettings] = useState({
     profileVisibility: 'members',
     showPhone: true,
@@ -84,13 +88,41 @@ const MemberSettings = () => {
     // In real app, this would make an API call
   };
 
-  const handleChangePassword = () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      console.error('Passwords do not match');
+  const handleChangePassword = async () => {
+    // Validate password
+    const validation = validatePasswordComplete(
+      passwordData.newPassword, 
+      passwordData.confirmPassword, 
+      {
+        email: user?.email,
+        firstName: user?.user_metadata?.first_name,
+        lastName: user?.user_metadata?.last_name
+      }
+    );
+
+    if (!validation.isValid) {
+      toast({
+        title: "Password Validation Failed",
+        description: validation.errors.join(", "),
+        variant: "destructive",
+      });
       return;
     }
-    console.log('Changing password...');
-    // In real app, this would call the auth service
+
+    try {
+      const { error } = await changePassword(passwordData.currentPassword, passwordData.newPassword);
+      
+      if (!error) {
+        // Clear password fields after successful change
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: ""
+        });
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+    }
   };
 
   const toggleTwoFactor = () => {
@@ -518,7 +550,24 @@ const MemberSettings = () => {
                   />
                 </div>
 
-                <Button onClick={handleChangePassword} className="w-full">
+                {/* Password Strength Indicator */}
+                {passwordData.newPassword && (
+                  <PasswordStrengthIndicator
+                    password={passwordData.newPassword}
+                    confirmPassword={passwordData.confirmPassword}
+                    userInfo={{
+                      email: user?.email,
+                      firstName: user?.user_metadata?.first_name,
+                      lastName: user?.user_metadata?.last_name
+                    }}
+                  />
+                )}
+
+                <Button 
+                  onClick={handleChangePassword} 
+                  className="w-full"
+                  disabled={!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                >
                   Change Password
                 </Button>
               </CardContent>

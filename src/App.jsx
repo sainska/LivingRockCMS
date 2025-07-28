@@ -12,6 +12,10 @@ import DashboardRedirect from "./components/auth/DashboardRedirect";
 import Layout from "./components/layout/Layout";
 import Welcome from "./pages/Welcome";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
+import InvitationAccept from "./pages/InvitationAccept";
+import EmailChangeConfirmation from "./pages/EmailChangeConfirmation";
+import ReauthenticationConfirmation from "./pages/ReauthenticationConfirmation";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RoleSelection from "./pages/RoleSelection";
@@ -20,12 +24,13 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import SystemDashboard from "./components/admin/SystemDashboard";
 import TreasurerDashboard from "./components/admin/TreasurerDashboard";
+import AccountActivation from "./components/admin/AccountActivation";
+import UserManagement from "./components/admin/UserManagement";
 import SecretaryDashboard from "./components/admin/SecretaryDashboard";
 import ClergyDashboard from "./components/admin/ClergyDashboard";
 import UserDashboard from "./components/admin/UserDashboard";
 import ChurchSettings from "./components/settings/ChurchSettings";
 import SystemSettings from "./components/settings/SystemSettings";
-import UserManagement from "./components/settings/UserManagement";
 import BackupSettings from "./components/settings/BackupSettings";
 import SecurityOverview from "./components/security/SecurityOverview";
 import UserAccessControl from "./components/security/UserAccessControl";
@@ -113,6 +118,11 @@ import UserAccessReport from './components/treasurer/UserAccessReport';
 import BackupRestoreReport from './components/treasurer/BackupRestoreReport';
 import SettingsDashboard from './pages/SettingsDashboard';
 import MemberGroups from "./components/member/MemberGroups";
+import SecretaryAnnouncements from './components/secretary/SecretaryAnnouncements';
+import SecretaryAlerts from './components/secretary/SecretaryAlerts';
+import Volunteer from './pages/Volunteer';
+import ChatPage from './pages/Chat';
+import EventTicketsPage from './pages/EventTickets';
 
 const queryClient = new QueryClient();
 
@@ -166,6 +176,10 @@ const App = () => {
               {/* Public Routes */}
               <Route path="/welcome" element={<Welcome />} />
               <Route path="/auth" element={<Auth />} />
+                      <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/auth/confirm-email-change" element={<EmailChangeConfirmation />} />
+        <Route path="/auth/reauthenticate" element={<ReauthenticationConfirmation />} />
+        <Route path="/invitation/accept" element={<InvitationAccept />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/role-selection" element={<RoleSelection />} />
@@ -204,6 +218,16 @@ const App = () => {
               <Route path="/admin-dashboard" element={
                 <RoleBasedRoute allowedRoles={['system_admin']}>
                   <Layout><AdminDashboard /></Layout>
+                </RoleBasedRoute>
+              } />
+              <Route path="/admin/account-activation" element={
+                <RoleBasedRoute allowedRoles={['system_admin']}>
+                  <Layout><AccountActivation /></Layout>
+                </RoleBasedRoute>
+              } />
+              <Route path="/admin/user-management" element={
+                <RoleBasedRoute allowedRoles={['system_admin']}>
+                  <Layout><UserManagement /></Layout>
                 </RoleBasedRoute>
               } />
               <Route path="/system-dashboard" element={
@@ -293,6 +317,8 @@ const App = () => {
                 <Route path="tools/templates" element={<SecretaryDocumentTemplates />} />
                 <Route path="tools/settings" element={<SecretarySettings />} />
                 <Route path="tools/roles" element={<SecretaryProfileRoleManagement />} />
+                <Route path="announcements" element={<SecretaryAnnouncements />} />
+                <Route path="alerts" element={<SecretaryAlerts />} />
               </Route>
               <Route path="/clergy-dashboard" element={
                 <RoleBasedRoute allowedRoles={['clergy', 'system_admin']}>
@@ -451,6 +477,9 @@ const App = () => {
               } />
 
               <Route path="/prayers" element={<PrayerRequests />} />
+              <Route path="/volunteer" element={<Volunteer />} />
+              <Route path="/chat" element={<ChatPage />} />
+              <Route path="/event-tickets" element={<EventTicketsPage />} />
 
               <Route path="/ministry" element={
                 <RoleBasedRoute allowedRoles={['member', 'clergy', 'treasurer', 'secretary', 'system_admin']}>

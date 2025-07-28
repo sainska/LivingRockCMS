@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Church, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import PasswordStrengthIndicator from "@/components/ui/PasswordStrengthIndicator";
+import { validatePasswordComplete } from "@/utils/passwordValidation";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -39,10 +41,13 @@ const ResetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (formData.password !== formData.confirmPassword) {
+    // Validate password
+    const validation = validatePasswordComplete(formData.password, formData.confirmPassword);
+    
+    if (!validation.isValid) {
       toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match. Please try again.",
+        title: "Password Validation Failed",
+        description: validation.errors.join(", "),
         variant: "destructive",
       });
       return;
@@ -137,10 +142,18 @@ const ResetPassword = () => {
               </div>
             </div>
 
+            {/* Password Strength Indicator */}
+            {formData.password && (
+              <PasswordStrengthIndicator
+                password={formData.password}
+                confirmPassword={formData.confirmPassword}
+              />
+            )}
+
             <Button
               type="submit"
               className="w-full bg-xiracom-blue hover:bg-xiracom-darkblue"
-              disabled={isLoading || formData.password !== formData.confirmPassword}
+              disabled={isLoading || !formData.password || !formData.confirmPassword}
             >
               {isLoading ? "Updating Password..." : "Update Password"}
             </Button>
