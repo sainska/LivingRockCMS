@@ -43,7 +43,7 @@ const Welcome = () => {
               <h1 className="text-lg font-bold text-church-purple">Living Rock Church</h1>
               <p className="text-church-purple/80 text-xs flex items-center gap-1">
                 <MapPin className="h-2 w-2" />
-                Nairobi, Kenya
+                Eldoret, Kenya
               </p>
             </div>
           </div>
@@ -80,7 +80,7 @@ const Welcome = () => {
           </h2>
           
           <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-4xl mx-auto leading-relaxed animate-fade-in-up" style={{animationDelay: '0.6s'}}>
-            From the highlands of Mount Kenya to the coastal regions of Mombasa, 
+            From the lowlands of Lake Victoria to the coastal regions of Mombasa, 
             streamline your church operations with our comprehensive management system. 
             <span className="text-savanna-gold font-semibold">Built for African churches, by African innovators.</span>
           </p>

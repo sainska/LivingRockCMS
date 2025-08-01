@@ -1,0 +1,19 @@
+# Gmail SMTP Configuration Template
+# Replace the values below with your actual Gmail credentials
+
+# Gmail SMTP Settings
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-gmail@gmail.com
+SMTP_PASS=your-16-character-app-password
+SMTP_FROM=your-gmail@gmail.com
+
+# Test email
+TEST_EMAIL=kogoallan593@gmail.com
+
+# Instructions:
+# 1. Enable 2-Factor Authentication on your Gmail account
+# 2. Generate an App Password in Google Account settings
+# 3. Replace 'your-gmail@gmail.com' with your actual Gmail address
+# 4. Replace 'your-16-character-app-password' with the app password from Google
+# 5. Copy these settings to your .env file 

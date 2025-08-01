@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthLayout } from "@/components/auth/AuthLayout";
+import TwoFactorAuth from "@/components/auth/TwoFactorAuth";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [show2FA, setShow2FA] = useState(false);
+  const [twoFactorData, setTwoFactorData] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,10 +28,23 @@ const Login = () => {
     console.log('Login: Starting login process...');
     
     try {
-      const { error } = await signIn(formData.email, formData.password);
+      const { error, requires2FA, twoFactorMethod, userName } = await signIn(formData.email, formData.password);
       
       if (error) {
         console.error('Login: Login failed with error:', error);
+        setIsLoading(false);
+        return;
+      }
+
+      // Check if 2FA is required
+      if (requires2FA) {
+        console.log('Login: 2FA required, showing 2FA form');
+        setTwoFactorData({
+          email: formData.email,
+          method: twoFactorMethod,
+          userName: userName
+        });
+        setShow2FA(true);
         setIsLoading(false);
         return;
       }
@@ -56,6 +72,44 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  const handle2FASuccess = async () => {
+    console.log('Login: 2FA verification successful, redirecting...');
+    
+    // Wait a moment for the session to be established
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Get user role and redirect to appropriate dashboard
+    const userRole = await getUserRole();
+    console.log('Login: User role retrieved:', userRole);
+    
+    if (userRole) {
+      const dashboardRoute = getDashboardRoute(userRole);
+      console.log('Login: Redirecting to dashboard:', dashboardRoute);
+      navigate(dashboardRoute);
+    } else {
+      console.log('Login: No role found, redirecting to user dashboard');
+      navigate('/user-dashboard');
+    }
+  };
+
+  const handleBackToLogin = () => {
+    setShow2FA(false);
+    setTwoFactorData(null);
+  };
+
+  // Show 2FA component if 2FA is required
+  if (show2FA && twoFactorData) {
+    return (
+      <TwoFactorAuth
+        email={twoFactorData.email}
+        method={twoFactorData.method}
+        userName={twoFactorData.userName}
+        onVerificationSuccess={handle2FASuccess}
+        onBack={handleBackToLogin}
+      />
+    );
+  }
 
   return (
     <AuthLayout 

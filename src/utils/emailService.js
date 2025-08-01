@@ -293,6 +293,60 @@ export const isValidEmail = (email) => {
 };
 
 /**
+ * Send 2FA verification code email
+ * @param {string} email - User's email address
+ * @param {string} code - 6-digit verification code
+ * @param {string} userName - User's name
+ * @returns {Promise<Object>} - Result of the email sending operation
+ */
+export const send2FAVerificationEmail = async (email, code, userName) => {
+  try {
+    const emailData = {
+      to: email,
+      subject: `Two-Factor Authentication - Living Rock Church Management System`,
+      template: 'two-factor-auth',
+      templateData: {
+        SiteURL: window.location.origin,
+        Email: email,
+        UserName: userName,
+        Token: code,
+        RequestTime: new Date().toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      }
+    };
+
+    console.log('Sending 2FA verification email with data:', emailData);
+    
+    // Call the email API endpoint
+    const response = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(emailData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to send email');
+    }
+    
+    const result = await response.json();
+    console.log('2FA email sent successfully:', result);
+    
+    return { success: true, message: '2FA verification email sent successfully' };
+  } catch (error) {
+    console.error('Error sending 2FA verification email:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
  * Generate email template variables for common use cases
  * @param {Object} data - Data to generate variables from
  * @returns {Object} - Template variables object

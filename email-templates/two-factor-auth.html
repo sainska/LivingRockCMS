@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Two-Factor Authentication - Living Rock Church Management System</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    /* Email wrapper */
+    .email-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+    }
+    
+    /* Header with gradient */
+    .email-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 40px 30px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Floating background elements */
+    .header-bg-element {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .bg-element-1 {
+      width: 80px;
+      height: 80px;
+      background: #fbbf24;
+      top: 20px;
+      left: 20px;
+      animation-delay: 0s;
+    }
+    
+    .bg-element-2 {
+      width: 60px;
+      height: 60px;
+      background: #10b981;
+      top: 40px;
+      right: 30px;
+      animation-delay: 2s;
+    }
+    
+    .bg-element-3 {
+      width: 40px;
+      height: 40px;
+      background: #f59e0b;
+      bottom: 30px;
+      left: 50px;
+      animation-delay: 4s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    /* Church logo and branding */
+    .church-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    
+    .church-name {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .church-location {
+      color: #e2e8f0;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    
+    /* Main content */
+    .email-content {
+      padding: 40px 30px;
+    }
+    
+    /* 2FA Badge */
+    .twofa-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+    }
+    
+    /* Main heading */
+    h1 {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Subtitle */
+    .subtitle {
+      font-size: 18px;
+      color: #6b7280;
+      text-align: center;
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+    
+    /* Content text */
+    .content-text {
+      font-size: 16px;
+      color: #374151;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .highlight {
+      color: #8b5cf6;
+      font-weight: 600;
+    }
+    
+    /* Verification Code Section */
+    .verification-section {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 2px solid #0ea5e9;
+      border-radius: 16px;
+      padding: 30px;
+      margin: 30px 0;
+      text-align: center;
+    }
+    
+    .verification-title {
+      color: #0c4a6e;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .verification-description {
+      color: #0369a1;
+      font-size: 16px;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+    
+    /* Code Display */
+    .code-container {
+      background: white;
+      border: 3px solid #0ea5e9;
+      border-radius: 12px;
+      padding: 25px;
+      margin: 20px 0;
+      box-shadow: 0 8px 20px rgba(14, 165, 233, 0.15);
+    }
+    
+    .code-label {
+      color: #0c4a6e;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    
+    .verification-code {
+      font-size: 36px;
+      font-weight: bold;
+      color: #0c4a6e;
+      letter-spacing: 8px;
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 2px 4px rgba(14, 165, 233, 0.1);
+    }
+    
+    /* Instructions */
+    .instructions-section {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 25px;
+      margin: 30px 0;
+    }
+    
+    .instructions-title {
+      color: #1f2937;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .instructions-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .instructions-list li {
+      color: #4b5563;
+      font-size: 14px;
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+    
+    .instructions-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: bold;
+    }
+    
+    /* Security section */
+    .security-section {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 1px solid #10b981;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 30px 0;
+    }
+    
+    .security-title {
+      color: #065f46;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .security-text {
+      color: #047857;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    /* Info section */
+    .info-section {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 1px solid #f59e0b;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 30px 0;
+    }
+    
+    .info-title {
+      color: #92400e;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .info-text {
+      color: #b45309;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    /* Trust indicators */
+    .trust-section {
+      text-align: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: 12px;
+      border: 1px solid #0ea5e9;
+    }
+    
+    .trust-title {
+      color: #0c4a6e;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    
+    .trust-items {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #0369a1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .trust-icon {
+      width: 16px;
+      height: 16px;
+      background: #0ea5e9;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 8px;
+    }
+    
+    /* Footer */
+    .email-footer {
+      background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+      padding: 30px;
+      text-align: center;
+      color: white;
+    }
+    
+    .footer-content {
+      margin-bottom: 20px;
+    }
+    
+    .footer-text {
+      color: #d1d5db;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .footer-link {
+      color: #fbbf24;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+    
+    .footer-copyright {
+      color: #9ca3af;
+      font-size: 12px;
+      border-top: 1px solid #374151;
+      padding-top: 20px;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 600px) {
+      .email-wrapper {
+        margin: 0;
+        border-radius: 0;
+      }
+      
+      .email-header,
+      .email-content,
+      .email-footer {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .verification-code {
+        font-size: 28px;
+        letter-spacing: 6px;
+      }
+      
+      .trust-items {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <!-- Header Section -->
+    <div class="email-header">
+      <!-- Floating background elements -->
+      <div class="header-bg-element bg-element-1"></div>
+      <div class="header-bg-element bg-element-2"></div>
+      <div class="header-bg-element bg-element-3"></div>
+      
+      <!-- Church branding -->
+      <div class="church-logo">
+        <div class="logo-icon">⛪</div>
+        <div>
+          <div class="church-name">Living Rock Church</div>
+          <div class="church-location">📍 Nairobi, Kenya</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="email-content">
+      <!-- 2FA Badge -->
+      <div class="twofa-badge">🔐 Two-Factor Authentication</div>
+      
+      <!-- Main heading -->
+      <h1>
+        <span class="gradient-text">Confirm</span> Reauthentication
+      </h1>
+      
+      <!-- Subtitle -->
+      <p class="subtitle">
+        Enter the verification code below to complete your <strong>Living Rock Church Management System</strong> login
+      </p>
+      
+      <!-- Main content -->
+      <p class="content-text">
+        Hello <strong>{{ .UserName }}</strong>,
+      </p>
+      
+      <p class="content-text">
+        We've detected a login attempt to your <span class="highlight">Living Rock Church Management System</span> account. To ensure your account security, please enter the verification code below to complete the authentication process.
+      </p>
+      
+      <!-- Verification Code Section -->
+      <div class="verification-section">
+        <div class="verification-title">
+          <span>🔐</span>
+          Your Verification Code
+        </div>
+        <div class="verification-description">
+          Enter this code in the verification field to complete your login:
+        </div>
+        
+        <div class="code-container">
+          <div class="code-label">Verification Code</div>
+          <div class="verification-code">{{ .Token }}</div>
+        </div>
+      </div>
+      
+      <!-- Instructions Section -->
+      <div class="instructions-section">
+        <div class="instructions-title">
+          <span>📋</span>
+          How to Use This Code
+        </div>
+        <ul class="instructions-list">
+          <li>Return to the login page where you were prompted for verification</li>
+          <li>Enter the 6-digit code shown above in the verification field</li>
+          <li>Click "Verify" or "Submit" to complete your login</li>
+          <li>This code will expire in 10 minutes for your security</li>
+        </ul>
+      </div>
+      
+      <!-- Security section -->
+      <div class="security-section">
+        <div class="security-title">
+          <span>🛡️</span>
+          Security Information
+        </div>
+        <div class="security-text">
+          This verification code is unique to your account and will expire in 10 minutes. If you didn't attempt to log in, please change your password immediately and contact support.
+        </div>
+      </div>
+      
+      <!-- Info section -->
+      <div class="info-section">
+        <div class="info-title">
+          <span>⚠️</span>
+          Important Notice
+        </div>
+        <div class="info-text">
+          Never share this verification code with anyone, including support staff. Our team will never ask for your verification codes via email, phone, or chat.
+        </div>
+      </div>
+      
+      <!-- Trust Indicators -->
+      <div class="trust-section">
+        <h4 class="trust-title">Your Security is Our Priority</h4>
+        <div class="trust-items">
+          <div class="trust-item">
+            <div class="trust-icon">✓</div>
+            <span>Two-Factor Security</span>
+          </div>
+          <div class="trust-item">
+            <div class="trust-icon">✓</div>
+            <span>Real-Time Monitoring</span>
+          </div>
+          <div class="trust-item">
+            <div class="trust-icon">✓</div>
+            <span>Instant Support</span>
+          </div>
+        </div>
+      </div>
+      
+      <p class="content-text">
+        If you didn't attempt to log in or need assistance, please contact our support team immediately at <strong>support@livingrockchurch.com</strong>.
+      </p>
+      
+      <p class="content-text">
+        <strong>— The Living Rock Church Team</strong><br>
+        <em>Empowering churches from Mount Kenya to the Indian Ocean</em>
+      </p>
+    </div>
+    
+    <!-- Footer -->
+    <div class="email-footer">
+      <div class="footer-content">
+        <p class="footer-text">
+          Questions about account security? Need help with verification?
+        </p>
+        <div class="footer-links">
+          <a href="mailto:support@livingrockchurch.com" class="footer-link">Contact Support</a>
+          <a href="https://livingrockchurch.com/help" class="footer-link">Help Center</a>
+          <a href="https://livingrockchurch.com/security" class="footer-link">Security Info</a>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        © 2025 Living Rock Church Management System. All rights reserved.<br>
+        Built with Love in Kenya by Xiracom Technologies
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

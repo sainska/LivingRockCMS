@@ -5,10 +5,30 @@ import { useToast } from '@/hooks/use-toast';
 import { 
   sendChangeEmailConfirmation, 
   sendPasswordResetEmail, 
-  sendReauthenticationEmail 
+  sendReauthenticationEmail,
+  send2FAVerificationEmail
 } from '@/utils/emailService';
+import { send2FAVerificationSMS } from '@/utils/smsService';
 
 const AuthContext = createContext(null);
+
+// Simple in-memory storage for 2FA codes (temporary solution)
+const twoFactorCodes = new Map();
+
+// Clean up expired codes every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [email, codeData] of twoFactorCodes.entries()) {
+    if (now > codeData.expiresAt) {
+      twoFactorCodes.delete(email);
+    }
+  }
+}, 5 * 60 * 1000); // 5 minutes
+
+// Debug function to check stored codes
+window.debug2FACodes = () => {
+  console.log('Current 2FA codes:', Array.from(twoFactorCodes.entries()));
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -115,15 +135,43 @@ export const AuthProvider = ({ children }) => {
           description: error.message,
           variant: "destructive",
         });
-      } else {
-        console.log('AuthContext: Sign in successful, user:', data.user);
+        return { error };
+      }
+
+      // Check if 2FA is enabled for this user
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('two_factor_enabled, two_factor_method, first_name, last_name')
+        .eq('email', email)
+        .single();
+
+      if (profileError) {
+        console.error('AuthContext: Error checking 2FA status:', profileError);
+        // Continue with normal login if we can't check 2FA status
         toast({
           title: "Login Successful",
           description: "Welcome to Living Rock Church Management System!",
         });
+        return { error: null };
       }
+
+      if (profileData?.two_factor_enabled) {
+        console.log('AuthContext: 2FA is enabled, returning 2FA required status');
+        return { 
+          error: null, 
+          requires2FA: true, 
+          twoFactorMethod: profileData.two_factor_method,
+          userName: `${profileData.first_name} ${profileData.last_name}`.trim() || email.split('@')[0]
+        };
+      }
+
+      console.log('AuthContext: Sign in successful, user:', data.user);
+      toast({
+        title: "Login Successful",
+        description: "Welcome to Living Rock Church Management System!",
+      });
       
-      return { error };
+      return { error: null };
     } catch (error) {
       console.error('AuthContext: Unexpected sign in error:', error);
       toast({
@@ -725,37 +773,309 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Check if email exists in database
+  const checkEmailExists = async (email) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email, is_activated')
+        .eq('email', email.toLowerCase())
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+        console.error('Error checking email existence:', error);
+        return { exists: false, error: 'Database error' };
+      }
+
+      return { 
+        exists: !!data, 
+        user: data,
+        error: null 
+      };
+    } catch (error) {
+      console.error('Error in checkEmailExists:', error);
+      return { exists: false, error: 'Unexpected error' };
+    }
+  };
+
+  const checkPhoneExists = async (phone) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, phone, is_activated')
+        .eq('phone', phone)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+        console.error('Error checking phone existence:', error);
+        return { exists: false, error: 'Database error' };
+      }
+
+      return { 
+        exists: !!data, 
+        user: data,
+        error: null 
+      };
+    } catch (error) {
+      console.error('Error in checkPhoneExists:', error);
+      return { exists: false, error: 'Unexpected error' };
+    }
+  };
+
   // Magic Link Authentication Methods
   const sendMagicLink = async (email) => {
-    try {
-      const redirectUrl = `${window.location.origin}/auth/callback`;
-      const { data, error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: redirectUrl,
-          shouldCreateUser: false, // Only allow existing users
-        }
+    console.log('🔍 Validating email:', email);
+    const { data: validationData, error: validationError } = await supabase
+      .rpc('send_validated_magic_link', {
+        email_address: email,
+        allow_signup: false
       });
+    console.log('📊 Validation result:', validationData);
+    console.log('❌ Validation error:', validationError);
+    if (validationError) {
+      console.error('Validation error:', validationError);
+      toast({ title: "Validation Failed", description: "Unable to validate email address", variant: "destructive" });
+      return { error: validationError };
+    }
+    if (!validationData.success) {
+      console.log('🚫 Validation failed, not sending email');
+      toast({ title: "Magic Link Failed", description: validationData.message, variant: "destructive" });
+      return { error: { message: validationData.message } };
+    }
+    console.log('✅ Validation passed, sending magic link');
+    const redirectUrl = `${window.location.origin}/auth/callback`;
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: redirectUrl, shouldCreateUser: false }
+    });
+    if (error) {
+      toast({ title: "Magic Link Failed", description: error.message, variant: "destructive" });
+      return { error };
+    }
+    toast({ title: "Magic Link Sent", description: "Check your email for a secure login link." });
+    return { data, error: null };
+  };
 
-      if (error) {
+  const send2FACode = async (email, method = 'email') => {
+    try {
+      console.log('AuthContext: Sending 2FA code to:', email, 'method:', method);
+      
+      // Get user profile to check available methods and get phone number
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, phone, email')
+        .eq('email', email)
+        .single();
+
+      if (profileError) {
+        console.error('AuthContext: Error fetching user profile:', profileError);
         toast({
-          title: "Magic Link Failed",
+          title: "Profile Error",
+          description: "Failed to load user profile.",
+          variant: "destructive",
+        });
+        return { error: profileError };
+      }
+
+      // Check if the requested method is available
+      if (method === 'sms' && !profileData.phone) {
+        toast({
+          title: "SMS Not Available",
+          description: "No phone number found for this user. Please use email verification.",
+          variant: "destructive",
+        });
+        return { error: new Error('No phone number available') };
+      }
+
+      // Generate a 2FA code directly (temporary solution while database functions are being fixed)
+      const generateCode = () => {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+      };
+      
+      // Check if there's already a valid code for this user
+      const existingCode = twoFactorCodes.get(email);
+      let codeData;
+      
+      if (existingCode && Date.now() < existingCode.expiresAt) {
+        console.log('AuthContext v2: Using existing code:', existingCode.code);
+        codeData = {
+          success: true,
+          code: existingCode.code,
+          message: '2FA code already exists'
+        };
+      } else {
+        const generatedCode = generateCode();
+        
+        // Store the code temporarily (expires in 10 minutes)
+        twoFactorCodes.set(email, {
+          code: generatedCode,
+          expiresAt: Date.now() + (10 * 60 * 1000), // 10 minutes
+          method: method
+        });
+        
+        codeData = {
+          success: true,
+          code: generatedCode,
+          message: '2FA code generated successfully'
+        };
+      }
+      
+              console.log('AuthContext v2: Generated 2FA code:', codeData.code);
+        console.log('AuthContext v2: Stored code for email:', email, 'data:', twoFactorCodes.get(email));
+
+      const userName = profileData ? 
+        `${profileData.first_name} ${profileData.last_name}`.trim() : 
+        email.split('@')[0];
+
+      // Send code via the selected method
+      console.log('AuthContext v2: Sending code via', method, 'code:', codeData.code);
+      
+      if (method === 'email') {
+        const emailResult = await send2FAVerificationEmail(email, codeData.code, userName);
+        if (!emailResult.success) {
+          toast({
+            title: "2FA Email Failed",
+            description: emailResult.error,
+            variant: "destructive",
+          });
+          return { error: new Error(emailResult.error) };
+        }
+      } else if (method === 'sms') {
+        const smsResult = await send2FAVerificationSMS(profileData.phone, codeData.code, userName);
+        if (!smsResult.success) {
+          toast({
+            title: "2FA SMS Failed",
+            description: smsResult.error,
+            variant: "destructive",
+          });
+          return { error: new Error(smsResult.error) };
+        }
+      }
+
+      console.log('AuthContext: 2FA code sent successfully via', method);
+      toast({
+        title: "2FA Code Sent",
+        description: method === 'email' ? "Check your email for the verification code." : "Check your phone for the SMS code.",
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('AuthContext: Error sending 2FA code:', error);
+      toast({
+        title: "2FA Code Failed",
+        description: "Failed to send verification code.",
+        variant: "destructive",
+      });
+      return { error };
+    }
+  };
+
+    const verify2FACode = async (email, code, method = 'email') => {
+    try {
+      console.log('AuthContext v2: Verifying 2FA code for:', email, 'code:', code, 'method:', method);
+      console.log('AuthContext v2: Current stored codes:', Array.from(twoFactorCodes.entries()));
+      
+      // Check against stored codes
+      const storedCodeData = twoFactorCodes.get(email);
+      
+      if (!storedCodeData) {
+        console.error('AuthContext: No 2FA code found for user');
+        toast({
+          title: "2FA Verification Failed",
+          description: "No verification code found. Please request a new code.",
+          variant: "destructive",
+        });
+        return { error: new Error('No verification code found') };
+      }
+      
+      // Check if code has expired
+      if (Date.now() > storedCodeData.expiresAt) {
+        twoFactorCodes.delete(email); // Clean up expired code
+        console.error('AuthContext: 2FA code has expired');
+        toast({
+          title: "2FA Verification Failed",
+          description: "Verification code has expired. Please request a new code.",
+          variant: "destructive",
+        });
+        return { error: new Error('Verification code has expired') };
+      }
+      
+      // Check if code matches
+      console.log('AuthContext v2: Comparing codes - entered:', code, 'stored:', storedCodeData.code, 'match:', code === storedCodeData.code);
+      
+      if (code === storedCodeData.code) {
+        // Remove the code after successful verification
+        twoFactorCodes.delete(email);
+        
+        console.log('AuthContext v2: 2FA verification successful');
+        toast({
+          title: "2FA Verification Successful",
+          description: "Welcome to Living Rock Church Management System!",
+        });
+        return { 
+          data: {
+            success: true,
+            message: '2FA verification successful'
+          }
+        };
+      } else {
+        console.error('AuthContext v2: Invalid 2FA code - entered:', code, 'expected:', storedCodeData.code);
+        toast({
+          title: "2FA Verification Failed",
+          description: "Invalid verification code. Please try again.",
+          variant: "destructive",
+        });
+        return { error: new Error('Invalid verification code') };
+      }
+    } catch (error) {
+      console.error('AuthContext: Unexpected error verifying 2FA code:', error);
+      toast({
+        title: "2FA Verification Failed",
+        description: "Failed to verify code.",
+        variant: "destructive",
+      });
+      return { error };
+    }
+  };
+
+  const enable2FA = async (email, method = 'email') => {
+    try {
+      console.log('AuthContext: Enabling 2FA for:', email, 'method:', method);
+      
+      const { data, error } = await supabase.rpc('enable_2fa_for_user', {
+        user_email: email,
+        method: method
+        });
+        
+        if (error) {
+        console.error('AuthContext: Error enabling 2FA:', error);
+        toast({
+          title: "2FA Enable Failed",
           description: error.message,
           variant: "destructive",
         });
-        return { error };
+          return { error };
+        }
+        
+      if (!data.success) {
+        console.error('AuthContext: 2FA enable failed:', data.message);
+        toast({
+          title: "2FA Enable Failed",
+          description: data.message,
+          variant: "destructive",
+        });
+        return { error: new Error(data.message) };
       }
 
+      console.log('AuthContext: 2FA enabled successfully');
       toast({
-        title: "Magic Link Sent",
-        description: "Check your email for a secure login link.",
+        title: "2FA Enabled",
+        description: "Two-factor authentication has been enabled successfully.",
       });
-
-      return { data, error: null };
+      return { data };
     } catch (error) {
-      console.error('Error in sendMagicLink:', error);
+      console.error('AuthContext: Unexpected error enabling 2FA:', error);
       toast({
-        title: "Magic Link Failed",
+        title: "2FA Enable Failed",
         description: "An unexpected error occurred",
         variant: "destructive",
       });
@@ -763,8 +1083,107 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const disable2FA = async (email) => {
+    try {
+      console.log('AuthContext: Disabling 2FA for:', email);
+      
+      const { data, error } = await supabase.rpc('disable_2fa_for_user', {
+        user_email: email
+        });
+        
+        if (error) {
+        console.error('AuthContext: Error disabling 2FA:', error);
+        toast({
+          title: "2FA Disable Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+          return { error };
+        }
+        
+      if (!data.success) {
+        console.error('AuthContext: 2FA disable failed:', data.message);
+        toast({
+          title: "2FA Disable Failed",
+          description: data.message,
+          variant: "destructive",
+        });
+        return { error: new Error(data.message) };
+      }
+
+      console.log('AuthContext: 2FA disabled successfully');
+      toast({
+        title: "2FA Disabled",
+        description: "Two-factor authentication has been disabled successfully.",
+      });
+      return { data };
+    } catch (error) {
+      console.error('AuthContext: Unexpected error disabling 2FA:', error);
+      toast({
+        title: "2FA Disable Failed",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return { error };
+    }
+  };
+
+  const get2FAStatus = async (email) => {
+    try {
+      console.log('AuthContext: Getting 2FA status for:', email);
+      
+      const { data, error } = await supabase.rpc('get_2fa_status', {
+        user_email: email
+        });
+        
+        if (error) {
+        console.error('AuthContext: Error getting 2FA status:', error);
+          return { error };
+        }
+        
+      if (!data.success) {
+        console.error('AuthContext: Get 2FA status failed:', data.message);
+        return { error: new Error(data.message) };
+      }
+
+      console.log('AuthContext: 2FA status retrieved successfully');
+      return { data };
+    } catch (error) {
+      console.error('AuthContext: Unexpected error getting 2FA status:', error);
+      return { error };
+    }
+  };
+
+  const get2FASystemStats = async () => {
+    try {
+      const { data, error } = await supabase.rpc('get_2fa_system_stats');
+      
+      if (error) {
+        console.error('AuthContext: Error getting 2FA system stats:', error);
+        return { error };
+      }
+
+      return { data };
+    } catch (error) {
+      console.error('AuthContext: Error getting 2FA system stats:', error);
+      return { error };
+    }
+  };
+
   const signInWithMagicLink = async (email) => {
     try {
+      // For signup, we can skip validation or do a basic check
+      const { data: validationData, error: validationError } = await supabase
+        .rpc('send_validated_magic_link', {
+          email_address: email,
+          allow_signup: true
+        });
+
+      if (validationError) {
+        console.error('Validation error:', validationError);
+        // For signup, we can still proceed even if validation fails
+      }
+
       const redirectUrl = `${window.location.origin}/auth/callback`;
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
@@ -989,6 +1408,14 @@ export const AuthProvider = ({ children }) => {
     signInWithMagicLink,
     changeEmailAddress,
     requireReauthentication,
+    checkEmailExists,
+    checkPhoneExists,
+    send2FACode,
+    verify2FACode,
+    enable2FA,
+    disable2FA,
+    get2FAStatus,
+    get2FASystemStats,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
